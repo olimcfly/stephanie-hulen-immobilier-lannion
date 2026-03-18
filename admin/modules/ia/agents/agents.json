@@ -1,0 +1,74 @@
+[
+  {
+    "id": "describer-property",
+    "name": "Descripteur de Biens",
+    "icon": "🏠",
+    "category": "Description",
+    "model": "Claude-3.5",
+    "description": "Génère des descriptions immobilières complètes et captivantes pour vos annonces.",
+    "prompt": "Tu es un expert en rédaction immobilière. Crée une description attractive d'une propriété basée sur ces informations: [INPUT]. La description doit être engageante, précise et optimisée pour le web."
+  },
+  {
+    "id": "blog-writer",
+    "name": "Rédacteur Blog",
+    "icon": "✍️",
+    "category": "Rédaction",
+    "model": "GPT-4",
+    "description": "Rédige des articles de blog optimisés SEO pour le marché immobilier.",
+    "prompt": "Tu es un journaliste immobilier expérimenté. Écris un article de blog sur: [INPUT]. L'article doit être informatif, bien structuré, avec au minimum 500 mots et optimisé pour le SEO immobilier."
+  },
+  {
+    "id": "email-generator",
+    "name": "Générateur d'Emails",
+    "icon": "📧",
+    "category": "Email",
+    "model": "Claude-3.5",
+    "description": "Crée des emails marketing et de prospection convaincants pour vos contacts.",
+    "prompt": "Tu es un expert en copywriting immobilier. Rédige un email marketing pour: [INPUT]. L'email doit être court, convaincant et avec un CTA clair."
+  },
+  {
+    "id": "social-media",
+    "name": "Content Réseaux Sociaux",
+    "icon": "📱",
+    "category": "Réseaux sociaux",
+    "model": "GPT-4",
+    "description": "Génère des posts optimisés pour Instagram, LinkedIn et Facebook.",
+    "prompt": "Tu es un expert en social media immobilier. Crée un post accrocheur pour: [INPUT]. Le post doit être court (140 caractères max), engageant et incluire des hashtags pertinents."
+  },
+  {
+    "id": "seo-titles",
+    "name": "Titres et Meta SEO",
+    "icon": "🔍",
+    "category": "SEO",
+    "model": "Claude-3.5",
+    "description": "Génère des titres et meta-descriptions optimisés pour le SEO.",
+    "prompt": "Tu es un expert en SEO immobilier. Crée 5 variations de titres et meta-descriptions pour: [INPUT]. Chaque titre doit faire 60 caractères max et être optimisé avec des mots-clés pertinents."
+  },
+  {
+    "id": "faq-generator",
+    "name": "Générateur FAQ",
+    "icon": "❓",
+    "category": "Rédaction",
+    "model": "GPT-4",
+    "description": "Crée des FAQ complètes pour vos pages immobilières.",
+    "prompt": "Tu es un expert immobilier. Crée une FAQ complète sur: [INPUT]. Inclus au minimum 10 questions/réponses pertinentes et utiles pour les prospects."
+  },
+  {
+    "id": "market-analysis",
+    "name": "Analyse de Marché",
+    "icon": "📊",
+    "category": "Marketing",
+    "model": "Claude-3.5",
+    "description": "Génère des analyses de marché et rapports sur les tendances immobilières.",
+    "prompt": "Tu es un analyste immobilier. Analyse le marché pour: [INPUT]. Fournis une analyse détaillée avec tendances, prix moyens et opportunités."
+  },
+  {
+    "id": "offer-copy",
+    "name": "Copywriter Offres",
+    "icon": "💼",
+    "category": "Marketing",
+    "model": "GPT-4",
+    "description": "Rédige des textes de présentation pour vos offres de services immobiliers.",
+    "prompt": "Tu es un copywriter immobilier. Crée un texte de présentation marketing pour: [INPUT]. Le texte doit être persuasif, centré sur les bénéfices et inclure un CTA."
+  }
+]

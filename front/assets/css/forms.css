@@ -1,0 +1,682 @@
+/**
+ * ===================================================
+ * FORMS.CSS - FORMULAIRES
+ * Site: Eduardo De Sul - Immobilier Bordeaux
+ * ===================================================
+ * 
+ * Pour: estimation, contact, simulation, 
+ *       merci-estimation, traitement-simulation
+ * 
+ * ===================================================
+ */
+
+
+/* ========================================
+   HERO ESTIMATION / CONTACT
+   ======================================== */
+.hero-estimation,
+.hero-contact {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: var(--white);
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.hero-estimation h1,
+.hero-contact h1 {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 800;
+    margin-bottom: 15px;
+    color: var(--white);
+}
+
+.hero-estimation .subtitle,
+.hero-contact .subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Benefits list dans hero */
+.hero-benefits {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.hero-benefit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-benefit::before {
+    content: '✓';
+    color: var(--white);
+    font-weight: 700;
+}
+
+
+/* ========================================
+   FORM CONTAINER
+   ======================================== */
+.form-section {
+    padding: var(--section-padding) 20px;
+    background-color: var(--bg-light);
+}
+
+.form-container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+
+/* ========================================
+   FORM STEPS INDICATOR
+   ======================================== */
+.form-steps {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 25px 30px;
+    background-color: var(--bg-light);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.form-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px;
+    position: relative;
+}
+
+.form-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -15px;
+    width: 30px;
+    height: 2px;
+    background-color: var(--border-color);
+}
+
+.form-step.active::after {
+    background-color: var(--primary);
+}
+
+.step-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--border-color);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all var(--transition-base);
+}
+
+.form-step.active .step-circle {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--white);
+}
+
+.form-step.completed .step-circle {
+    background-color: var(--success);
+    color: var(--white);
+}
+
+.form-step.completed .step-circle::before {
+    content: '✓';
+}
+
+.step-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.form-step.active .step-label {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+
+/* ========================================
+   FORM CONTENT
+   ======================================== */
+.form-content {
+    padding: 40px;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.form-header h2 {
+    color: var(--primary);
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.form-header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+
+/* ========================================
+   FORM GROUPS
+   ======================================== */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.form-group label .required {
+    color: var(--danger);
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group input[type="number"],
+.form-group input[type="url"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    color: var(--text-primary);
+    background-color: var(--white);
+    transition: all var(--transition-fast);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
+}
+
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error {
+    border-color: var(--danger);
+}
+
+.form-group textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.form-group .hint {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 6px;
+}
+
+.form-group .error-message {
+    font-size: 0.85rem;
+    color: var(--danger);
+    margin-top: 6px;
+}
+
+
+/* ========================================
+   RADIO & CHECKBOX OPTIONS
+   ======================================== */
+.radio-group,
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.radio-option,
+.checkbox-option {
+    position: relative;
+}
+
+.radio-option input,
+.checkbox-option input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.radio-option label,
+.checkbox-option label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background-color: var(--bg-light);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-weight: 500;
+}
+
+.radio-option label:hover,
+.checkbox-option label:hover {
+    border-color: var(--primary);
+    background-color: rgba(139, 0, 0, 0.03);
+}
+
+.radio-option input:checked + label,
+.checkbox-option input:checked + label {
+    border-color: var(--primary);
+    background-color: rgba(139, 0, 0, 0.08);
+    color: var(--primary);
+}
+
+.radio-option label .icon {
+    font-size: 1.3rem;
+}
+
+
+/* ========================================
+   FORM NAVIGATION
+   ======================================== */
+.form-navigation {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 35px;
+    padding-top: 25px;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-prev {
+    background-color: var(--bg-light);
+    color: var(--text-secondary);
+    padding: 14px 28px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.btn-prev:hover {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-next,
+.btn-submit {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--white);
+    padding: 14px 35px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.btn-next:hover,
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-primary);
+}
+
+.btn-next:disabled,
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+/* ========================================
+   CONTACT PAGE - 2 COLUMNS LAYOUT
+   ======================================== */
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 40px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.contact-form {
+    background: var(--white);
+    padding: 40px;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+}
+
+.contact-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.sidebar-card {
+    background: var(--white);
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.sidebar-card h3 {
+    color: var(--primary);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.sidebar-card p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+}
+
+.sidebar-card a {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+
+/* ========================================
+   MERCI / CONFIRMATION PAGE
+   ======================================== */
+.section-merci {
+    padding: 80px 20px;
+    text-align: center;
+    background: linear-gradient(180deg, var(--bg-light) 0%, var(--white) 100%);
+}
+
+.merci-container {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.merci-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, var(--success), #2f855a);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    margin: 0 auto 30px;
+    box-shadow: 0 10px 30px rgba(56, 161, 105, 0.3);
+}
+
+.merci-container h1 {
+    color: var(--primary);
+    margin-bottom: 20px;
+}
+
+.merci-container p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+/* Recap Grid */
+.recap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 40px 0;
+    text-align: left;
+}
+
+.recap-item {
+    background: var(--white);
+    padding: 20px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.recap-item .label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+}
+
+.recap-item .value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Info Box */
+.info-box {
+    background-color: var(--bg-beige);
+    padding: 25px;
+    border-radius: var(--radius-lg);
+    margin: 30px 0;
+    text-align: left;
+}
+
+.info-box h3 {
+    color: var(--primary);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.info-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info-box li {
+    padding-left: 25px;
+    position: relative;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.info-box li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+}
+
+/* Merci CTA */
+.merci-cta {
+    margin-top: 40px;
+}
+
+.merci-cta .cta-btn {
+    margin: 10px;
+}
+
+
+/* ========================================
+   SIMPLE FORM (simulation.php)
+   ======================================== */
+.form-estimation-simple {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--white);
+    padding: 40px;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+}
+
+.form-estimation-simple h2 {
+    color: var(--primary);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-content {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 992px) {
+    .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .contact-sidebar {
+        order: -1;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .sidebar-card {
+        flex: 1;
+        min-width: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-estimation,
+    .hero-contact {
+        padding: 60px 20px;
+    }
+    
+    .hero-estimation h1,
+    .hero-contact h1 {
+        font-size: 1.6rem;
+    }
+    
+    .hero-benefits {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .form-steps {
+        padding: 20px 15px;
+        overflow-x: auto;
+    }
+    
+    .form-step {
+        padding: 0 12px;
+    }
+    
+    .step-label {
+        display: none;
+    }
+    
+    .form-content {
+        padding: 30px 20px;
+    }
+    
+    .form-navigation {
+        flex-direction: column-reverse;
+    }
+    
+    .btn-prev,
+    .btn-next,
+    .btn-submit {
+        width: 100%;
+    }
+    
+    .radio-group,
+    .checkbox-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .contact-form {
+        padding: 30px 20px;
+    }
+    
+    .sidebar-card {
+        min-width: 100%;
+    }
+    
+    .section-merci {
+        padding: 60px 20px;
+    }
+    
+    .recap-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-estimation,
+    .hero-contact {
+        padding: 50px 15px;
+    }
+    
+    .form-content {
+        padding: 25px 15px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 12px 14px;
+    }
+    
+    .radio-option label,
+    .checkbox-option label {
+        padding: 14px 16px;
+    }
+    
+    .contact-form,
+    .form-estimation-simple {
+        padding: 25px 15px;
+    }
+    
+    .merci-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 2.5rem;
+    }
+}

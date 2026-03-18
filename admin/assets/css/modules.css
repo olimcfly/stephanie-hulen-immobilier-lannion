@@ -1,0 +1,219 @@
+/**
+ * ══════════════════════════════════════════════════════════════════════
+ *  IMMO LOCAL+ — Modules CSS
+ *  /admin/assets/css/modules.css
+ *
+ *  Variantes et extensions de admin-components.css.
+ *  Chargé dans admin/layout/header.php après admin-components.css.
+ *  ⚠️ Aucun style inline (<style>) n'est autorisé dans les modules.
+ * ══════════════════════════════════════════════════════════════════════
+ */
+
+
+/* ══════════════════════════════════════════════════════════════
+   ADMIN TOPBAR
+   Barre de navigation principale en haut de l'admin
+   ══════════════════════════════════════════════════════════════ */
+
+.admin-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 52px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 16px;
+}
+.admin-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .85rem;
+    color: var(--text-2);
+    min-width: 0;
+}
+.admin-topbar-brand {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: .82rem;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    white-space: nowrap;
+}
+.admin-topbar-sep {
+    color: var(--border);
+    font-size: 1rem;
+}
+.admin-topbar-title {
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.admin-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.admin-topbar-search {
+    width: 220px;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   ADMIN HEADER ICONS
+   Icônes de navigation rapide à droite du topbar
+   ══════════════════════════════════════════════════════════════ */
+
+.admin-header-icons {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+.admin-header-icon {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius);
+    color: var(--text-3);
+    text-decoration: none;
+    transition: all .15s var(--ease);
+    font-size: .85rem;
+}
+.admin-header-icon:hover {
+    background: var(--surface-2);
+    color: var(--accent);
+}
+.admin-header-icon.active {
+    background: var(--accent-bg);
+    color: var(--accent);
+}
+.admin-header-icon-logout:hover {
+    background: var(--red-bg);
+    color: var(--red);
+}
+
+/* Tooltip au survol via data-tip */
+.admin-header-icon[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: -32px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--sb-bg);
+    color: #fff;
+    font-size: .68rem;
+    font-weight: 500;
+    white-space: nowrap;
+    padding: 3px 8px;
+    border-radius: 5px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .15s;
+    z-index: 999;
+}
+.admin-header-icon[data-tip]:hover::after {
+    opacity: 1;
+}
+
+/* Séparateur vertical entre groupes d'icônes */
+.admin-header-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+    margin: 0 4px;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   MOD-HERO VARIANTE CLAIRE
+   Usage : class="mod-hero mod-hero-light"
+   ══════════════════════════════════════════════════════════════ */
+
+.mod-hero-light {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,.06));
+}
+.mod-hero-light::after {
+    display: none;
+}
+.mod-hero-light h1 {
+    color: var(--text);
+}
+.mod-hero-light p {
+    color: var(--text-3);
+}
+.mod-hero-light .mod-stat {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+}
+.mod-hero-light .mod-stat-value {
+    color: var(--text);
+}
+.mod-hero-light .mod-stat-label {
+    color: var(--text-3);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   MOD-HERO VARIANTE ACCENT (couleur primaire)
+   Usage : class="mod-hero mod-hero-accent"
+   ══════════════════════════════════════════════════════════════ */
+
+.mod-hero-accent {
+    background: linear-gradient(135deg, var(--accent), #4338ca);
+}
+
+
+/* Toolbar avec fond et bordure (variante encadrée) */
+.mod-toolbar-bordered {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    margin-top: 8px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MAINTENANCE MODULE
+   ══════════════════════════════════════════════════════════════ */
+
+/* Dot pulsant statut actif */
+@keyframes modPulseRed {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,.5); }
+    50%       { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
+}
+@keyframes modPulseGreen {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(5,150,105,.4); }
+    50%       { box-shadow: 0 0 0 8px rgba(5,150,105,0); }
+}
+
+.mod-pulse-red   { animation: modPulseRed   1.8s ease-in-out infinite; }
+.mod-pulse-green { animation: modPulseGreen 2s   ease-in-out infinite; }
+
+/* Boutons toggle ON/OFF maintenance (grands boutons pleine largeur) */
+.mod-toggle-btn {
+    width: 100%;
+    padding: 18px;
+    font-size: .95rem;
+    justify-content: center;
+    border-radius: var(--radius-lg);
+}
+.mod-toggle-btn.is-current {
+    box-shadow: 0 0 0 3px var(--accent-bg);
+    border-width: 2px;
+}
+.mod-toggle-btn-on.is-current  { box-shadow: 0 0 0 3px rgba(5,150,105,.25); }
+.mod-toggle-btn-off.is-current { box-shadow: 0 0 0 3px rgba(220,38,38,.25); }

@@ -1,0 +1,12 @@
+{
+    "builder": {
+        "enabled": false
+    },
+    "journal": {
+        "enabled": false
+    },
+    "sociallinkedin": {
+        "enabled": true,
+        "updated_at": "2026-03-12 23:31:10"
+    }
+}

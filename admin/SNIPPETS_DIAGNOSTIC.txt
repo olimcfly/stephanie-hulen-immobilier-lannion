@@ -1,0 +1,157 @@
+<!-- ══════════════════════════════════════════════════════════════
+     SNIPPETS DIAGNOSTIC — À COLLER DANS CHAQUE MODULE
+     /admin/SNIPPETS_DIAGNOSTIC.txt
+     ══════════════════════════════════════════════════════════════
+
+PRINCIPE : 3 modifications dans chaque index.php de module
+  1. Ajouter $activeTab en haut (PHP)
+  2. Ajouter le bloc onglets HTML après le banner
+  3. Wrapper le contenu existant dans if($activeTab === 'liste')
+     + ajouter le bloc elseif diagnostic
+
+FICHIER COMMUN requis : /admin/includes/diagnostic_tab.php
+══════════════════════════════════════════════════════════════ -->
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SNIPPET 1 — LIGNE PHP À AJOUTER EN HAUT (tous modules)
+     Juste après la connexion DB, avant les filtres
+══════════════════════════════════════════════════════════════ -->
+
+<?php $activeTab = $_GET['tab'] ?? 'liste'; ?>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SNIPPET 2 — BLOC ONGLETS HTML (adapté par module)
+     À insérer APRÈS le banner, AVANT la toolbar
+══════════════════════════════════════════════════════════════ -->
+
+
+<!-- ── MODULE : ANNUAIRE (?page=annuaire) ── -->
+<div class="mod-tabs">
+    <a href="?page=annuaire&tab=liste"      class="mod-tab <?= ($activeTab==='liste')       ? 'active' : '' ?>"><i class="fas fa-list"></i> Liste</a>
+    <a href="?page=annuaire&tab=diagnostic" class="mod-tab <?= ($activeTab==='diagnostic')  ? 'active' : '' ?>"><i class="fas fa-stethoscope"></i> Diagnostic</a>
+</div>
+
+
+<!-- ── MODULE : SECTEURS (?page=secteurs) ── -->
+<div class="mod-tabs">
+    <a href="?page=secteurs&tab=liste"      class="mod-tab <?= ($activeTab==='liste')       ? 'active' : '' ?>"><i class="fas fa-list"></i> Liste</a>
+    <a href="?page=secteurs&tab=diagnostic" class="mod-tab <?= ($activeTab==='diagnostic')  ? 'active' : '' ?>"><i class="fas fa-stethoscope"></i> Diagnostic</a>
+</div>
+
+
+<!-- ── MODULE : PAGES (?page=pages) ── -->
+<div class="mod-tabs">
+    <a href="?page=pages&tab=liste"      class="mod-tab <?= ($activeTab==='liste')       ? 'active' : '' ?>"><i class="fas fa-list"></i> Liste</a>
+    <a href="?page=pages&tab=diagnostic" class="mod-tab <?= ($activeTab==='diagnostic')  ? 'active' : '' ?>"><i class="fas fa-stethoscope"></i> Diagnostic</a>
+</div>
+
+
+<!-- ── MODULE : LEADS (?page=leads) ── -->
+<div class="mod-tabs">
+    <a href="?page=leads&tab=liste"      class="mod-tab <?= ($activeTab==='liste')       ? 'active' : '' ?>"><i class="fas fa-list"></i> Liste</a>
+    <a href="?page=leads&tab=diagnostic" class="mod-tab <?= ($activeTab==='diagnostic')  ? 'active' : '' ?>"><i class="fas fa-stethoscope"></i> Diagnostic</a>
+</div>
+
+
+<!-- ── MODULE : CRM (?page=crm) ── -->
+<div class="mod-tabs">
+    <a href="?page=crm&tab=liste"      class="mod-tab <?= ($activeTab==='liste')       ? 'active' : '' ?>"><i class="fas fa-list"></i> Liste</a>
+    <a href="?page=crm&tab=diagnostic" class="mod-tab <?= ($activeTab==='diagnostic')  ? 'active' : '' ?>"><i class="fas fa-stethoscope"></i> Diagnostic</a>
+</div>
+
+
+<!-- ── MODULE : BIENS / PROPERTIES (?page=properties) ── -->
+<div class="mod-tabs">
+    <a href="?page=properties&tab=liste"      class="mod-tab <?= ($activeTab==='liste')       ? 'active' : '' ?>"><i class="fas fa-list"></i> Liste</a>
+    <a href="?page=properties&tab=diagnostic" class="mod-tab <?= ($activeTab==='diagnostic')  ? 'active' : '' ?>"><i class="fas fa-stethoscope"></i> Diagnostic</a>
+</div>
+
+
+<!-- ── MODULE : ESTIMATIONS (?page=estimations) ── -->
+<div class="mod-tabs">
+    <a href="?page=estimations&tab=liste"      class="mod-tab <?= ($activeTab==='liste')       ? 'active' : '' ?>"><i class="fas fa-list"></i> Liste</a>
+    <a href="?page=estimations&tab=diagnostic" class="mod-tab <?= ($activeTab==='diagnostic')  ? 'active' : '' ?>"><i class="fas fa-stethoscope"></i> Diagnostic</a>
+</div>
+
+
+<!-- ── MODULE : RDV (?page=rdv) ── -->
+<div class="mod-tabs">
+    <a href="?page=rdv&tab=liste"      class="mod-tab <?= ($activeTab==='liste')       ? 'active' : '' ?>"><i class="fas fa-list"></i> Liste</a>
+    <a href="?page=rdv&tab=diagnostic" class="mod-tab <?= ($activeTab==='diagnostic')  ? 'active' : '' ?>"><i class="fas fa-stethoscope"></i> Diagnostic</a>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     CSS ONGLETS — À AJOUTER UNE SEULE FOIS dans le <style>
+     de chaque module (ou dans le CSS global admin)
+══════════════════════════════════════════════════════════════ -->
+<style>
+.mod-tabs {
+    display: flex; gap: 2px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 3px;
+    margin-bottom: 16px; width: fit-content;
+}
+.mod-tab {
+    padding: 7px 18px; border: none; background: transparent;
+    color: var(--text-2); font-size: 12.5px; font-weight: 600;
+    border-radius: 6px; cursor: pointer; transition: all .14s;
+    font-family: var(--font); display: flex; align-items: center;
+    gap: 6px; text-decoration: none; white-space: nowrap;
+}
+.mod-tab:hover  { color: var(--text); background: var(--surface-2); }
+.mod-tab.active { background: var(--accent); color: #fff; }
+</style>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SNIPPET 3 — WRAPPER CONTENU + BLOC DIAGNOSTIC
+     Structure finale identique pour tous les modules.
+     Remplacer MODULE_KEY par la clé du module.
+══════════════════════════════════════════════════════════════ -->
+
+<?php if ($activeTab === 'liste'): ?>
+
+    <!-- [... TOUT LE CONTENU EXISTANT DU MODULE ICI (inchangé) ...] -->
+    <!-- toolbar, sous-filtres, bulk, table-wrap, pagination -->
+
+<?php elseif ($activeTab === 'diagnostic'): ?>
+
+    <?php
+        // ── ANNUAIRE ──
+        $moduleKey = 'annuaire';
+        // ── SECTEURS ──       $moduleKey = 'secteurs';
+        // ── PAGES ──          $moduleKey = 'pages';
+        // ── LEADS ──          $moduleKey = 'leads';
+        // ── CRM ──            $moduleKey = 'crm';
+        // ── PROPERTIES ──     $moduleKey = 'properties';
+        // ── ESTIMATIONS ──    $moduleKey = 'estimations';
+        // ── RDV ──            $moduleKey = 'rdv';
+        // ── AI SETTINGS ──    $moduleKey = 'ai_settings';
+        // ── SETTINGS ──       $moduleKey = 'settings';
+
+        require_once dirname(dirname(dirname(__DIR__))) . '/includes/diagnostic_tab.php';
+    ?>
+
+<?php endif; ?>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     RÉCAPITULATIF CHEMIN require_once selon profondeur
+     (adapter selon l'emplacement du fichier module)
+══════════════════════════════════════════════════════════════
+
+  /admin/modules/content/annuaire/index.php
+  → dirname × 3 = /admin
+  → require_once dirname(dirname(dirname(__DIR__))) . '/includes/diagnostic_tab.php';
+
+  /admin/modules/system/settings/ai/index.php
+  → dirname × 4 = /admin
+  → require_once dirname(dirname(dirname(dirname(__DIR__)))) . '/includes/diagnostic_tab.php';
+
+  Ou plus robuste (si BASE_PATH défini dans init.php) :
+  → require_once BASE_PATH . '/admin/includes/diagnostic_tab.php';
+
+══════════════════════════════════════════════════════════════ -->

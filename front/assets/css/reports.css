@@ -1,0 +1,568 @@
+/**
+ * ===================================================
+ * REPORTS.CSS - RAPPORTS & STATISTIQUES
+ * Site: Eduardo De Sul - Immobilier Bordeaux
+ * ===================================================
+ * 
+ * Pour: rapport-marche, prix-immobilier-bordeaux,
+ *       pages avec tableaux et statistiques
+ * 
+ * ===================================================
+ */
+
+
+/* ========================================
+   SECTION BLOCKS
+   ======================================== */
+.section-block {
+    padding: var(--section-padding) 20px;
+}
+
+.section-block.grey {
+    background-color: var(--bg-light);
+}
+
+.section-block.beige {
+    background-color: var(--bg-beige);
+}
+
+
+/* ========================================
+   TABLE PRIX - TABLEAUX IMMOBILIERS
+   ======================================== */
+.table-prix {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 30px 0;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.table-prix thead {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+}
+
+.table-prix th {
+    padding: 18px 15px;
+    text-align: left;
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table-prix th:first-child {
+    padding-left: 25px;
+}
+
+.table-prix td {
+    padding: 16px 15px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.table-prix td:first-child {
+    padding-left: 25px;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.table-prix tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table-prix tbody tr:nth-child(even) {
+    background-color: var(--bg-light);
+}
+
+.table-prix tbody tr:hover {
+    background-color: rgba(139, 0, 0, 0.05);
+}
+
+/* Variation positive/négative */
+.table-prix .positive {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.table-prix .negative {
+    color: var(--danger);
+    font-weight: 600;
+}
+
+.table-prix .neutral {
+    color: var(--text-secondary);
+}
+
+
+/* ========================================
+   TABLE RESPONSIVE WRAPPER
+   ======================================== */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 25px 0;
+}
+
+.table-responsive table {
+    min-width: 600px;
+}
+
+
+/* ========================================
+   STAT BOX - STATISTIQUES
+   ======================================== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
+    margin: 40px 0;
+}
+
+.stat-box {
+    background: var(--white);
+    padding: 30px 25px;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-base);
+}
+
+.stat-box:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-box.primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--white);
+    border: none;
+    box-shadow: var(--shadow-primary);
+}
+
+.stat-box .stat-icon {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.stat-box .stat-number {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1;
+    margin-bottom: 10px;
+}
+
+.stat-box.primary .stat-number {
+    color: var(--white);
+}
+
+.stat-box .stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-box.primary .stat-label {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.stat-box .stat-change {
+    font-size: 0.85rem;
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+.stat-box .stat-change.up {
+    color: var(--success);
+}
+
+.stat-box .stat-change.down {
+    color: var(--danger);
+}
+
+
+/* ========================================
+   HIGHLIGHT BOX - ENCADRÉS
+   ======================================== */
+.highlight-box {
+    background: linear-gradient(135deg, rgba(139, 0, 0, 0.05), rgba(139, 0, 0, 0.1));
+    border-left: 5px solid var(--primary);
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    margin: 35px 0;
+}
+
+.highlight-box h3 {
+    color: var(--primary);
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+}
+
+.highlight-box p {
+    color: var(--text-primary);
+    line-height: 1.7;
+    margin-bottom: 0;
+}
+
+.highlight-box ul {
+    margin: 15px 0 0 0;
+    padding-left: 20px;
+}
+
+.highlight-box li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+
+/* ========================================
+   MARKET LIST - LISTES MARCHÉ
+   ======================================== */
+.market-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.market-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.market-list li:last-child {
+    border-bottom: none;
+}
+
+.market-list .label {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.market-list .value {
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+
+/* ========================================
+   ADVICE LIST - CONSEILS
+   ======================================== */
+.advice-list {
+    background-color: var(--bg-beige);
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    margin: 30px 0;
+}
+
+.advice-list h3 {
+    color: var(--primary);
+    margin-bottom: 20px;
+}
+
+.advice-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.advice-list li {
+    padding: 12px 0 12px 35px;
+    position: relative;
+    border-bottom: 1px solid var(--border-light);
+    line-height: 1.6;
+}
+
+.advice-list li:last-child {
+    border-bottom: none;
+}
+
+.advice-list li::before {
+    content: '💡';
+    position: absolute;
+    left: 0;
+    font-size: 1.1rem;
+}
+
+
+/* ========================================
+   GRID QUARTERS - QUARTIERS RAPPORT
+   ======================================== */
+.grid-quarters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin: 40px 0;
+}
+
+.quarter-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-base);
+    border: 1px solid var(--border-color);
+}
+
+.quarter-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.quarter-card-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--white);
+    padding: 20px;
+}
+
+.quarter-card-header h3 {
+    color: var(--white);
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.quarter-card-body {
+    padding: 25px;
+}
+
+.quarter-card-body .price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.quarter-card-body .price small {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+}
+
+.quarter-card-body .trend {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.quarter-card-body .trend.up {
+    color: var(--success);
+}
+
+.quarter-card-body .trend.down {
+    color: var(--danger);
+}
+
+.quarter-card-footer {
+    padding: 15px 25px;
+    background-color: var(--bg-light);
+    border-top: 1px solid var(--border-color);
+}
+
+.quarter-card-footer a {
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+
+/* ========================================
+   CTA INNER - CTA DANS RAPPORT
+   ======================================== */
+.cta-inner {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--white);
+    padding: 50px 40px;
+    border-radius: var(--radius-xl);
+    text-align: center;
+    margin: 50px 0;
+    box-shadow: var(--shadow-primary);
+}
+
+.cta-inner h3 {
+    color: var(--white);
+    font-size: 1.6rem;
+    margin-bottom: 15px;
+}
+
+.cta-inner p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.05rem;
+    margin-bottom: 25px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cta-inner .btn-primary,
+.cta-inner .cta-btn {
+    background-color: var(--white);
+    color: var(--primary);
+}
+
+.cta-inner .btn-primary:hover,
+.cta-inner .cta-btn:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+
+/* ========================================
+   CHART CONTAINER (pour futurs graphiques)
+   ======================================== */
+.chart-container {
+    background: var(--white);
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin: 30px 0;
+}
+
+.chart-container h3 {
+    color: var(--primary);
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.chart-placeholder {
+    height: 300px;
+    background: linear-gradient(135deg, var(--bg-light), var(--bg-lighter));
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+}
+
+
+/* ========================================
+   COMPARISON TABLE
+   ======================================== */
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 30px 0;
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: 15px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.comparison-table th {
+    background: var(--primary);
+    color: var(--white);
+    font-weight: 600;
+}
+
+.comparison-table th:first-child {
+    background: var(--dark);
+}
+
+.comparison-table td:first-child {
+    background: var(--bg-light);
+    font-weight: 600;
+    text-align: left;
+}
+
+.comparison-table tr:nth-child(even) td:not(:first-child) {
+    background: var(--bg-light);
+}
+
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 992px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .grid-quarters {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-box {
+        padding: 25px 20px;
+    }
+    
+    .stat-box .stat-number {
+        font-size: 1.8rem;
+    }
+    
+    .table-prix th,
+    .table-prix td {
+        padding: 12px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .table-prix th:first-child,
+    .table-prix td:first-child {
+        padding-left: 15px;
+    }
+    
+    .highlight-box {
+        padding: 25px 20px;
+    }
+    
+    .advice-list {
+        padding: 25px 20px;
+    }
+    
+    .cta-inner {
+        padding: 40px 25px;
+    }
+    
+    .cta-inner h3 {
+        font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stat-box {
+        padding: 20px 15px;
+    }
+    
+    .stat-box .stat-number {
+        font-size: 1.5rem;
+    }
+    
+    .table-prix th,
+    .table-prix td {
+        padding: 10px 8px;
+        font-size: 0.8rem;
+    }
+    
+    .market-list li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .quarter-card-body {
+        padding: 20px;
+    }
+    
+    .quarter-card-body .price {
+        font-size: 1.3rem;
+    }
+    
+    .cta-inner {
+        padding: 30px 20px;
+    }
+}
