@@ -1,0 +1,75 @@
+RewriteEngine On
+RewriteBase /
+
+# ── Sécurité : bloquer accès aux fichiers sensibles ─────
+<FilesMatch "^\.|composer\.(json|lock)|package\.json|\.env|\.gitignore">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+RewriteRule ^config(/.*)?$          - [F,L]
+RewriteRule ^includes(/.*)?$        - [F,L]
+RewriteRule ^logs(/.*)?$            - [F,L]
+RewriteRule ^vendor(/.*)?$          - [F,L]
+RewriteRule ^front/helpers(/.*)?$   - [F,L]
+RewriteRule ^front/renderers(/.*)?$ - [F,L]
+
+# ── Fichiers et dossiers existants → servis directement ─
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# ── Zones statiques / admin → pass-through ──────────────
+RewriteRule ^admin(/.*)?$        - [L]
+RewriteRule ^api(/.*)?$          - [L]
+RewriteRule ^assets(/.*)?$       - [L]
+RewriteRule ^uploads(/.*)?$      - [L]
+RewriteRule ^front/assets(/.*)?$ - [L]
+
+# ── Captures ─────────────────────────────────────────────
+RewriteRule ^capture/([a-z0-9_-]+)/?$                    /front/router.php?_uri=capture/$1 [L,QSA]
+RewriteRule ^capture/([a-z0-9_-]+)/(form|merci|submit)/?$ /front/router.php?_uri=capture/$1&step=$2 [L,QSA]
+
+# ── Page merci ───────────────────────────────────────────
+RewriteRule ^merci/?$                                     /front/router.php?_uri=merci [L,QSA]
+
+# ── Blog ─────────────────────────────────────────────────
+RewriteRule ^blog/?$                                      /front/router.php?_uri=blog [L,QSA]
+RewriteRule ^blog/([a-z0-9_-]+)/?$                        /front/router.php?_uri=blog/$1 [L,QSA]
+
+# ── Secteurs ─────────────────────────────────────────────
+RewriteRule ^secteurs/?$                                  /front/router.php?_uri=secteurs [L,QSA]
+RewriteRule ^secteurs/([a-z0-9_-]+)/?$                    /front/router.php?_uri=secteurs/$1 [L,QSA]
+
+# ── Guides ───────────────────────────────────────────────
+RewriteRule ^guide-local/?$                               /front/router.php?_uri=guide-local [L,QSA]
+RewriteRule ^guide-local/([a-z0-9_-]+)/?$                 /front/router.php?_uri=guide-local/$1 [L,QSA]
+
+# ── Biens immobiliers ────────────────────────────────────
+RewriteRule ^biens-immobiliers/?$                         /front/router.php?_uri=biens [L,QSA]
+RewriteRule ^biens/([a-z0-9-]+)/?$                        /front/router.php?_uri=biens/$1 [L,QSA]
+
+# ── Pages génériques (slug simple) ───────────────────────
+RewriteCond %{REQUEST_URI} !^/front/router\.php
+RewriteRule ^([a-z0-9_-]+)/?$                             /front/router.php?_uri=$1 [L,QSA]
+
+# ── Cache navigateur ─────────────────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg             "access plus 1 month"
+    ExpiresByType image/png              "access plus 1 month"
+    ExpiresByType image/webp             "access plus 1 month"
+    ExpiresByType text/css               "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType font/woff2             "access plus 1 month"
+</IfModule>
+
+# ── Compression ──────────────────────────────────────────
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css
+    AddOutputFilterByType DEFLATE application/javascript application/json
+</IfModule>
+
+# ── Pages d'erreur ───────────────────────────────────────
+ErrorDocument 404 /front/router.php
+ErrorDocument 500 /front/500.php

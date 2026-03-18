@@ -1,0 +1,24 @@
+01:50:06 === REQUETE ===
+01:50:06 Clé API: sk-ant-api03-1RXXwOj...
+01:50:06 BDD OK
+01:50:06 Input: {"page_id":8,"action":"generate","description":"Votre projet immobilier à Bordeaux mérite un financement sur mesure\nDans le marché dynamique de l'immobilier bordelais, chaque projet d'acquisition 
+01:50:06 Page: 8, Action: generate
+01:50:06 Appel Claude...
+01:50:47 HTTP 200
+01:50:47 OK - 10047 chars
+02:26:45 === REQUETE ===
+02:26:45 Clé API: sk-ant-api03-1RXXwOj...
+02:26:45 BDD OK
+02:26:45 Input: {"page_id":8,"action":"css"}
+02:26:45 Page: 8, Action: css
+02:26:45 Appel Claude...
+02:26:50 HTTP 200
+02:26:50 OK - 644 chars
+02:26:54 === REQUETE ===
+02:26:54 Clé API: sk-ant-api03-1RXXwOj...
+02:26:54 BDD OK
+02:26:54 Input: {"page_id":8,"action":"js"}
+02:26:54 Page: 8, Action: js
+02:26:54 Appel Claude...
+02:27:17 HTTP 200
+02:27:17 OK - 7608 chars

@@ -1,0 +1,12 @@
+# ══════════════════════════════════════════════════════════════
+# Autoriser import templates
+# ══════════════════════════════════════════════════════════════
+RewriteCond %{REQUEST_URI} ^/admin/modules/system/templates/import-16-templates\.php$
+RewriteRule ^ - [L]
+
+# ══════════════════════════════════════════════════════════════
+# Autoriser diagnostic AVANT le bloc modules
+# ══════════════════════════════════════════════════════════════
+RewriteCond %{REQUEST_URI} ^/admin/modules/.*/diagnostic\.php$
+RewriteRule ^ - [L]
+# ... reste du code

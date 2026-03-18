@@ -1,0 +1,9 @@
+/* main.css */
+@import url('./admin-components.css');
+@import url('./builder.css');
+@import url('./dashboard.css');
+@import url('./maintenance.css');
+@import url('./modules.css');
+@import url('./secteurs-admin.css');
+@import url('./sidebar.css');
+@import url('./layout.css');

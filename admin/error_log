@@ -1,0 +1,20 @@
+[04-Mar-2026 23:04:52 Europe/Paris] Database connection failed: SQLSTATE[HY000] [1045] Access denied for user ''@'localhost' (using password: NO)
+[05-Mar-2026 02:36:40 Europe/Paris] Database connection failed: SQLSTATE[HY000] [1045] Access denied for user ''@'localhost' (using password: NO)
+[17-Mar-2026 13:29:56 Europe/Paris] [pages/index] Templates fallback: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'slug' in 'SELECT'
+[17-Mar-2026 13:33:22 Europe/Paris] [pages/index] Templates fallback: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'slug' in 'SELECT'
+[17-Mar-2026 13:49:19 Europe/Paris] [system/templates] SQLSTATE[42S22]: Column not found: 1054 Unknown column 'sort_order' in 'ORDER BY'
+[17-Mar-2026 15:02:04 Europe/Paris] [ressources] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'cool1933_cms-site-sh-lanion.strategy_guides' doesn't exist
+[17-Mar-2026 15:02:11 Europe/Paris] [ressources] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'cool1933_cms-site-sh-lanion.strategy_guides' doesn't exist
+[17-Mar-2026 15:02:14 Europe/Paris] [ressources] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'cool1933_cms-site-sh-lanion.strategy_guides' doesn't exist
+[17-Mar-2026 15:02:16 Europe/Paris] [ressources] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'cool1933_cms-site-sh-lanion.strategy_guides' doesn't exist
+[17-Mar-2026 15:02:17 Europe/Paris] [ressources] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'cool1933_cms-site-sh-lanion.strategy_guides' doesn't exist
+[17-Mar-2026 15:02:19 Europe/Paris] [ressources] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'cool1933_cms-site-sh-lanion.strategy_guides' doesn't exist
+[17-Mar-2026 15:02:21 Europe/Paris] [ressources] SQLSTATE[42S02]: Base table or view not found: 1146 Table 'cool1933_cms-site-sh-lanion.strategy_guides' doesn't exist
+[18-Mar-2026 01:59:17 Europe/Paris] Advisor context error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'instance_id' in 'WHERE'
+[18-Mar-2026 02:00:44 Europe/Paris] Advisor context error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'instance_id' in 'WHERE'
+[18-Mar-2026 02:01:08 Europe/Paris] Advisor context error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'instance_id' in 'WHERE'
+[18-Mar-2026 02:04:06 Europe/Paris] Advisor context error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'instance_id' in 'WHERE'
+[18-Mar-2026 02:04:20 Europe/Paris] Advisor context error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'instance_id' in 'WHERE'
+[18-Mar-2026 02:04:24 Europe/Paris] Advisor context error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'instance_id' in 'WHERE'
+[18-Mar-2026 02:04:42 Europe/Paris] Advisor context error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'instance_id' in 'WHERE'
+[18-Mar-2026 10:26:51 Europe/Paris] Advisor context error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'instance_id' in 'WHERE'

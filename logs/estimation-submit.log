@@ -1,0 +1,173 @@
+2026-03-01 22:07:18 | === NOUVELLE SOUMISSION ===
+2026-03-01 22:07:18 | POST keys: type_bien, projet, surface, pieces, chambres, etage, annee, etat, adresse, code_postal, ville, quartier, exterieur, prix_bas, prix_moyen, prix_haut, timeline, besoin_financement, demarches_banque, proprietaire, motivation, prenom, nom, email, telephone, pref_contact, commentaire, want_rdv, rgpd, source
+2026-03-01 22:07:18 | Config trouvé: /home/mahe6420/public_html/config/database.php
+2026-03-01 22:07:18 | DB connectée via Database::getInstance()
+2026-03-01 22:07:18 | Table estimation_settings OK
+2026-03-01 22:07:18 | Prix bruts: bas='258 000 €' moy='309 000 €' haut='368 000 €'
+2026-03-01 22:07:18 | Prix parsés: bas=258000 moy=309000 haut=368000
+2026-03-01 22:07:18 | Mappings: type=appartement cond=renovation timeline=immédiat need=oui seller=proprietaire
+2026-03-01 22:07:18 | SQL params: {":request_id":"EST-20260301-AA238",":address":"231 Rue Saint-Honoré, 75001, Paris (saint-pierre)",":property_type":"appartement",":surface":100,":rooms":2,":floor":"1",":cond":"renovation",":amenities":"terrasse",":special":"Construction : 1950-1970 | Extérieur : terrasse | Source : estimation",":name":"Olivier Colas",":email":"oliviercolas83@gmail.com",":phone":"07 85 61 17 00",":budget":null,":authority":"moi",":need":"oui",":timeline":"immédiat",":seller_type":"proprietaire",":price_low":258000,":price_mean":309000,":price_high":368000,":priority":"haute",":notes":"Message : test\nProjet : vente\nQuartier : saint-pierre\nChambres : 2\nContact préféré : telephone\nFinancement : oui\nDémarches banque : oui_accord"}
+2026-03-01 22:07:18 | ❌ INSERT FAILED: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'request_id' in 'INSERT INTO'
+2026-03-01 22:07:18 | SQL: INSERT INTO estimation_settings (
+        request_id, address, property_type, surface, rooms, floor,
+        `condition`, amenities, special_features,
+        name, email, phone,
+        bant_budget, bant_authority, bant_need, bant_timeline,
+        seller_type,
+        estimated_price_low, estimated_price_mean, estimated_price_high,
+        estimation_date,
+        status, priority, notes,
+        created_at
+    ) VALUES (
+        :request_id, :address, :property_type, :surface, :rooms, :floor,
+        :cond, :amenities, :special,
+        :name, :email, :phone,
+        :budget, :authority, :need, :timeline,
+        :seller_type,
+        :price_low, :price_mean, :price_high,
+        NOW(),
+        'nouveau', :priority, :notes,
+        NOW()
+    )
+2026-03-01 22:15:59 | === NOUVELLE SOUMISSION ===
+2026-03-01 22:15:59 | POST keys: type_bien, projet, surface, pieces, chambres, etage, annee, etat, adresse, code_postal, ville, quartier, exterieur, prix_bas, prix_moyen, prix_haut, timeline, besoin_financement, demarches_banque, proprietaire, motivation, prenom, nom, email, telephone, pref_contact, commentaire, want_rdv, rgpd, source
+2026-03-01 22:15:59 | Config trouvé: /home/mahe6420/public_html/config/database.php
+2026-03-01 22:15:59 | DB connectée via Database::getInstance()
+2026-03-01 22:15:59 | Table estimation_settings OK
+2026-03-01 22:15:59 | Prix bruts: bas='258 000 €' moy='309 000 €' haut='368 000 €'
+2026-03-01 22:15:59 | Prix parsés: bas=258000 moy=309000 haut=368000
+2026-03-01 22:15:59 | Mappings: type=appartement cond=renovation timeline=immédiat need=oui seller=proprietaire
+2026-03-01 22:15:59 | SQL params: {":request_id":"EST-20260301-F4477",":address":"231 Rue Saint-Honoré, 75001, Paris (saint-pierre)",":property_type":"appartement",":surface":100,":rooms":2,":floor":"1",":cond":"renovation",":amenities":"terrasse",":special":"Construction : 1950-1970 | Extérieur : terrasse | Source : estimation",":name":"Olivier Colas",":email":"oliviercolas83@gmail.com",":phone":"07 85 61 17 00",":budget":null,":authority":"moi",":need":"oui",":timeline":"immédiat",":seller_type":"proprietaire",":price_low":258000,":price_mean":309000,":price_high":368000,":priority":"haute",":notes":"Message : test\nProjet : vente\nQuartier : saint-pierre\nChambres : 2\nContact préféré : telephone\nFinancement : oui\nDémarches banque : oui_accord"}
+2026-03-01 22:15:59 | ❌ INSERT FAILED: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'address' in 'INSERT INTO'
+2026-03-01 22:15:59 | SQL: INSERT INTO estimation_settings (
+        request_id, address, property_type, surface, rooms, floor,
+        `condition`, amenities, special_features,
+        name, email, phone,
+        bant_budget, bant_authority, bant_need, bant_timeline,
+        seller_type,
+        estimated_price_low, estimated_price_mean, estimated_price_high,
+        estimation_date,
+        status, priority, notes,
+        created_at
+    ) VALUES (
+        :request_id, :address, :property_type, :surface, :rooms, :floor,
+        :cond, :amenities, :special,
+        :name, :email, :phone,
+        :budget, :authority, :need, :timeline,
+        :seller_type,
+        :price_low, :price_mean, :price_high,
+        NOW(),
+        'nouveau', :priority, :notes,
+        NOW()
+    )
+2026-03-01 22:17:08 | === NOUVELLE SOUMISSION ===
+2026-03-01 22:17:08 | POST keys: type_bien, projet, surface, pieces, chambres, etage, annee, etat, adresse, code_postal, ville, quartier, exterieur, prix_bas, prix_moyen, prix_haut, timeline, besoin_financement, demarches_banque, proprietaire, motivation, prenom, nom, email, telephone, pref_contact, commentaire, want_rdv, rgpd, source
+2026-03-01 22:17:08 | Config trouvé: /home/mahe6420/public_html/config/database.php
+2026-03-01 22:17:08 | DB connectée via Database::getInstance()
+2026-03-01 22:17:08 | Table estimation_settings OK
+2026-03-01 22:17:08 | Prix bruts: bas='444 000 €' moy='532 000 €' haut='634 000 €'
+2026-03-01 22:17:08 | Prix parsés: bas=444000 moy=532000 haut=634000
+2026-03-01 22:17:08 | Mappings: type=maison cond=moyen timeline=immédiat need=oui seller=proprietaire
+2026-03-01 22:17:08 | SQL params: {":request_id":"EST-20260301-2D6F7",":address":"231 Rue Saint-Honoré, 75001, Paris (meriadeck)",":property_type":"maison",":surface":100,":rooms":1,":floor":null,":cond":"moyen",":amenities":"balcon, terrasse, jardin, garage",":special":"Extérieur : balcon, terrasse, jardin, garage | Source : estimation",":name":"Olivier Colas",":email":"oliviercolas83@gmail.com",":phone":"07 85 61 17 00",":budget":null,":authority":"moi",":need":"oui",":timeline":"immédiat",":seller_type":"proprietaire",":price_low":444000,":price_mean":532000,":price_high":634000,":priority":"haute",":notes":"Projet : vente\nQuartier : meriadeck\nChambres : 2\nContact préféré : telephone\nFinancement : oui\nDémarches banque : oui_accord"}
+2026-03-01 22:17:08 | ❌ INSERT FAILED: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'address' in 'INSERT INTO'
+2026-03-01 22:17:08 | SQL: INSERT INTO estimation_settings (
+        request_id, address, property_type, surface, rooms, floor,
+        `condition`, amenities, special_features,
+        name, email, phone,
+        bant_budget, bant_authority, bant_need, bant_timeline,
+        seller_type,
+        estimated_price_low, estimated_price_mean, estimated_price_high,
+        estimation_date,
+        status, priority, notes,
+        created_at
+    ) VALUES (
+        :request_id, :address, :property_type, :surface, :rooms, :floor,
+        :cond, :amenities, :special,
+        :name, :email, :phone,
+        :budget, :authority, :need, :timeline,
+        :seller_type,
+        :price_low, :price_mean, :price_high,
+        NOW(),
+        'nouveau', :priority, :notes,
+        NOW()
+    )
+2026-03-01 22:17:18 | === NOUVELLE SOUMISSION ===
+2026-03-01 22:17:18 | POST keys: type_bien, projet, surface, pieces, chambres, etage, annee, etat, adresse, code_postal, ville, quartier, exterieur, prix_bas, prix_moyen, prix_haut, timeline, besoin_financement, demarches_banque, proprietaire, motivation, prenom, nom, email, telephone, pref_contact, commentaire, want_rdv, rgpd, source
+2026-03-01 22:17:18 | Config trouvé: /home/mahe6420/public_html/config/database.php
+2026-03-01 22:17:18 | DB connectée via Database::getInstance()
+2026-03-01 22:17:19 | Table estimation_settings OK
+2026-03-01 22:17:19 | Prix bruts: bas='444 000 €' moy='532 000 €' haut='634 000 €'
+2026-03-01 22:17:19 | Prix parsés: bas=444000 moy=532000 haut=634000
+2026-03-01 22:17:19 | Mappings: type=maison cond=moyen timeline=immédiat need=oui seller=proprietaire
+2026-03-01 22:17:19 | SQL params: {":request_id":"EST-20260301-9DB38",":address":"231 Rue Saint-Honoré, 75001, Paris (meriadeck)",":property_type":"maison",":surface":100,":rooms":1,":floor":null,":cond":"moyen",":amenities":"balcon, terrasse, jardin, garage",":special":"Extérieur : balcon, terrasse, jardin, garage | Source : estimation",":name":"Olivier Colas",":email":"oliviercolas83@gmail.com",":phone":"07 85 61 17 00",":budget":null,":authority":"moi",":need":"oui",":timeline":"immédiat",":seller_type":"proprietaire",":price_low":444000,":price_mean":532000,":price_high":634000,":priority":"haute",":notes":"Projet : vente\nQuartier : meriadeck\nChambres : 2\nContact préféré : telephone\nFinancement : oui\nDémarches banque : oui_accord"}
+2026-03-01 22:17:19 | ❌ INSERT FAILED: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'address' in 'INSERT INTO'
+2026-03-01 22:17:19 | SQL: INSERT INTO estimation_settings (
+        request_id, address, property_type, surface, rooms, floor,
+        `condition`, amenities, special_features,
+        name, email, phone,
+        bant_budget, bant_authority, bant_need, bant_timeline,
+        seller_type,
+        estimated_price_low, estimated_price_mean, estimated_price_high,
+        estimation_date,
+        status, priority, notes,
+        created_at
+    ) VALUES (
+        :request_id, :address, :property_type, :surface, :rooms, :floor,
+        :cond, :amenities, :special,
+        :name, :email, :phone,
+        :budget, :authority, :need, :timeline,
+        :seller_type,
+        :price_low, :price_mean, :price_high,
+        NOW(),
+        'nouveau', :priority, :notes,
+        NOW()
+    )
+2026-03-01 22:17:26 | === NOUVELLE SOUMISSION ===
+2026-03-01 22:17:26 | POST keys: type_bien, projet, surface, pieces, chambres, etage, annee, etat, adresse, code_postal, ville, quartier, exterieur, prix_bas, prix_moyen, prix_haut, timeline, besoin_financement, demarches_banque, proprietaire, motivation, prenom, nom, email, telephone, pref_contact, commentaire, want_rdv, rgpd, source
+2026-03-01 22:17:26 | Config trouvé: /home/mahe6420/public_html/config/database.php
+2026-03-01 22:17:26 | DB connectée via Database::getInstance()
+2026-03-01 22:17:26 | Table estimation_settings OK
+2026-03-01 22:17:26 | Prix bruts: bas='444 000 €' moy='532 000 €' haut='634 000 €'
+2026-03-01 22:17:26 | Prix parsés: bas=444000 moy=532000 haut=634000
+2026-03-01 22:17:26 | Mappings: type=maison cond=moyen timeline=immédiat need=oui seller=proprietaire
+2026-03-01 22:17:26 | SQL params: {":request_id":"EST-20260301-0EAA7",":address":"231 Rue Saint-Honoré, 75001, Paris (meriadeck)",":property_type":"maison",":surface":100,":rooms":1,":floor":null,":cond":"moyen",":amenities":"balcon, terrasse, jardin, garage",":special":"Extérieur : balcon, terrasse, jardin, garage | Source : estimation",":name":"Olivier Colas",":email":"oliviercolas83@gmail.com",":phone":"07 85 61 17 00",":budget":null,":authority":"moi",":need":"oui",":timeline":"immédiat",":seller_type":"proprietaire",":price_low":444000,":price_mean":532000,":price_high":634000,":priority":"haute",":notes":"Projet : vente\nQuartier : meriadeck\nChambres : 2\nContact préféré : telephone\nFinancement : oui\nDémarches banque : oui_accord"}
+2026-03-01 22:17:26 | ❌ INSERT FAILED: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'address' in 'INSERT INTO'
+2026-03-01 22:17:26 | SQL: INSERT INTO estimation_settings (
+        request_id, address, property_type, surface, rooms, floor,
+        `condition`, amenities, special_features,
+        name, email, phone,
+        bant_budget, bant_authority, bant_need, bant_timeline,
+        seller_type,
+        estimated_price_low, estimated_price_mean, estimated_price_high,
+        estimation_date,
+        status, priority, notes,
+        created_at
+    ) VALUES (
+        :request_id, :address, :property_type, :surface, :rooms, :floor,
+        :cond, :amenities, :special,
+        :name, :email, :phone,
+        :budget, :authority, :need, :timeline,
+        :seller_type,
+        :price_low, :price_mean, :price_high,
+        NOW(),
+        'nouveau', :priority, :notes,
+        NOW()
+    )
+2026-03-01 22:24:55 | === NOUVELLE SOUMISSION ===
+2026-03-01 22:24:55 | Config trouvé: /home/mahe6420/public_html/config/database.php
+2026-03-01 22:24:55 | DB connectée via Database::getInstance()
+2026-03-01 22:24:55 | Contact: Olivier Colas | oliviercolas83@gmail.com | 07 85 61 17 00
+2026-03-01 22:24:55 | Bien: maison | 100m² | 2 pièces | 74120 Megeve
+2026-03-01 22:24:55 | Prix: bas=383000 moy=460000 haut=547000
+2026-03-01 22:24:55 | SQL INSERT estimations: {":nom":"Colas",":prenom":"Olivier",":email":"oliviercolas83@gmail.com",":telephone":"07 85 61 17 00",":adresse":"33 charle feiges",":ville":"Megeve",":code_postal":"74120",":type_bien":"maison",":surface":100,":pieces":2,":estimation_basse":383000,":estimation_haute":547000,":notes":"Projet: vente\nQuartier: saint-bruno\nChambres: 1\nÉtat: renover\nExtérieur: balcon, terrasse, jardin\nEstimation moyenne: 460 000 €\nTimeline: immediat\nFinancement: oui\nDémarches banque: oui_accord\nPropriétaire: oui\nMotivation: vente_simple\nContact préféré: telephone"}
+2026-03-01 22:24:55 | ✅ INSERT OK id=1 dans table estimations
+2026-03-01 22:24:56 | Email envoyé à contact@eduardo-desul-immobilier.fr
+2026-03-01 22:39:57 | === NOUVELLE SOUMISSION ===
+2026-03-01 22:39:57 | Config trouvé: /home/mahe6420/public_html/config/database.php
+2026-03-01 22:39:57 | DB connectée via Database::getInstance()
+2026-03-01 22:39:57 | Contact: Bernard Colas | oliviercolas83@gmail.com | 07 85 61 17 00
+2026-03-01 22:39:57 | Bien: appartement | 100m² | 2 pièces | 33000 Bordeaux
+2026-03-01 22:39:57 | Prix: bas=445000 moy=530000 haut=657000
+2026-03-01 22:39:57 | SQL INSERT estimations: {":nom":"Colas",":prenom":"Bernard",":email":"oliviercolas83@gmail.com",":telephone":"07 85 61 17 00",":adresse":"33 charle feiges",":ville":"Bordeaux",":code_postal":"33000",":type_bien":"appartement",":surface":100,":pieces":2,":estimation_basse":445000,":estimation_haute":657000,":notes":"Projet: vente\nQuartier: centre\nChambres: 1\nÉtat: bon\nExtérieur: balcon, terrasse\nEstimation moyenne: 530 000 €\nTimeline: immediat\nFinancement: oui\nDémarches banque: oui_accord\nPropriétaire: oui\nMotivation: vente_simple\nContact préféré: telephone"}
+2026-03-01 22:39:57 | ✅ INSERT OK id=2 dans table estimations
+2026-03-01 22:39:57 | Email envoyé à contact@eduardo-desul-immobilier.fr

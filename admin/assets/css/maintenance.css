@@ -1,0 +1,116 @@
+/**
+ * Maintenance CSS — IMMO LOCAL+
+ * admin/assets/css/maintenance.css
+ *
+ * Ancienne position : modules/system/maintenance/assets/css/maintenance.css
+ * Chargé dans : modules/system/maintenance/index.php
+ */
+
+/* ── Toggle switch maintenance ────────────────────────────────────── */
+.maintenance-toggle-wrap {
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px; border-radius: var(--radius-lg, 12px);
+    border: 2px solid var(--border, rgba(0,0,0,.08));
+    background: var(--surface, #fff);
+    transition: border-color .2s, background .2s;
+}
+.maintenance-toggle-wrap.is-active {
+    border-color: var(--amber, #d97706);
+    background: var(--amber-bg, rgba(217,119,6,.06));
+}
+.maintenance-toggle-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+    background: var(--surface-2, #f5f7fb);
+    color: var(--text-3, #8b93b0);
+    transition: background .2s, color .2s;
+}
+.maintenance-toggle-wrap.is-active .maintenance-toggle-icon {
+    background: var(--amber-bg, rgba(217,119,6,.12));
+    color: var(--amber, #d97706);
+}
+.maintenance-toggle-info { flex: 1; }
+.maintenance-toggle-title {
+    font-size: 14px; font-weight: 700; color: var(--text, #1a1d2e);
+}
+.maintenance-toggle-sub  { font-size: 11px; color: var(--text-3, #8b93b0); margin-top: 2px; }
+
+/* ── Switch UI ────────────────────────────────────────────────────── */
+.toggle-switch {
+    position: relative; width: 44px; height: 24px; flex-shrink: 0;
+}
+.toggle-switch input   { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+    position: absolute; inset: 0; cursor: pointer;
+    background: var(--surface-3, #eaecf3); border-radius: 24px;
+    transition: background .2s;
+}
+.toggle-slider::before {
+    content: ''; position: absolute;
+    height: 18px; width: 18px; border-radius: 50%;
+    left: 3px; top: 3px; background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    transition: transform .2s;
+}
+.toggle-switch input:checked + .toggle-slider               { background: var(--amber, #d97706); }
+.toggle-switch input:checked + .toggle-slider::before       { transform: translateX(20px); }
+
+/* ── Status banner ────────────────────────────────────────────────── */
+.maintenance-status-banner {
+    display: none; align-items: center; gap: 10px;
+    padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;
+    font-size: 12px; font-weight: 600;
+}
+.maintenance-status-banner.visible { display: flex; }
+.maintenance-status-banner.active  {
+    background: var(--amber-bg, rgba(217,119,6,.09));
+    border: 1px solid rgba(217,119,6,.25); color: var(--amber, #d97706);
+}
+.maintenance-status-banner.inactive {
+    background: var(--green-bg, rgba(13,162,113,.09));
+    border: 1px solid rgba(13,162,113,.2); color: var(--green, #0da271);
+}
+
+/* ── IP autorisées ────────────────────────────────────────────────── */
+.maintenance-ip-list { display: flex; flex-direction: column; gap: 6px; }
+.maintenance-ip-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 10px; border-radius: 6px;
+    background: var(--surface-2, #f5f7fb);
+    border: 1px solid var(--border, rgba(0,0,0,.08));
+    font-size: 12px; font-family: var(--mono, monospace);
+    color: var(--text-2, #4a5068);
+}
+.maintenance-ip-item i    { color: var(--green, #0da271); font-size: 10px; }
+.maintenance-ip-remove {
+    margin-left: auto; cursor: pointer; font-size: 11px;
+    color: var(--text-3, #8b93b0); background: none; border: none;
+    padding: 2px 4px; border-radius: 4px;
+    transition: all .12s;
+}
+.maintenance-ip-remove:hover { background: var(--red-bg, rgba(229,62,62,.08)); color: var(--red, #e53e3e); }
+
+/* ── Page publique maintenance ────────────────────────────────────── */
+.maintenance-page-preview {
+    border: 1px solid var(--border, rgba(0,0,0,.08));
+    border-radius: 8px; overflow: hidden;
+    box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,.07));
+}
+.maintenance-page-preview iframe {
+    width: 100%; height: 280px; border: none; display: block;
+}
+
+/* ── Countdown / fin prévue ───────────────────────────────────────── */
+.maintenance-countdown {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; border-radius: 8px;
+    background: var(--surface-2, #f5f7fb);
+    border: 1px solid var(--border, rgba(0,0,0,.08));
+    font-size: 12px;
+}
+.maintenance-countdown-val {
+    font-size: 22px; font-weight: 800;
+    color: var(--amber, #d97706); line-height: 1;
+}
+.maintenance-countdown-label { font-size: 10px; color: var(--text-3, #8b93b0); }

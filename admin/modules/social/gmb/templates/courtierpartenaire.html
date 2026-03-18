@@ -1,0 +1,83 @@
+<!-- TEMPLATE: Réseau Courtier — 2L Courtage
+     Variables: {{business_name}}, {{contact_name}}, {{rating}}, {{city}}, {{business_category}}, {{sender_name}}
+     Séquence: 3 étapes
+     Note: Ce template est spécifique aux courtiers et agents immobiliers
+           pour les intégrer au réseau de recommandation avec 2L Courtage comme courtier partenaire
+-->
+
+<!-- STEP 1: Proposition réseau courtier -->
+<!-- delay_days: 0 | subject: Réseau de recommandation courtier — {{business_name}} -->
+<p>Bonjour {{contact_name}},</p>
+
+<p>Je suis {{sender_name}}, conseiller immobilier chez <strong>eXp France</strong> à {{city}}.</p>
+
+<p>Je travaille avec un réseau de professionnels de l'immobilier dans l'agglomération bordelaise et je recherche des partenaires pour <strong>renforcer notre réseau de recommandation</strong>.</p>
+
+<p><strong>Le concept est simple :</strong></p>
+
+<p>Quand un de mes clients a besoin d'un financement, je le dirige vers <strong>2L Courtage</strong>, notre courtier partenaire. Et quand 2L Courtage ou nos autres partenaires ont des clients avec un projet d'achat ou de vente, ils me les recommandent.</p>
+
+<p><strong>Ce que je vous propose :</strong></p>
+<ul style="margin:12px 0;padding-left:20px;line-height:1.8">
+    <li>🏠 <strong>Recommandations mutuelles</strong> — Je vous envoie mes clients qui ont besoin de vos services</li>
+    <li>💰 <strong>Accès au réseau</strong> — 2L Courtage peut aussi vous envoyer des leads qualifiés</li>
+    <li>🔗 <strong>Visibilité croisée</strong> — Mise en avant sur nos supports respectifs</li>
+    <li>📊 <strong>Suivi transparent</strong> — Chaque recommandation est tracée</li>
+</ul>
+
+<p>Avec votre note de <strong>{{rating}}/5 sur Google</strong>, {{business_name}} a le profil idéal pour rejoindre notre réseau.</p>
+
+<p>Seriez-vous disponible pour un appel de 15 minutes cette semaine ? Je pourrai vous détailler le fonctionnement et les résultats obtenus par nos partenaires actuels.</p>
+
+<p style="margin-top:24px">Cordialement,<br>
+<strong>{{sender_name}}</strong><br>
+Conseiller immobilier — eXp France<br>
+📍 {{city}}<br>
+En partenariat avec 2L Courtage</p>
+
+<!-- /STEP 1 -->
+
+<!-- STEP 2: Relance avec preuve sociale J+4 -->
+<!-- delay_days: 4 | subject: Suite : Réseau de recommandation à {{city}} — {{business_name}} -->
+<!--
+<p>Bonjour {{contact_name}},</p>
+
+<p>Je reviens vers vous concernant notre réseau de recommandation entre professionnels de l'immobilier à {{city}}.</p>
+
+<p><strong>Quelques chiffres de notre réseau actuel :</strong></p>
+<ul style="margin:12px 0;padding-left:20px;line-height:1.8">
+    <li>📈 +30 recommandations échangées par trimestre</li>
+    <li>🤝 12 partenaires actifs dans l'agglomération</li>
+    <li>💰 Taux de conversion moyen de 25% sur les leads partagés</li>
+</ul>
+
+<p>Le réseau fonctionne parce que chaque partenaire y trouve un intérêt direct : des clients qualifiés, orientés par un professionnel de confiance.</p>
+
+<p>Êtes-vous disponible pour un échange rapide ? Même 10 minutes suffisent pour voir si ça fait sens pour {{business_name}}.</p>
+
+<p style="margin-top:24px">Bien à vous,<br>
+<strong>{{sender_name}}</strong><br>
+eXp France — {{city}}</p>
+-->
+<!-- /STEP 2 -->
+
+<!-- STEP 3: Dernière relance + valeur ajoutée J+5 -->
+<!-- delay_days: 5 | subject: Dernière proposition — Réseau partenaires {{city}} -->
+<!--
+<p>Bonjour {{contact_name}},</p>
+
+<p>C'est mon dernier message à ce sujet. Je comprends que votre emploi du temps soit chargé.</p>
+
+<p>Si jamais le timing n'est pas le bon aujourd'hui, sachez que notre réseau de partenaires est en croissance constante. Vous êtes le/la bienvenu(e) à tout moment.</p>
+
+<p>En attendant, n'hésitez pas à me contacter directement si un de vos clients cherche un bien à {{city}} ou s'il souhaite vendre. Je serai ravi de m'en occuper avec le plus grand soin.</p>
+
+<p>Belle continuation à {{business_name}} ! 🏆</p>
+
+<p style="margin-top:24px">Cordialement,<br>
+<strong>{{sender_name}}</strong><br>
+Conseiller immobilier — eXp France<br>
+📍 {{city}}<br>
+En partenariat avec 2L Courtage</p>
+-->
+<!-- /STEP 3 -->

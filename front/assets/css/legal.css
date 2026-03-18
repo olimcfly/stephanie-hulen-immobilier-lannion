@@ -1,0 +1,341 @@
+/**
+ * ===================================================
+ * LEGAL.CSS - PAGES LÉGALES
+ * Site: Eduardo De Sul - Immobilier Bordeaux
+ * ===================================================
+ * 
+ * Pour: mentions-legales, politique-confidentialite, 
+ *       cgu, honoraires, mediation
+ * 
+ * ===================================================
+ */
+
+
+/* ========================================
+   HERO LEGAL (même que hero-page)
+   ======================================== */
+.hero-legal {
+    background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark) 100%);
+    color: var(--white);
+    padding: 70px 20px;
+    text-align: center;
+}
+
+.hero-legal h1 {
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: var(--white);
+}
+
+.hero-legal .subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+
+/* ========================================
+   LEGAL TEXT CONTAINER
+   ======================================== */
+.legal-content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--section-padding) 20px;
+}
+
+.legal-text {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+}
+
+.legal-text h2 {
+    color: var(--primary);
+    font-size: 1.5rem;
+    margin: 50px 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--bg-beige);
+}
+
+.legal-text h2:first-child {
+    margin-top: 0;
+}
+
+.legal-text h3 {
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    margin: 35px 0 15px;
+}
+
+.legal-text p {
+    margin-bottom: 18px;
+}
+
+.legal-text ul,
+.legal-text ol {
+    padding-left: 25px;
+    margin-bottom: 20px;
+}
+
+.legal-text li {
+    margin-bottom: 10px;
+    line-height: 1.7;
+}
+
+.legal-text a {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+.legal-text a:hover {
+    color: var(--primary-dark);
+}
+
+.legal-text strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+
+/* ========================================
+   LEGAL TABLES
+   ======================================== */
+.legal-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.95rem;
+}
+
+.legal-table th,
+.legal-table td {
+    padding: 15px;
+    text-align: left;
+    border: 1px solid var(--border-color);
+}
+
+.legal-table th {
+    background-color: var(--primary);
+    color: var(--white);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.legal-table tr:nth-child(even) {
+    background-color: var(--bg-light);
+}
+
+.legal-table tr:hover {
+    background-color: var(--bg-beige);
+}
+
+.legal-table td {
+    color: var(--text-primary);
+}
+
+
+/* ========================================
+   HONORAIRES TABLE (specific)
+   ======================================== */
+.honoraires-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 30px 0;
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.honoraires-table th {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--white);
+    padding: 18px 15px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.honoraires-table td {
+    padding: 18px 15px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.honoraires-table tr:last-child td {
+    border-bottom: none;
+}
+
+.honoraires-table tr:nth-child(even) {
+    background-color: var(--bg-light);
+}
+
+.honoraires-table .highlight-row {
+    background-color: rgba(139, 0, 0, 0.08);
+    font-weight: 600;
+}
+
+
+/* ========================================
+   LEGAL INFO BOX
+   ======================================== */
+.legal-info-box {
+    background-color: var(--bg-beige);
+    border-left: 4px solid var(--primary);
+    padding: 25px;
+    border-radius: var(--radius-md);
+    margin: 30px 0;
+}
+
+.legal-info-box h4 {
+    color: var(--primary);
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+}
+
+.legal-info-box p {
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+.legal-info-box p:last-child {
+    margin-bottom: 0;
+}
+
+
+/* ========================================
+   LEGAL CONTACT BLOCK
+   ======================================== */
+.legal-contact {
+    background-color: var(--bg-light);
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    margin: 40px 0;
+}
+
+.legal-contact h3 {
+    color: var(--primary);
+    margin-bottom: 20px;
+}
+
+.legal-contact p {
+    margin-bottom: 8px;
+}
+
+.legal-contact a {
+    color: var(--primary);
+    font-weight: 500;
+}
+
+
+/* ========================================
+   LEGAL UPDATED DATE
+   ======================================== */
+.legal-updated {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border-color);
+}
+
+
+/* ========================================
+   MEDIATION SPECIFIC
+   ======================================== */
+.mediation-block {
+    background: linear-gradient(to right, var(--bg-beige), var(--bg-light));
+    padding: 35px;
+    border-radius: var(--radius-lg);
+    margin: 30px 0;
+    border: 1px solid var(--border-color);
+}
+
+.mediation-block h3 {
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+.mediation-block p {
+    margin-bottom: 12px;
+}
+
+.mediation-block a.btn {
+    margin-top: 15px;
+}
+
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+    .hero-legal {
+        padding: 50px 20px;
+    }
+    
+    .hero-legal h1 {
+        font-size: 1.5rem;
+    }
+    
+    .legal-content {
+        padding: 50px 20px;
+    }
+    
+    .legal-text h2 {
+        font-size: 1.3rem;
+        margin: 40px 0 15px;
+    }
+    
+    .legal-table,
+    .honoraires-table {
+        font-size: 0.85rem;
+    }
+    
+    .legal-table th,
+    .legal-table td,
+    .honoraires-table th,
+    .honoraires-table td {
+        padding: 12px 10px;
+    }
+    
+    /* Table responsive */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .legal-info-box,
+    .legal-contact,
+    .mediation-block {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-legal {
+        padding: 40px 15px;
+    }
+    
+    .hero-legal h1 {
+        font-size: 1.3rem;
+    }
+    
+    .legal-content {
+        padding: 40px 15px;
+    }
+    
+    .legal-text {
+        font-size: 0.95rem;
+    }
+    
+    .legal-text h2 {
+        font-size: 1.2rem;
+    }
+    
+    .legal-table th,
+    .legal-table td {
+        padding: 10px 8px;
+        font-size: 0.8rem;
+    }
+}
