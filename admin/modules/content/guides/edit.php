@@ -1,387 +1,376 @@
 <?php
 /**
+ * MODULE ADMIN — Guides & Ressources — EDIT (create + update)
  * /admin/modules/content/guides/edit.php
- * Éditeur de guides — Même design que l'éditeur d'articles
+ * Formulaire unifié : création (sans id) et édition (avec id)
  */
 
-session_start();
-if (!isset($_SESSION['admin_logged_in'])) {
-    header('Location: /admin/login.php');
-    exit;
+if (!isset($pdo) && !isset($db)) {
+    if (!defined('ADMIN_ROUTER')) require_once dirname(dirname(dirname(__DIR__))) . '/includes/init.php';
 }
+if (isset($db) && !isset($pdo)) $pdo = $db;
+if (isset($pdo) && !isset($db)) $db  = $pdo;
 
-require_once dirname(__DIR__, 3) . '/includes/init.php';
+// ─── Déterminer le mode ───
+$id    = (int)($_GET['id'] ?? 0);
+$isNew = ($id === 0);
 
-$pdo = Database::getInstance()->getConnection();
-$guideId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-$guide = null;
-$isNew = $guideId === 0;
-
-// Récupérer le guide existant
-if (!$isNew) {
+if ($isNew) {
+    $item = [
+        'title'       => '',
+        'slug'        => '',
+        'description' => '',
+        'type'        => 'ebook',
+        'format'      => 'PDF',
+        'niveau'      => 'débutant',
+        'content'     => '',
+        'headline'    => '',
+        'file_url'    => '',
+        'file_size'   => 0,
+        'status'      => 'inactive',
+    ];
+} else {
     try {
-        $stmt = $pdo->prepare("SELECT * FROM ressources WHERE id = ?");
-        $stmt->execute([$guideId]);
-        $guide = $stmt->fetch(PDO::FETCH_ASSOC);
-        if (!$guide) {
-            header('Location: ?page=guides');
-            exit;
+        $stmt = $pdo->prepare("SELECT * FROM guides WHERE id = ?");
+        $stmt->execute([$id]);
+        $item = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$item) {
+            echo '<div style="padding:40px;text-align:center;color:#dc2626">Guide introuvable (ID: ' . $id . '). <a href="?page=guides">Retour</a></div>';
+            return;
         }
     } catch (Exception $e) {
-        error_log($e->getMessage());
-        header('Location: ?page=guides');
-        exit;
+        error_log("[Guides Edit] " . $e->getMessage());
+        echo '<div style="padding:40px;text-align:center;color:#dc2626">Erreur chargement. <a href="?page=guides">Retour</a></div>';
+        return;
     }
 }
 
-// Traiter les soumissions AJAX
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    header('Content-Type: application/json');
-
-    if ($_POST['action'] === 'save') {
-        $name = $_POST['name'] ?? '';
-        $slug = $_POST['slug'] ?? '';
-        $description = $_POST['description'] ?? '';
-        $extrait = $_POST['extrait'] ?? '';
-        $persona = $_POST['persona'] ?? '';
-        $format = $_POST['format'] ?? 'PDF';
-        $pages = $_POST['pages'] ?? '0';
-        $chapitres = isset($_POST['chapitres']) ? json_encode($_POST['chapitres']) : '[]';
-        $status = $_POST['status'] ?? 'draft';
-
-        // Validation
-        if (empty($name) || empty($slug)) {
-            echo json_encode(['success' => false, 'message' => 'Nom et slug requis']);
-            exit;
-        }
-
-        try {
-            if ($isNew) {
-                $stmt = $pdo->prepare("
-                    INSERT INTO ressources 
-                    (name, slug, description, extrait, persona, format, pages, chapitres, status, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
-                ");
-                $stmt->execute([$name, $slug, $description, $extrait, $persona, $format, $pages, $chapitres, $status]);
-                $guideId = $pdo->lastInsertId();
-                echo json_encode(['success' => true, 'message' => 'Guide créé', 'id' => $guideId]);
-            } else {
-                $stmt = $pdo->prepare("
-                    UPDATE ressources 
-                    SET name = ?, slug = ?, description = ?, extrait = ?, persona = ?, format = ?, pages = ?, chapitres = ?, status = ?, updated_at = NOW()
-                    WHERE id = ?
-                ");
-                $stmt->execute([$name, $slug, $description, $extrait, $persona, $format, $pages, $chapitres, $status, $guideId]);
-                echo json_encode(['success' => true, 'message' => 'Guide mis à jour', 'id' => $guideId]);
-            }
-        } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-        }
-        exit;
-    }
+// ─── CSRF ───
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-$name = $guide['name'] ?? '';
-$slug = $guide['slug'] ?? '';
-$description = $guide['description'] ?? '';
-$extrait = $guide['extrait'] ?? '';
-$persona = $guide['persona'] ?? 'vendeur';
-$format = $guide['format'] ?? 'PDF';
-$pages = $guide['pages'] ?? '0';
-$chapitres = $guide['chapitres'] ? json_decode($guide['chapitres'], true) : [];
-$status = $guide['status'] ?? 'draft';
-
+// ─── Message flash ───
+$flashMsg = '';
+if (isset($_GET['msg'])) {
+    if ($_GET['msg'] === 'created') $flashMsg = 'Guide créé avec succès !';
+}
 ?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><?= $isNew ? 'Nouveau guide' : 'Éditer guide' ?> | Admin</title>
-<link rel="stylesheet" href="/admin/assets/css/admin-components.css">
+
 <style>
-.editor-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; }
-.editor-h1 { font-size:1.8rem; font-weight:800; color:#1a1a2e; margin:0; }
-.editor-actions { display:flex; gap:12px; }
-.btn { padding:12px 24px; border:none; border-radius:8px; font-weight:600; cursor:pointer; transition:all .2s; }
-.btn-primary { background:#1B3A4B; color:white; }
-.btn-primary:hover { background:#122A37; }
-.btn-secondary { background:#f5f5f5; color:#1a1a2e; border:1px solid #ddd; }
-.btn-secondary:hover { background:#eff0f1; }
+/* ══ GUIDES EDIT ══════════════════════════════════════════════ */
+.gui-edit-wrap { font-family:var(--font,'Inter',sans-serif); max-width:920px; margin:0 auto; }
 
-.editor-layout { display:grid; grid-template-columns:1fr 380px; gap:32px; }
-.editor-main { }
-.editor-sidebar { }
+.gui-edit-head { display:flex; align-items:center; gap:14px; margin-bottom:28px; }
+.gui-edit-back { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--text-3,#9ca3af); text-decoration:none; transition:all .15s; border:1px solid var(--border,#e5e7eb); }
+.gui-edit-back:hover { color:#7c3aed; border-color:var(--border,#e5e7eb); background:rgba(124,58,237,.07); }
+.gui-edit-title { font-size:1.65rem; font-weight:700; color:var(--text,#111827); margin:0; }
+.gui-edit-badge { display:inline-flex; align-items:center; gap:6px; font-size:.72rem; font-weight:700; padding:4px 11px; border-radius:10px; }
+.gui-edit-badge.create { background:rgba(124,58,237,.1); color:#7c3aed; }
+.gui-edit-badge.edit { background:rgba(16,185,129,.1); color:#059669; }
 
-.section-block { background:white; border:1px solid #e2d9cc; border-radius:12px; padding:28px; margin-bottom:24px; box-shadow:0 1px 3px rgba(0,0,0,.04); }
-.section-header { display:flex; align-items:center; gap:12px; margin-bottom:20px; padding-bottom:16px; border-bottom:2px solid #f0ede8; }
-.section-icon { font-size:1.3rem; }
-.section-title { font-size:1.1rem; font-weight:800; color:#1B3A4B; margin:0; }
+.gui-edit-alerts { margin-bottom:20px; }
+.gui-edit-alert { padding:12px 16px; border-radius:10px; font-size:.85rem; font-weight:600; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.gui-edit-alert.error { background:#fef2f2; color:#dc2626; border:1px solid rgba(220,38,38,.12); }
+.gui-edit-alert.success { background:#f0fdf4; color:#059669; border:1px solid rgba(5,150,105,.12); }
+.gui-edit-alert.info { background:#eff6ff; color:#0369a1; border:1px solid rgba(3,105,161,.12); }
+.gui-edit-alert i { font-size:.9rem; }
 
-.field-group { margin-bottom:24px; }
-.field-group:last-child { margin-bottom:0; }
-.field-label { display:block; font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#4a5568; margin-bottom:8px; }
-.field-input, .field-textarea, .field-select { width:100%; padding:12px 14px; border:1px solid #e2d9cc; border-radius:8px; font-family:inherit; font-size:.9rem; color:#1a1a2e; }
-.field-input:focus, .field-textarea:focus, .field-select:focus { outline:none; border-color:#C8A96E; box-shadow:0 0 0 3px rgba(200,169,110,.1); }
-.field-textarea { resize:vertical; min-height:120px; font-family:'DM Sans', sans-serif; }
+.gui-edit-form { background:var(--surface,#fff); border:1px solid var(--border,#e5e7eb); border-radius:14px; padding:26px; }
 
-.field-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-.field-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+.gui-form-group { margin-bottom:22px; }
+.gui-form-group:last-child { margin-bottom:0; }
+.gui-form-label { display:block; font-size:.82rem; font-weight:700; color:var(--text,#111827); margin-bottom:8px; letter-spacing:-.02em; }
+.gui-form-label .req { color:#dc2626; }
+.gui-form-label .hint { font-size:.72rem; font-weight:500; color:var(--text-3,#9ca3af); display:block; margin-top:3px; }
+.gui-form-input,.gui-form-select,.gui-form-textarea {
+    width:100%; padding:11px 14px; border:1px solid var(--border,#e5e7eb); border-radius:10px;
+    background:var(--surface,#fff); color:var(--text,#111827); font-size:.85rem; font-family:inherit;
+    transition:all .15s;
+}
+.gui-form-input:focus,.gui-form-select:focus,.gui-form-textarea:focus {
+    outline:none; border-color:#7c3aed; box-shadow:0 0 0 3px rgba(124,58,237,.1);
+}
+.gui-form-textarea { resize:vertical; min-height:100px; }
 
-.sidebar-card { background:white; border:1px solid #e2d9cc; border-radius:12px; padding:20px; margin-bottom:20px; }
-.sidebar-title { font-size:.9rem; font-weight:700; color:#1B3A4B; margin-bottom:16px; text-transform:uppercase; letter-spacing:.03em; }
+.gui-form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media(max-width:768px) { .gui-form-row { grid-template-columns:1fr; } }
 
-.status-badge { display:inline-block; padding:6px 12px; border-radius:20px; font-size:.75rem; font-weight:700; text-transform:uppercase; }
-.status-draft { background:#fef3c7; color:#92400e; }
-.status-published { background:#d1fae5; color:#065f46; }
+.gui-form-section { background:var(--surface-2,#f9fafb); border-radius:12px; padding:16px; margin-bottom:16px; border:1px solid var(--border,#f3f4f6); }
+.gui-form-section-title { font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-3,#9ca3af); margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.gui-form-section-title i { font-size:.85rem; }
 
-.remplissage { background:#f8f6f3; border-radius:12px; padding:24px; text-align:center; }
-.remplissage-num { font-size:3rem; font-weight:900; color:#C8A96E; }
-.remplissage-label { font-size:.75rem; color:#4a5568; text-transform:uppercase; letter-spacing:.05em; margin-top:8px; }
+.gui-form-footer { display:flex; align-items:center; justify-content:flex-end; padding-top:22px; border-top:1px solid var(--border,#e5e7eb); gap:10px; }
+.gui-form-actions { display:flex; gap:10px; }
+.gui-btn { display:inline-flex; align-items:center; gap:6px; padding:9px 20px; border-radius:10px; font-size:.83rem; font-weight:700; cursor:pointer; border:none; transition:all .15s; font-family:inherit; text-decoration:none; line-height:1.3; }
+.gui-btn-primary { background:#7c3aed; color:#fff; box-shadow:0 1px 4px rgba(124,58,237,.22); }
+.gui-btn-primary:hover { background:#6d28d9; transform:translateY(-1px); }
+.gui-btn-primary:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+.gui-btn-outline { background:var(--surface,#fff); color:var(--text-2,#6b7280); border:1px solid var(--border,#e5e7eb); }
+.gui-btn-outline:hover { border-color:#7c3aed; color:#7c3aed; }
 
-.chapitres-list { list-style:none; padding:0; margin:0; }
-.chapitres-list li { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #f0ede8; }
-.chapitres-list li:last-child { border-bottom:none; }
-.chapitres-add { width:100%; padding:10px; margin-top:12px; background:#f8f6f3; border:1px dashed #C8A96E; border-radius:8px; color:#1B3A4B; cursor:pointer; font-weight:600; transition:all .2s; }
-.chapitres-add:hover { background:#f0ede8; }
-
-@media(max-width:1200px) { .editor-layout { grid-template-columns:1fr; } }
+.gui-char-count { font-size:.7rem; color:var(--text-3,#9ca3af); margin-top:4px; }
+.gui-slug-preview { font-size:.72rem; color:var(--text-3,#9ca3af); font-family:monospace; margin-top:6px; padding:6px 10px; background:var(--surface-2,#f9fafb); border-radius:6px; border-left:2px solid #7c3aed; }
 </style>
-</head>
-<body>
 
-<!-- HEADER -->
-<div style="background:white; border-bottom:1px solid #e2d9cc; padding:20px 0; sticky top:0; z-index:100;">
-    <div style="max-width:1400px; margin:0 auto; padding:0 24px;">
-        <div class="editor-header">
-            <h1 class="editor-h1">
-                📖 <?= $isNew ? 'Nouveau guide' : 'Éditer guide' ?> #<?= $guideId ?: 'nouveau' ?>
-            </h1>
-            <div class="editor-actions">
-                <a href="?page=guides" class="btn btn-secondary">← Retour</a>
-                <button onclick="saveGuide()" class="btn btn-primary">✓ Enregistrer</button>
-            </div>
-        </div>
+<div class="gui-edit-wrap">
+
+<!-- Header -->
+<div class="gui-edit-head">
+    <a href="?page=guides" class="gui-edit-back" title="Retour"><i class="fas fa-arrow-left"></i></a>
+    <div style="flex:1">
+        <h1 class="gui-edit-title"><?= $isNew ? 'Nouveau guide' : 'Modifier : ' . htmlspecialchars($item['title']) ?></h1>
+        <span class="gui-edit-badge <?= $isNew ? 'create' : 'edit' ?>">
+            <i class="fas fa-<?= $isNew ? 'plus' : 'pen' ?>"></i>
+            <?= $isNew ? 'Création' : 'Édition #' . $id ?>
+        </span>
     </div>
 </div>
 
-<!-- MAIN LAYOUT -->
-<div style="max-width:1400px; margin:0 auto; padding:24px; min-height:calc(100vh - 100px);">
-    <div class="editor-layout">
+<!-- Flash message -->
+<?php if ($flashMsg): ?>
+<div class="gui-edit-alerts">
+    <div class="gui-edit-alert success"><i class="fas fa-check-circle"></i> <?= htmlspecialchars($flashMsg) ?></div>
+</div>
+<?php endif; ?>
 
-        <!-- COLONNE PRINCIPALE -->
-        <div class="editor-main">
+<!-- Alerts zone (JS) -->
+<div class="gui-edit-alerts" id="guideAlerts"></div>
 
-            <!-- INFORMATIONS GÉNÉRALES -->
-            <div class="section-block">
-                <div class="section-header">
-                    <span class="section-icon">📋</span>
-                    <h2 class="section-title">Informations générales</h2>
-                </div>
+<!-- Form -->
+<form id="guideForm" class="gui-edit-form" onsubmit="return saveGuide(event)">
+    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+    <input type="hidden" name="id" id="guideId" value="<?= $id ?>">
 
-                <div class="field-group">
-                    <label class="field-label">Nom du guide</label>
-                    <input type="text" id="name" class="field-input" placeholder="Ex: Guide de l'acheteur immobilier" value="<?= htmlspecialchars($name) ?>">
-                </div>
+    <!-- ──── SECTION: Infos principales ──── -->
+    <div class="gui-form-section">
+        <div class="gui-form-section-title"><i class="fas fa-file-lines"></i> Infos principales</div>
 
-                <div class="field-group">
-                    <label class="field-label">URL (slug)</label>
-                    <input type="text" id="slug" class="field-input" placeholder="guide-acheteur-immobilier" value="<?= htmlspecialchars($slug) ?>">
-                </div>
+        <!-- Titre -->
+        <div class="gui-form-group">
+            <label class="gui-form-label">
+                Titre <span class="req">*</span>
+                <span class="hint">Titre principal du guide</span>
+            </label>
+            <input type="text" name="title" id="guideTitle" class="gui-form-input" value="<?= htmlspecialchars($item['title']) ?>" maxlength="200" required autofocus>
+        </div>
 
-                <div class="field-row">
-                    <div class="field-group">
-                        <label class="field-label">Persona</label>
-                        <select id="persona" class="field-select">
-                            <option value="vendeur" <?= $persona === 'vendeur' ? 'selected' : '' ?>>🏷️ Vendeur</option>
-                            <option value="acheteur" <?= $persona === 'acheteur' ? 'selected' : '' ?>>🛒 Acheteur</option>
-                            <option value="proprietaire" <?= $persona === 'proprietaire' ? 'selected' : '' ?>>🏠 Propriétaire</option>
-                        </select>
-                    </div>
-                    <div class="field-group">
-                        <label class="field-label">Format</label>
-                        <select id="format" class="field-select">
-                            <option value="PDF" <?= $format === 'PDF' ? 'selected' : '' ?>>PDF</option>
-                            <option value="Document" <?= $format === 'Document' ? 'selected' : '' ?>>Document</option>
-                            <option value="Infographie" <?= $format === 'Infographie' ? 'selected' : '' ?>>Infographie</option>
-                        </select>
-                    </div>
-                </div>
+        <!-- Slug -->
+        <div class="gui-form-group">
+            <label class="gui-form-label">
+                Slug <span class="req">*</span>
+                <span class="hint">URL-friendly identifier</span>
+            </label>
+            <input type="text" name="slug" class="gui-form-input" id="guideSlug" value="<?= htmlspecialchars($item['slug']) ?>" required>
+            <div class="gui-slug-preview" id="slugPreview">/guide/<?= htmlspecialchars($item['slug'] ?: 'mon-guide') ?></div>
+        </div>
 
-                <div class="field-group">
-                    <label class="field-label">Nombre de pages</label>
-                    <input type="number" id="pages" class="field-input" placeholder="20" value="<?= htmlspecialchars($pages) ?>">
-                </div>
-            </div>
+        <!-- Description -->
+        <div class="gui-form-group">
+            <label class="gui-form-label">
+                Description <span class="req">*</span>
+                <span class="hint">Résumé court du guide (moteurs de recherche)</span>
+            </label>
+            <textarea name="description" id="guideDescription" class="gui-form-textarea" maxlength="500" required><?= htmlspecialchars($item['description']) ?></textarea>
+            <div class="gui-char-count"><span id="descCount">0</span>/500</div>
+        </div>
 
-            <!-- DESCRIPTION -->
-            <div class="section-block">
-                <div class="section-header">
-                    <span class="section-icon">✍️</span>
-                    <h2 class="section-title">Description</h2>
-                </div>
+        <!-- Headline (optionnel) -->
+        <div class="gui-form-group">
+            <label class="gui-form-label">
+                Headline (optionnel)
+                <span class="hint">Titre alternatif pour les réseaux sociaux</span>
+            </label>
+            <input type="text" name="headline" id="guideHeadline" class="gui-form-input" value="<?= htmlspecialchars($item['headline']) ?>" maxlength="120">
+        </div>
 
-                <div class="field-group">
-                    <label class="field-label">Description courte (pour listing)</label>
-                    <textarea id="description" class="field-textarea" placeholder="Décrivez le contenu du guide en 2-3 lignes...<?= htmlspecialchars($description) ?></textarea>
-                </div>
+        <!-- Content (optionnel) -->
+        <div class="gui-form-group">
+            <label class="gui-form-label">
+                Contenu (optionnel)
+                <span class="hint">Contenu long-form du guide</span>
+            </label>
+            <textarea name="content" id="guideContent" class="gui-form-textarea" style="min-height:200px"><?= htmlspecialchars($item['content']) ?></textarea>
+        </div>
+    </div>
 
-                <div class="field-group">
-                    <label class="field-label">Extrait (pour page détail)</label>
-                    <textarea id="extrait" class="field-textarea" placeholder="Texte plus détaillé sur le guide..." style="min-height:150px;"><?= htmlspecialchars($extrait) ?></textarea>
-                </div>
-            </div>
+    <!-- ──── SECTION: Type & Format ──── -->
+    <div class="gui-form-section">
+        <div class="gui-form-section-title"><i class="fas fa-cube"></i> Type & Format</div>
 
-            <!-- CHAPITRES -->
-            <div class="section-block">
-                <div class="section-header">
-                    <span class="section-icon">📚</span>
-                    <h2 class="section-title">Chapitres inclus</h2>
-                </div>
-
-                <ul class="chapitres-list" id="chapitresList">
-                    <?php foreach ($chapitres as $index => $ch): ?>
-                    <li>
-                        <input type="text" class="field-input" value="<?= htmlspecialchars($ch) ?>" style="flex:1; margin-right:10px;" onchange="updateChapitres()">
-                        <button onclick="removeChap(<?= $index ?>)" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight:600;">✕</button>
-                    </li>
+        <div class="gui-form-row">
+            <div class="gui-form-group">
+                <label class="gui-form-label">Type <span class="req">*</span></label>
+                <select name="type" id="guideType" class="gui-form-select" required>
+                    <?php
+                    $types = ['ebook'=>'eBook / Guide PDF','checklist'=>'Checklist','template'=>'Template / Modèle','webinaire'=>'Webinaire / Vidéo','tool'=>'Outil / Calculatrice','guide'=>'Guide / Tutoriel','other'=>'Autre'];
+                    foreach ($types as $val => $label):
+                    ?>
+                    <option value="<?= $val ?>" <?= ($item['type'] ?? '') === $val ? 'selected' : '' ?>><?= $label ?></option>
                     <?php endforeach; ?>
-                </ul>
-                <button class="chapitres-add" onclick="addChap()">+ Ajouter un chapitre</button>
+                </select>
             </div>
 
+            <div class="gui-form-group">
+                <label class="gui-form-label">Format <span class="req">*</span></label>
+                <select name="format" id="guideFormat" class="gui-form-select" required>
+                    <?php
+                    $formats = ['PDF'=>'PDF','Google Sheets'=>'Google Sheets','Excel'=>'Excel','HTML'=>'HTML','Video'=>'Vidéo','Audio'=>'Audio','Archive'=>'Archive (ZIP)'];
+                    foreach ($formats as $val => $label):
+                    ?>
+                    <option value="<?= $val ?>" <?= ($item['format'] ?? '') === $val ? 'selected' : '' ?>><?= $label ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         </div>
 
-        <!-- SIDEBAR -->
-        <div class="editor-sidebar">
-
-            <!-- PUBLICATION -->
-            <div class="sidebar-card">
-                <div class="sidebar-title">Publication</div>
-                <div style="margin-bottom:16px;">
-                    <select id="status" class="field-select" style="margin-bottom:12px;">
-                        <option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Brouillon</option>
-                        <option value="active" <?= $status === 'active' ? 'selected' : '' ?>>Publié</option>
-                    </select>
-                </div>
-                <div id="statusBadge">
-                    <span class="status-badge status-<?= $status ?>">
-                        <?= $status === 'draft' ? '📝 Brouillon' : '✓ Publié' ?>
-                    </span>
-                </div>
+        <div class="gui-form-row">
+            <div class="gui-form-group">
+                <label class="gui-form-label">Niveau <span class="req">*</span></label>
+                <select name="niveau" id="guideNiveau" class="gui-form-select" required>
+                    <?php
+                    $niveaux = ['débutant'=>'Débutant','intermédiaire'=>'Intermédiaire','avancé'=>'Avancé','expert'=>'Expert'];
+                    foreach ($niveaux as $val => $label):
+                    ?>
+                    <option value="<?= $val ?>" <?= ($item['niveau'] ?? '') === $val ? 'selected' : '' ?>><?= $label ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
 
-            <!-- REMPLISSAGE -->
-            <div class="sidebar-card">
-                <div class="sidebar-title">Remplissage</div>
-                <div class="remplissage">
-                    <div class="remplissage-num" id="fillPercent">0%</div>
-                    <div class="remplissage-label">Champs complétés</div>
-                </div>
+            <div class="gui-form-group">
+                <label class="gui-form-label">Note initiale (optionnel)</label>
+                <input type="number" name="rating" class="gui-form-input" value="<?= htmlspecialchars($item['rating'] ?? 0) ?>" min="0" max="5" step="0.5" placeholder="0 à 5 étoiles">
             </div>
-
-            <!-- MÉTADONNÉES -->
-            <div class="sidebar-card">
-                <div class="sidebar-title">Métadonnées</div>
-                <table style="width:100%; font-size:.8rem; color:#4a5568;">
-                    <tr>
-                        <td style="padding:8px 0; border-bottom:1px solid #f0ede8;">Créé</td>
-                        <td style="text-align:right; padding:8px 0; border-bottom:1px solid #f0ede8; font-weight:600;">
-                            <?= $guide ? date('d/m/Y H:i', strtotime($guide['created_at'])) : 'Maintenant' ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding:8px 0; border-bottom:1px solid #f0ede8;">Modifié</td>
-                        <td style="text-align:right; padding:8px 0; border-bottom:1px solid #f0ede8; font-weight:600;">
-                            <?= $guide ? date('d/m/Y H:i', strtotime($guide['updated_at'] ?? $guide['created_at'])) : '—' ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding:8px 0;">ID</td>
-                        <td style="text-align:right; padding:8px 0; font-weight:600;"><?= $guideId ?: '—' ?></td>
-                    </tr>
-                </table>
-            </div>
-
         </div>
-
     </div>
-</div>
+
+    <!-- ──── SECTION: Téléchargement ──── -->
+    <div class="gui-form-section">
+        <div class="gui-form-section-title"><i class="fas fa-file-download"></i> Téléchargement (optionnel)</div>
+
+        <div class="gui-form-group">
+            <label class="gui-form-label">
+                URL du fichier
+                <span class="hint">Lien complet vers le fichier à télécharger</span>
+            </label>
+            <input type="url" name="file_url" id="guideFileUrl" class="gui-form-input" value="<?= htmlspecialchars($item['file_url']) ?>" placeholder="https://example.com/file.pdf">
+        </div>
+
+        <div class="gui-form-group">
+            <label class="gui-form-label">
+                Taille du fichier (octets)
+                <span class="hint">Taille en octets (ex: 1048576 = 1 MB)</span>
+            </label>
+            <input type="number" name="file_size" id="guideFileSize" class="gui-form-input" value="<?= (int)($item['file_size'] ?? 0) ?>" min="0" placeholder="0">
+        </div>
+    </div>
+
+    <!-- ──── SECTION: Statut ──── -->
+    <div class="gui-form-section">
+        <div class="gui-form-section-title"><i class="fas fa-toggle-on"></i> Statut de publication</div>
+
+        <div style="display:flex; gap:20px">
+            <label style="display:flex; align-items:center; gap:10px; font-size:.85rem; cursor:pointer">
+                <input type="radio" name="status" value="inactive" <?= ($item['status'] ?? 'inactive') !== 'active' ? 'checked' : '' ?> style="cursor:pointer; width:16px; height:16px">
+                <span style="color:var(--text,#111827); font-weight:600">Brouillon (inactif)</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:10px; font-size:.85rem; cursor:pointer">
+                <input type="radio" name="status" value="active" <?= ($item['status'] ?? '') === 'active' ? 'checked' : '' ?> style="cursor:pointer; width:16px; height:16px">
+                <span style="color:var(--text,#111827); font-weight:600">Publié (actif)</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="gui-form-footer">
+        <div class="gui-form-actions">
+            <a href="?page=guides" class="gui-btn gui-btn-outline"><i class="fas fa-times"></i> Annuler</a>
+            <button type="submit" class="gui-btn gui-btn-primary" id="guideSaveBtn">
+                <i class="fas fa-<?= $isNew ? 'plus' : 'save' ?>"></i>
+                <?= $isNew ? 'Créer le guide' : 'Enregistrer' ?>
+            </button>
+        </div>
+    </div>
+</form>
+
+</div><!-- /gui-edit-wrap -->
 
 <script>
-let guideId = <?= $guideId ?>;
-let chapitres = <?= json_encode($chapitres) ?>;
+const guideIsNew = <?= $isNew ? 'true' : 'false' ?>;
 
-function updateChapitres() {
-    const inputs = document.querySelectorAll('#chapitresList input');
-    chapitres = Array.from(inputs).map(i => i.value).filter(v => v.trim());
-    updateFill();
-}
-
-function addChap() {
-    const li = document.createElement('li');
-    li.innerHTML = `<input type="text" class="field-input" placeholder="Chapitre..." style="flex:1; margin-right:10px;" onchange="updateChapitres()">
-        <button onclick="removeChap(this)" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight:600;">✕</button>`;
-    document.getElementById('chapitresList').appendChild(li);
-}
-
-function removeChap(el) {
-    if (typeof el === 'number') {
-        document.querySelectorAll('#chapitresList li')[el].remove();
-    } else {
-        el.closest('li').remove();
-    }
-    updateChapitres();
-}
-
-function updateFill() {
-    const fields = [
-        document.getElementById('name').value,
-        document.getElementById('slug').value,
-        document.getElementById('description').value,
-        document.getElementById('extrait').value,
-        document.getElementById('persona').value,
-    ];
-    const filled = fields.filter(f => f && f.trim()).length;
-    const percent = Math.round((filled / fields.length) * 100);
-    document.getElementById('fillPercent').textContent = percent + '%';
-}
-
-function saveGuide() {
-    updateChapitres();
-    const data = new FormData();
-    data.append('action', 'save');
-    data.append('name', document.getElementById('name').value);
-    data.append('slug', document.getElementById('slug').value);
-    data.append('description', document.getElementById('description').value);
-    data.append('extrait', document.getElementById('extrait').value);
-    data.append('persona', document.getElementById('persona').value);
-    data.append('format', document.getElementById('format').value);
-    data.append('pages', document.getElementById('pages').value);
-    data.append('status', document.getElementById('status').value);
-    chapitres.forEach(ch => data.append('chapitres[]', ch));
-
-    fetch('', { method: 'POST', body: data })
-        .then(r => r.json())
-        .then(d => {
-            if (d.success) {
-                alert(d.message);
-                if (guideId === 0) window.location.href = '?page=guides&edit=' + d.id;
-            } else {
-                alert('Erreur: ' + d.message);
-            }
-        });
-}
-
-// MAJ au chargement
-updateFill();
-document.getElementById('status').addEventListener('change', function() {
-    const badge = document.getElementById('statusBadge');
-    badge.innerHTML = this.value === 'draft' 
-        ? '<span class="status-badge status-draft">📝 Brouillon</span>'
-        : '<span class="status-badge status-published">✓ Publié</span>';
+// Actualiser le slug depuis le titre
+document.getElementById('guideTitle').addEventListener('input', function() {
+    if (document.getElementById('guideSlug').dataset.custom) return;
+    let slug = this.value
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+    document.getElementById('guideSlug').value = slug;
+    updateSlugPreview();
 });
-</script>
 
-</body>
-</html>
+// Marquer le slug comme modifié manuellement
+document.getElementById('guideSlug').addEventListener('input', function() {
+    this.dataset.custom = 'true';
+    updateSlugPreview();
+});
+
+function updateSlugPreview() {
+    const slug = document.getElementById('guideSlug').value;
+    document.getElementById('slugPreview').textContent = '/guide/' + (slug || 'mon-guide');
+}
+
+// Compteur de caractères
+const descTA = document.getElementById('guideDescription');
+descTA.addEventListener('input', function() {
+    document.getElementById('descCount').textContent = this.value.length;
+});
+document.getElementById('descCount').textContent = descTA.value.length;
+
+// Sauvegarder via API
+function saveGuide(e) {
+    e.preventDefault();
+
+    const btn = document.getElementById('guideSaveBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enregistrement...';
+
+    const form = document.getElementById('guideForm');
+    const data = new FormData(form);
+    data.append('action', 'save');
+
+    fetch('?page=guides&action=api&ajax=1', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: data
+    })
+    .then(r => r.json())
+    .then(d => {
+        const alerts = document.getElementById('guideAlerts');
+        if (d.success) {
+            alerts.innerHTML = '<div class="gui-edit-alert success"><i class="fas fa-check-circle"></i> ' + d.message + '</div>';
+            if (guideIsNew && d.id) {
+                // Redirect to edit mode
+                window.location.href = '?page=guides&action=edit&id=' + d.id + '&msg=created';
+            }
+        } else {
+            alerts.innerHTML = '<div class="gui-edit-alert error"><i class="fas fa-exclamation-circle"></i> ' + (d.error || d.message || 'Erreur inconnue') + '</div>';
+        }
+    })
+    .catch(err => {
+        document.getElementById('guideAlerts').innerHTML = '<div class="gui-edit-alert error"><i class="fas fa-exclamation-circle"></i> Erreur réseau : ' + err.message + '</div>';
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = guideIsNew
+            ? '<i class="fas fa-plus"></i> Créer le guide'
+            : '<i class="fas fa-save"></i> Enregistrer';
+    });
+
+    return false;
+}
+</script>
