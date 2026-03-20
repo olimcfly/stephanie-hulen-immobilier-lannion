@@ -46,31 +46,8 @@ try {
     $tableExists = true;
 } catch (PDOException $e) {}
 
-// ─── ACTIONS POST ───
+// ─── Actions traitées via AJAX → /admin/api/content/annuaire.php ───
 $error = null;
-if ($tableExists && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $postAction = $_POST['action'] ?? '';
-    $itemId     = (int)($_POST['id'] ?? 0);
-
-    if ($postAction === 'delete' && $itemId > 0) {
-        try {
-            $pdo->prepare("DELETE FROM annuaire WHERE id = ?")->execute([$itemId]);
-            header("Location: /admin/dashboard.php?page=annuaire&msg=deleted"); exit;
-        } catch (PDOException $e) { $error = $e->getMessage(); }
-    }
-    if ($postAction === 'toggle_status' && $itemId > 0) {
-        try {
-            $pdo->prepare("UPDATE annuaire SET status = IF(status='published','draft','published') WHERE id = ?")->execute([$itemId]);
-            header("Location: /admin/dashboard.php?page=annuaire&msg=updated"); exit;
-        } catch (PDOException $e) { $error = $e->getMessage(); }
-    }
-    if ($postAction === 'toggle_featured' && $itemId > 0) {
-        try {
-            $pdo->prepare("UPDATE annuaire SET is_featured = IF(is_featured=1,0,1) WHERE id = ?")->execute([$itemId]);
-            header("Location: /admin/dashboard.php?page=annuaire&msg=updated"); exit;
-        } catch (PDOException $e) { $error = $e->getMessage(); }
-    }
-}
 
 // ─── FILTRES ───
 $filterStatus   = $_GET['status']    ?? 'all';

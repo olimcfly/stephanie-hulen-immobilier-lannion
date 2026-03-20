@@ -22,274 +22,9 @@ if (!isset($pdo)) {
     }
 }
 
-// ── AJAX — doit sortir AVANT tout HTML ────────────────────────────────────────
-if (isset($_GET['ajax']) || (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])==='xmlhttprequest' && isset($_GET['action']))) {
-    if (ob_get_level()) ob_clean();
-    header('Content-Type: application/json; charset=utf-8');
-
-    $action = $_POST['action'] ?? $_GET['action'] ?? '';
-
-    switch ($action) {
-
-        case 'get_lead':
-            $id  = (int)($_POST['id'] ?? 0);
-            $tbl = preg_replace('/[^a-z_]/', '', $_POST['tbl'] ?? 'leads');
-            try {
-                $s = $pdo->prepare("SELECT * FROM `$tbl` WHERE id = ?");
-                $s->execute([$id]);
-                $row = $s->fetch();
-                echo json_encode(['success' => (bool)$row, 'lead' => $row ?: null]);
-            } catch (Exception $e) {
-                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-            }
-            exit;
-
-        case 'add_lead':
-            $fn = trim($_POST['firstname'] ?? '');
-            $ln = trim($_POST['lastname']  ?? '');
-            if (!$fn && !$ln) { echo json_encode(['success'=>false,'error'=>'Prénom ou nom requis']); exit; }
-            try {
-                $pdo->prepare("INSERT INTO leads
-                    (firstname,lastname,email,phone,city,source,notes,status,temperature,next_action,next_action_date,created_at,updated_at)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())")
-                ->execute([
-                    $fn, $ln,
-                    trim($_POST['email'] ?? '') ?: null,
-                    trim($_POST['phone'] ?? '') ?: null,
-                    trim($_POST['city']  ?? '') ?: null,
-                    $_POST['source']      ?? 'manuel',
-                    trim($_POST['notes'] ?? '') ?: null,
-                    $_POST['status']      ?? 'new',
-                    $_POST['temperature'] ?? 'warm',
-                    trim($_POST['next_action']      ?? '') ?: null,
-                    trim($_POST['next_action_date'] ?? '') ?: null,
-                ]);
-                echo json_encode(['success' => true, 'id' => (int)$pdo->lastInsertId()]);
-            } catch (Exception $e) {
-                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-            }
-            exit;
-
-        case 'update_lead':
-            $id  = (int)($_POST['id']  ?? 0);
-            $tbl = preg_replace('/[^a-z_]/', '', $_POST['tbl'] ?? 'leads');
-            if (!$id) { echo json_encode(['success'=>false,'error'=>'ID manquant']); exit; }
-            try {
-                switch ($tbl) {
-                    case 'leads':
-                        $pdo->prepare("UPDATE leads SET
-                            firstname=?,lastname=?,email=?,phone=?,city=?,source=?,notes=?,
-                            status=?,temperature=?,next_action=?,next_action_date=?,updated_at=NOW()
-                            WHERE id=?")
-                        ->execute([
-                            trim($_POST['firstname']??''), trim($_POST['lastname']??''),
-                            trim($_POST['email']??'')           ?: null,
-                            trim($_POST['phone']??'')           ?: null,
-                            trim($_POST['city'] ??'')           ?: null,
-                            $_POST['source']      ?? 'manuel',
-                            trim($_POST['notes']??'')           ?: null,
-                            $_POST['status']      ?? 'new',
-                            $_POST['temperature'] ?? 'warm',
-                            trim($_POST['next_action']     ??'') ?: null,
-                            trim($_POST['next_action_date']??'') ?: null,
-                            $id,
-                        ]);
-                        break;
-                    case 'capture_leads':
-                        $pdo->prepare("UPDATE capture_leads SET prenom=?,nom=?,email=?,tel=? WHERE id=?")
-                            ->execute([trim($_POST['firstname']??''),trim($_POST['lastname']??''),trim($_POST['email']??''),trim($_POST['phone']??''),$id]);
-                        break;
-                    case 'demandes_estimation':
-                        $pdo->prepare("UPDATE demandes_estimation SET email=?,telephone=?,statut=? WHERE id=?")
-                            ->execute([trim($_POST['email']??''),trim($_POST['phone']??''),$_POST['status']??'nouveau',$id]);
-                        break;
-                    case 'contacts':
-                        $pdo->prepare("UPDATE contacts SET firstname=?,lastname=?,email=?,phone=?,city=?,notes=?,status=?,updated_at=NOW() WHERE id=?")
-                            ->execute([trim($_POST['firstname']??''),trim($_POST['lastname']??''),trim($_POST['email']??''),trim($_POST['phone']??''),trim($_POST['city']??''),trim($_POST['notes']??''),$_POST['status']??'actif',$id]);
-                        break;
-                    case 'financement_leads':
-                        $pdo->prepare("UPDATE financement_leads SET prenom=?,nom=?,email=?,telephone=?,statut=?,notes=?,updated_at=NOW() WHERE id=?")
-                            ->execute([trim($_POST['firstname']??''),trim($_POST['lastname']??''),trim($_POST['email']??''),trim($_POST['phone']??''),$_POST['status']??'nouveau',trim($_POST['notes']??''),$id]);
-                        break;
-                }
-                echo json_encode(['success' => true]);
-            } catch (Exception $e) {
-                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-            }
-            exit;
-
-        case 'delete_lead':
-            $id  = (int)($_POST['id'] ?? 0);
-            $tbl = preg_replace('/[^a-z_]/', '', $_POST['tbl'] ?? 'leads');
-            try {
-                $pdo->prepare("DELETE FROM `$tbl` WHERE id=?")->execute([$id]);
-                if ($tbl === 'leads') {
-                    try { $pdo->prepare("DELETE FROM lead_interactions WHERE lead_id=?")->execute([$id]); } catch(Exception $e){}
-                }
-                echo json_encode(['success' => true]);
-            } catch (Exception $e) {
-                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-            }
-            exit;
-
-        case 'get_interactions':
-            $lid = (int)($_POST['lead_id'] ?? 0);
-            try {
-                $s = $pdo->prepare("SELECT * FROM lead_interactions WHERE lead_id=? ORDER BY COALESCE(interaction_date,created_at) DESC");
-                $s->execute([$lid]);
-                echo json_encode(['success'=>true,'interactions'=>$s->fetchAll()]);
-            } catch (Exception $e) {
-                echo json_encode(['success'=>true,'interactions'=>[]]);
-            }
-            exit;
-
-        case 'add_interaction':
-            $lid  = (int)($_POST['lead_id'] ?? 0);
-            $type = in_array($_POST['type']??'',['note','appel','email','rdv','sms','visite']) ? $_POST['type'] : 'note';
-            try {
-                $pdo->prepare("INSERT INTO lead_interactions (lead_id,type,subject,content,interaction_date,duration_minutes,outcome) VALUES (?,?,?,?,?,?,?)")
-                    ->execute([$lid,$type,trim($_POST['subject']??'')?:null,trim($_POST['content']??'')?:null,trim($_POST['interaction_date']??'')?:null,(int)($_POST['duration_minutes']??0)?:null,$_POST['outcome']??null]);
-                try { $pdo->prepare("UPDATE leads SET updated_at=NOW() WHERE id=?")->execute([$lid]); } catch(Exception $e){}
-                echo json_encode(['success' => true]);
-            } catch (Exception $e) {
-                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-            }
-            exit;
-
-        case 'export':
-            header('Content-Type: text/csv; charset=UTF-8');
-            header('Content-Disposition: attachment; filename="leads-'.date('Y-m-d').'.csv"');
-            $out = fopen('php://output','w');
-            fprintf($out, chr(0xEF).chr(0xBB).chr(0xBF));
-            fputcsv($out, ['Source','Prénom','Nom','Email','Téléphone','Ville','Statut','Date'], ';');
-            foreach (getAllLeads($pdo,'','','created_at','DESC','',0,99999)['rows'] as $r)
-                fputcsv($out, [$r['_src_label'],$r['_fn'],$r['_ln'],$r['_email']??'',$r['_phone']??'',$r['_city']??'',$r['_status']??'',date('d/m/Y H:i',strtotime($r['created_at']))], ';');
-            fclose($out);
-            exit;
-
-        default:
-            echo json_encode(['success'=>false,'error'=>'Action inconnue: '.$action]);
-            exit;
-    }
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// FONCTION UNIFIÉE — toutes sources
-// ══════════════════════════════════════════════════════════════════════════════
-function getAllLeads(PDO $pdo, string $search, string $srcFilter, string $sort, string $order, string $statusFlt, int $offset, int $limit): array {
-    $rows = [];
-
-    if (!$srcFilter || in_array($srcFilter,['Manuel','Site web','GMB','Facebook','Google','Téléphone','Recommandation','Flyer','Boîtage','Salon'])) {
-        try {
-            $w=['1=1'];$p=[];
-            if ($search) { $t="%$search%"; $w[]="(firstname LIKE ? OR lastname LIKE ? OR full_name LIKE ? OR email LIKE ? OR phone LIKE ?)"; $p=[$t,$t,$t,$t,$t]; }
-            if ($statusFlt) { $w[]="status=?"; $p[]=$statusFlt; }
-            $s=$pdo->prepare("SELECT *,'leads' AS _tbl FROM leads WHERE ".implode(' AND ',$w)." ORDER BY created_at DESC");
-            $s->execute($p);
-            $srcMap=['site_web'=>'Site web','gmb'=>'GMB','pub_facebook'=>'Facebook','pub_google'=>'Google','recommandation'=>'Recommandation','telephone'=>'Téléphone','flyer'=>'Flyer','boitage'=>'Boîtage','salon'=>'Salon','estimation'=>'Estimation','capture'=>'Capture','financement'=>'Financement','manuel'=>'Manuel','autre'=>'Autre'];
-            foreach ($s->fetchAll() as $r) {
-                $r['_fn']  = trim($r['firstname'] ?? '');
-                $r['_ln']  = trim($r['lastname']  ?? '');
-                if (!$r['_fn'] && !$r['_ln'] && !empty($r['full_name'])) {
-                    $pts = explode(' ', trim($r['full_name']), 2);
-                    $r['_fn'] = $pts[0]; $r['_ln'] = $pts[1] ?? '';
-                }
-                $r['_email']=$r['email']??null; $r['_phone']=$r['phone']??null; $r['_city']=$r['city']??null;
-                $r['_status']=$r['status']??''; $r['_score']=(int)($r['score']??0);
-                $src = $r['source'] ?? 'manuel';
-                $r['_src_label'] = $srcMap[$src] ?? ucfirst($src);
-                $r['_src_key']   = 'leads';
-                if ($srcFilter && $r['_src_label'] !== $srcFilter) continue;
-                $rows[] = $r;
-            }
-        } catch (Exception $e) {}
-    }
-
-    if (!$srcFilter || $srcFilter === 'Capture') {
-        try {
-            $w=['1=1'];$p=[];
-            if ($search) { $t="%$search%"; $w[]="(prenom LIKE ? OR nom LIKE ? OR email LIKE ? OR tel LIKE ?)"; $p=[$t,$t,$t,$t]; }
-            $s=$pdo->prepare("SELECT *,'capture_leads' AS _tbl FROM capture_leads WHERE ".implode(' AND ',$w)." ORDER BY created_at DESC");
-            $s->execute($p);
-            foreach ($s->fetchAll() as $r) {
-                $r['_fn']=$r['prenom']??''; $r['_ln']=$r['nom']??''; $r['_email']=$r['email']??null; $r['_phone']=$r['tel']??null;
-                $r['_city']=null; $r['_status']=$r['injected_crm']?'contacté':'nouveau'; $r['_score']=0;
-                $r['_src_label']='Capture'; $r['_src_key']='capture_leads';
-                $r['notes']=$r['message']??null;
-                $rows[]=$r;
-            }
-        } catch (Exception $e) {}
-    }
-
-    if (!$srcFilter || $srcFilter === 'Estimation') {
-        try {
-            $w=['1=1'];$p=[];
-            if ($search) { $t="%$search%"; $w[]="(email LIKE ? OR telephone LIKE ? OR ville LIKE ?)"; $p=[$t,$t,$t]; }
-            $s=$pdo->prepare("SELECT *,'demandes_estimation' AS _tbl FROM demandes_estimation WHERE ".implode(' AND ',$w)." ORDER BY created_at DESC");
-            $s->execute($p);
-            foreach ($s->fetchAll() as $r) {
-                $r['_fn']=''; $r['_ln']=trim(($r['type_bien']??'Bien').' '.($r['ville']??''));
-                $r['_email']=$r['email']??null; $r['_phone']=$r['telephone']??null; $r['_city']=$r['ville']??null;
-                $r['_status']=$r['statut']??'nouveau'; $r['_score']=0;
-                $r['_src_label']='Estimation'; $r['_src_key']='demandes_estimation';
-                $parts=array_filter([$r['type_bien']??'', $r['surface']?($r['surface'].'m²'):'', $r['estimation_moyenne']?('~'.number_format($r['estimation_moyenne'],0,',',' ').'€'):'']);
-                $r['notes']=implode(' — ',$parts);
-                $rows[]=$r;
-            }
-        } catch (Exception $e) {}
-    }
-
-    if (!$srcFilter || $srcFilter === 'Contact') {
-        try {
-            $w=['1=1'];$p=[];
-            if ($search) { $t="%$search%"; $w[]="(firstname LIKE ? OR lastname LIKE ? OR nom LIKE ? OR prenom LIKE ? OR email LIKE ? OR phone LIKE ?)"; $p=[$t,$t,$t,$t,$t,$t]; }
-            $s=$pdo->prepare("SELECT *,'contacts' AS _tbl FROM contacts WHERE ".implode(' AND ',$w)." ORDER BY created_at DESC");
-            $s->execute($p);
-            foreach ($s->fetchAll() as $r) {
-                $r['_fn']=$r['firstname']??$r['prenom']??''; $r['_ln']=$r['lastname']??$r['nom']??'';
-                $r['_email']=$r['email']??null; $r['_phone']=$r['phone']??$r['telephone']??null; $r['_city']=$r['city']??null;
-                $r['_status']=$r['status']??'actif'; $r['_score']=(int)($r['rating']??0);
-                $r['_src_label']='Contact'; $r['_src_key']='contacts';
-                $rows[]=$r;
-            }
-        } catch (Exception $e) {}
-    }
-
-    if (!$srcFilter || $srcFilter === 'Financement') {
-        try {
-            $w=['1=1'];$p=[];
-            if ($search) { $t="%$search%"; $w[]="(prenom LIKE ? OR nom LIKE ? OR email LIKE ? OR telephone LIKE ?)"; $p=[$t,$t,$t,$t]; }
-            $s=$pdo->prepare("SELECT *,'financement_leads' AS _tbl FROM financement_leads WHERE ".implode(' AND ',$w)." ORDER BY created_at DESC");
-            $s->execute($p);
-            foreach ($s->fetchAll() as $r) {
-                $r['_fn']=$r['prenom']??''; $r['_ln']=$r['nom']??''; $r['_email']=$r['email']??null; $r['_phone']=$r['telephone']??null;
-                $r['_city']=null; $r['_status']=$r['statut']??'nouveau'; $r['_score']=0;
-                $r['_src_label']='Financement'; $r['_src_key']='financement_leads';
-                $r['notes']=trim(($r['type_projet']??'Projet').($r['montant_projet']?' — '.number_format($r['montant_projet'],0,',',' ').'€':'').($r['notes']?' | '.$r['notes']:''));
-                $rows[]=$r;
-            }
-        } catch (Exception $e) {}
-    }
-
-    // Dédoublonnage email
-    $seen=[]; $deduped=[];
-    foreach ($rows as $r) {
-        $key = strtolower(trim($r['_email'] ?? ''));
-        if ($key && isset($seen[$key])) continue;
-        if ($key) $seen[$key]=true;
-        $deduped[]=$r;
-    }
-
-    usort($deduped, function($a,$b) use ($sort,$order) {
-        $va = match($sort) { '_fn'=>strtolower($a['_fn'].$a['_ln']), '_email'=>strtolower($a['_email']??''), '_score'=>(int)$a['_score'], default=>$a['created_at']??'' };
-        $vb = match($sort) { '_fn'=>strtolower($b['_fn'].$b['_ln']), '_email'=>strtolower($b['_email']??''), '_score'=>(int)$b['_score'], default=>$b['created_at']??'' };
-        $cmp = is_int($va) ? ($va<=>$vb) : strcmp((string)$va,(string)$vb);
-        return $order==='DESC' ? -$cmp : $cmp;
-    });
-
-    $total = count($deduped);
-    return ['rows' => array_slice($deduped,$offset,$limit), 'total' => $total];
-}
+// ── LeadService ──────────────────────────────────────────────────────────────
+require_once __DIR__ . '/LeadService.php';
+$leadService = new LeadService($pdo);
 
 // ── Paramètres page ───────────────────────────────────────────────────────────
 $search    = trim($_GET['search'] ?? '');
@@ -301,13 +36,13 @@ $page      = max(1, (int)($_GET['p'] ?? 1));
 $perPage   = 25;
 $offset    = ($page-1)*$perPage;
 
-$result     = getAllLeads($pdo, $search, $srcFilter, $sortBy, $sortOrder, $statusFlt, $offset, $perPage);
+$result     = $leadService->getAllLeads($search, $srcFilter, $sortBy, $sortOrder, $statusFlt, $offset, $perPage);
 $leads      = $result['rows'];
 $totalLeads = $result['total'];
 $totalPages = max(1, ceil($totalLeads/$perPage));
 
 // Stats globales
-$statsAll = getAllLeads($pdo,'','','created_at','DESC','',0,99999)['rows'];
+$statsAll = $leadService->getAllLeads('','','created_at','DESC','',0,99999)['rows'];
 $sTotal   = count($statsAll);
 $sMonth   = count(array_filter($statsAll, fn($r)=>substr($r['created_at'],0,7)===date('Y-m')));
 $sEstim   = count(array_filter($statsAll, fn($r)=>($r['_src_label']??'')==='Estimation'));
@@ -604,7 +339,7 @@ $srcFilters = [
             <div class="lv-bstat"><div class="num rose"><?=$sNew?></div><div class="lbl">Nouveaux</div></div>
         </div>
         <div class="lv-banner-actions">
-            <a href="?page=leads&ajax=1&action=export" class="lv-btn lv-btn-outline lv-btn-sm"><i class="fas fa-download"></i> Export CSV</a>
+            <a href="/admin/modules/marketing/leads/api.php?action=export" class="lv-btn lv-btn-outline lv-btn-sm"><i class="fas fa-download"></i> Export CSV</a>
             <button class="lv-btn lv-btn-primary lv-btn-sm" onclick="lvOpenModal()"><i class="fas fa-plus"></i> Nouveau lead</button>
         </div>
     </div>
@@ -929,7 +664,7 @@ $srcFilters = [
 // ─────────────────────────────────────────────────────────────────────────────
 // Config
 // ─────────────────────────────────────────────────────────────────────────────
-const LV_BASE = window.location.pathname + '?page=leads&ajax=1';
+const LV_BASE = '/admin/modules/marketing/leads/api.php';
 
 let shId = null, shTbl = 'leads', logType = 'appel', logOutcome = 'positif';
 let shData = null;
