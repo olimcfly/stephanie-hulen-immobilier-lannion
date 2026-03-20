@@ -550,6 +550,232 @@ $TPL = [
     ],
 
     // ══════════════════════════════════════════════════
+    // T20 — FINANCEMENT
+    // ══════════════════════════════════════════════════
+    't20-financement' => [
+        ['section'=>'Hero',                     'icon'=>'fa-money-bill-wave','color'=>'#10b981','fields'=>[
+            ['key'=>'hero_eyebrow',  'label'=>'Eyebrow',                       'type'=>'text',    'hint'=>'Ex : Financement immobilier'],
+            ['key'=>'hero_title',    'label'=>'Titre H1',                      'type'=>'text'],
+            ['key'=>'hero_subtitle', 'label'=>'Sous-titre',                    'type'=>'textarea'],
+            ['key'=>'hero_cta_text', 'label'=>'CTA — texte bouton',            'type'=>'text'],
+        ]],
+        ['section'=>'Simulateur de prêt',       'icon'=>'fa-calculator',    'color'=>'#6366f1','fields'=>[
+            ['key'=>'sim_title',     'label'=>'Titre simulateur',              'type'=>'text'],
+            ['key'=>'sim_text',      'label'=>'Texte explicatif',              'type'=>'textarea'],
+        ]],
+        ['section'=>'Avantages courtier',       'icon'=>'fa-handshake',     'color'=>'#f59e0b','fields'=>[
+            ['key'=>'av_title',  'label'=>'Titre section',                     'type'=>'text'],
+            ['key'=>'av1_icon',  'label'=>'Avantage 1 — emoji',               'type'=>'text'],
+            ['key'=>'av1_title', 'label'=>'Avantage 1 — titre',               'type'=>'text'],
+            ['key'=>'av1_text',  'label'=>'Avantage 1 — texte',               'type'=>'textarea'],
+            ['key'=>'av2_icon',  'label'=>'Avantage 2 — emoji',               'type'=>'text'],
+            ['key'=>'av2_title', 'label'=>'Avantage 2 — titre',               'type'=>'text'],
+            ['key'=>'av2_text',  'label'=>'Avantage 2 — texte',               'type'=>'textarea'],
+            ['key'=>'av3_icon',  'label'=>'Avantage 3 — emoji',               'type'=>'text'],
+            ['key'=>'av3_title', 'label'=>'Avantage 3 — titre',               'type'=>'text'],
+            ['key'=>'av3_text',  'label'=>'Avantage 3 — texte',               'type'=>'textarea'],
+        ]],
+        ['section'=>'Courtiers partenaires',    'icon'=>'fa-building-columns','color'=>'#0ea5e9','fields'=>[
+            ['key'=>'court_title',  'label'=>'Titre section',                  'type'=>'text'],
+            ['key'=>'court_text',   'label'=>'Texte introductif',              'type'=>'textarea'],
+            ['key'=>'court1_name',  'label'=>'Courtier 1 — nom',              'type'=>'text'],
+            ['key'=>'court1_desc',  'label'=>'Courtier 1 — description',      'type'=>'textarea'],
+            ['key'=>'court1_phone', 'label'=>'Courtier 1 — téléphone',        'type'=>'text'],
+            ['key'=>'court2_name',  'label'=>'Courtier 2 — nom',              'type'=>'text'],
+            ['key'=>'court2_desc',  'label'=>'Courtier 2 — description',      'type'=>'textarea'],
+            ['key'=>'court2_phone', 'label'=>'Courtier 2 — téléphone',        'type'=>'text'],
+            ['key'=>'court3_name',  'label'=>'Courtier 3 — nom',              'type'=>'text'],
+            ['key'=>'court3_desc',  'label'=>'Courtier 3 — description',      'type'=>'textarea'],
+            ['key'=>'court3_phone', 'label'=>'Courtier 3 — téléphone',        'type'=>'text'],
+        ]],
+        ['section'=>'Guide SEO',                'icon'=>'fa-book-open',     'color'=>'#8b5cf6','fields'=>[
+            ['key'=>'guide_title', 'label'=>'Titre du guide',                  'type'=>'text'],
+            ['key'=>'g1_num',      'label'=>'Article 1 — numéro',             'type'=>'text'],
+            ['key'=>'g1_title',    'label'=>'Article 1 — titre',              'type'=>'text'],
+            ['key'=>'g1_text',     'label'=>'Article 1 — contenu',            'type'=>'rich'],
+            ['key'=>'g2_num',      'label'=>'Article 2 — numéro',             'type'=>'text'],
+            ['key'=>'g2_title',    'label'=>'Article 2 — titre',              'type'=>'text'],
+            ['key'=>'g2_text',     'label'=>'Article 2 — contenu',            'type'=>'rich'],
+            ['key'=>'g3_num',      'label'=>'Article 3 — numéro',             'type'=>'text'],
+            ['key'=>'g3_title',    'label'=>'Article 3 — titre',              'type'=>'text'],
+            ['key'=>'g3_text',     'label'=>'Article 3 — contenu',            'type'=>'rich'],
+        ]],
+        ['section'=>'CTA Finale',               'icon'=>'fa-rocket',        'color'=>'#10b981','fields'=>[
+            ['key'=>'cta_title',    'label'=>'Titre',                          'type'=>'text'],
+            ['key'=>'cta_text',     'label'=>'Description',                    'type'=>'textarea'],
+            ['key'=>'cta_btn_text', 'label'=>'Texte bouton',                   'type'=>'text'],
+            ['key'=>'cta_btn_url',  'label'=>'Lien bouton',                    'type'=>'url'],
+        ]],
+    ],
+
+    // ══════════════════════════════════════════════════
+    // T21 — RDV EN LIGNE
+    // ══════════════════════════════════════════════════
+    't21-rdv' => [
+        ['section'=>'Hero',                     'icon'=>'fa-calendar-check','color'=>'#6366f1','fields'=>[
+            ['key'=>'hero_eyebrow',  'label'=>'Eyebrow',                       'type'=>'text',    'hint'=>'Ex : Rendez-vous en ligne'],
+            ['key'=>'hero_title',    'label'=>'Titre H1',                      'type'=>'text'],
+            ['key'=>'hero_subtitle', 'label'=>'Sous-titre',                    'type'=>'textarea'],
+        ]],
+        ['section'=>'Types de RDV',             'icon'=>'fa-list-check',    'color'=>'#0d9488','fields'=>[
+            ['key'=>'types_title',  'label'=>'Titre section',                  'type'=>'text'],
+            ['key'=>'type1_icon',   'label'=>'Type 1 — emoji',                'type'=>'text'],
+            ['key'=>'type1_title',  'label'=>'Type 1 — titre',                'type'=>'text'],
+            ['key'=>'type1_text',   'label'=>'Type 1 — texte',                'type'=>'textarea'],
+            ['key'=>'type1_duree',  'label'=>'Type 1 — durée',                'type'=>'text',    'hint'=>'Ex : 45 min'],
+            ['key'=>'type2_icon',   'label'=>'Type 2 — emoji',                'type'=>'text'],
+            ['key'=>'type2_title',  'label'=>'Type 2 — titre',                'type'=>'text'],
+            ['key'=>'type2_text',   'label'=>'Type 2 — texte',                'type'=>'textarea'],
+            ['key'=>'type2_duree',  'label'=>'Type 2 — durée',                'type'=>'text'],
+            ['key'=>'type3_icon',   'label'=>'Type 3 — emoji',                'type'=>'text'],
+            ['key'=>'type3_title',  'label'=>'Type 3 — titre',                'type'=>'text'],
+            ['key'=>'type3_text',   'label'=>'Type 3 — texte',                'type'=>'textarea'],
+            ['key'=>'type3_duree',  'label'=>'Type 3 — durée',                'type'=>'text'],
+            ['key'=>'type4_icon',   'label'=>'Type 4 — emoji',                'type'=>'text'],
+            ['key'=>'type4_title',  'label'=>'Type 4 — titre',                'type'=>'text'],
+            ['key'=>'type4_text',   'label'=>'Type 4 — texte',                'type'=>'textarea'],
+            ['key'=>'type4_duree',  'label'=>'Type 4 — durée',                'type'=>'text'],
+        ]],
+        ['section'=>'Réservation / Calendrier', 'icon'=>'fa-calendar-days','color'=>'#f59e0b','fields'=>[
+            ['key'=>'book_title',    'label'=>'Titre section',                 'type'=>'text'],
+            ['key'=>'book_text',     'label'=>'Texte explicatif',              'type'=>'textarea'],
+            ['key'=>'book_url',      'label'=>'URL Calendly / Cal.com',        'type'=>'url',     'hint'=>'Lien d\'intégration du calendrier'],
+            ['key'=>'book_btn_text', 'label'=>'Texte bouton agenda',           'type'=>'text'],
+        ]],
+        ['section'=>'Infos pratiques',          'icon'=>'fa-info-circle',   'color'=>'#0ea5e9','fields'=>[
+            ['key'=>'info_title',    'label'=>'Titre section',                 'type'=>'text'],
+            ['key'=>'info_lieu',     'label'=>'Lieu de RDV',                   'type'=>'text'],
+            ['key'=>'info_horaires', 'label'=>'Horaires',                      'type'=>'text'],
+            ['key'=>'info_delai',    'label'=>'Délai de confirmation',         'type'=>'text'],
+        ]],
+        ['section'=>'CTA Finale',               'icon'=>'fa-rocket',        'color'=>'#10b981','fields'=>[
+            ['key'=>'cta_title',      'label'=>'Titre',                        'type'=>'text'],
+            ['key'=>'cta_text',       'label'=>'Description',                  'type'=>'textarea'],
+            ['key'=>'cta_phone_text', 'label'=>'Numéro de téléphone',          'type'=>'text'],
+        ]],
+    ],
+
+    // ══════════════════════════════════════════════════
+    // T22 — ANNUAIRE PARTENAIRES
+    // ══════════════════════════════════════════════════
+    't22-annuaire-partenaires' => [
+        ['section'=>'Hero',                     'icon'=>'fa-address-book',  'color'=>'#8b5cf6','fields'=>[
+            ['key'=>'hero_eyebrow',  'label'=>'Eyebrow',                       'type'=>'text',    'hint'=>'Ex : Annuaire partenaires'],
+            ['key'=>'hero_title',    'label'=>'Titre H1',                      'type'=>'text'],
+            ['key'=>'hero_subtitle', 'label'=>'Sous-titre',                    'type'=>'textarea'],
+        ]],
+        ['section'=>'Introduction',             'icon'=>'fa-pen-nib',       'color'=>'#0ea5e9','fields'=>[
+            ['key'=>'intro_title',   'label'=>'Titre intro',                   'type'=>'text'],
+            ['key'=>'intro_text',    'label'=>'Texte intro',                   'type'=>'textarea'],
+        ]],
+        ['section'=>'Notaires',                 'icon'=>'fa-scale-balanced','color'=>'#6366f1','fields'=>[
+            ['key'=>'not_title',   'label'=>'Titre catégorie',                 'type'=>'text'],
+            ['key'=>'not_icon',    'label'=>'Icône catégorie',                 'type'=>'text'],
+            ['key'=>'not1_name',   'label'=>'Notaire 1 — nom',                'type'=>'text'],
+            ['key'=>'not1_desc',   'label'=>'Notaire 1 — description',        'type'=>'textarea'],
+            ['key'=>'not1_phone',  'label'=>'Notaire 1 — téléphone',          'type'=>'text'],
+            ['key'=>'not1_addr',   'label'=>'Notaire 1 — adresse',            'type'=>'text'],
+            ['key'=>'not2_name',   'label'=>'Notaire 2 — nom',                'type'=>'text'],
+            ['key'=>'not2_desc',   'label'=>'Notaire 2 — description',        'type'=>'textarea'],
+            ['key'=>'not2_phone',  'label'=>'Notaire 2 — téléphone',          'type'=>'text'],
+            ['key'=>'not2_addr',   'label'=>'Notaire 2 — adresse',            'type'=>'text'],
+        ]],
+        ['section'=>'Diagnostiqueurs',          'icon'=>'fa-microscope',    'color'=>'#0d9488','fields'=>[
+            ['key'=>'diag_title',   'label'=>'Titre catégorie',                'type'=>'text'],
+            ['key'=>'diag_icon',    'label'=>'Icône catégorie',                'type'=>'text'],
+            ['key'=>'diag1_name',   'label'=>'Diagnostiqueur 1 — nom',        'type'=>'text'],
+            ['key'=>'diag1_desc',   'label'=>'Diagnostiqueur 1 — description','type'=>'textarea'],
+            ['key'=>'diag1_phone',  'label'=>'Diagnostiqueur 1 — téléphone',  'type'=>'text'],
+            ['key'=>'diag2_name',   'label'=>'Diagnostiqueur 2 — nom',        'type'=>'text'],
+            ['key'=>'diag2_desc',   'label'=>'Diagnostiqueur 2 — description','type'=>'textarea'],
+            ['key'=>'diag2_phone',  'label'=>'Diagnostiqueur 2 — téléphone',  'type'=>'text'],
+        ]],
+        ['section'=>'Artisans & travaux',       'icon'=>'fa-hammer',        'color'=>'#f59e0b','fields'=>[
+            ['key'=>'art_title',    'label'=>'Titre catégorie',                'type'=>'text'],
+            ['key'=>'art_icon',     'label'=>'Icône catégorie',                'type'=>'text'],
+            ['key'=>'art1_name',    'label'=>'Artisan 1 — nom',               'type'=>'text'],
+            ['key'=>'art1_desc',    'label'=>'Artisan 1 — description',       'type'=>'textarea'],
+            ['key'=>'art1_metier',  'label'=>'Artisan 1 — métier',            'type'=>'text'],
+            ['key'=>'art1_phone',   'label'=>'Artisan 1 — téléphone',         'type'=>'text'],
+            ['key'=>'art2_name',    'label'=>'Artisan 2 — nom',               'type'=>'text'],
+            ['key'=>'art2_desc',    'label'=>'Artisan 2 — description',       'type'=>'textarea'],
+            ['key'=>'art2_metier',  'label'=>'Artisan 2 — métier',            'type'=>'text'],
+            ['key'=>'art2_phone',   'label'=>'Artisan 2 — téléphone',         'type'=>'text'],
+            ['key'=>'art3_name',    'label'=>'Artisan 3 — nom',               'type'=>'text'],
+            ['key'=>'art3_desc',    'label'=>'Artisan 3 — description',       'type'=>'textarea'],
+            ['key'=>'art3_metier',  'label'=>'Artisan 3 — métier',            'type'=>'text'],
+            ['key'=>'art3_phone',   'label'=>'Artisan 3 — téléphone',         'type'=>'text'],
+        ]],
+        ['section'=>'Autres professionnels',    'icon'=>'fa-handshake',     'color'=>'#ec4899','fields'=>[
+            ['key'=>'autres_title',   'label'=>'Titre catégorie',              'type'=>'text'],
+            ['key'=>'autres_icon',    'label'=>'Icône catégorie',              'type'=>'text'],
+            ['key'=>'autre1_name',    'label'=>'Pro 1 — nom',                 'type'=>'text'],
+            ['key'=>'autre1_desc',    'label'=>'Pro 1 — description',         'type'=>'textarea'],
+            ['key'=>'autre1_metier',  'label'=>'Pro 1 — métier',              'type'=>'text'],
+            ['key'=>'autre1_phone',   'label'=>'Pro 1 — téléphone',           'type'=>'text'],
+            ['key'=>'autre2_name',    'label'=>'Pro 2 — nom',                 'type'=>'text'],
+            ['key'=>'autre2_desc',    'label'=>'Pro 2 — description',         'type'=>'textarea'],
+            ['key'=>'autre2_metier',  'label'=>'Pro 2 — métier',              'type'=>'text'],
+            ['key'=>'autre2_phone',   'label'=>'Pro 2 — téléphone',           'type'=>'text'],
+        ]],
+        ['section'=>'CTA Finale',               'icon'=>'fa-rocket',        'color'=>'#10b981','fields'=>[
+            ['key'=>'cta_title',    'label'=>'Titre',                          'type'=>'text'],
+            ['key'=>'cta_text',     'label'=>'Description',                    'type'=>'textarea'],
+            ['key'=>'cta_btn_text', 'label'=>'Texte bouton',                   'type'=>'text'],
+            ['key'=>'cta_btn_url',  'label'=>'Lien bouton',                    'type'=>'url'],
+        ]],
+    ],
+
+    // ══════════════════════════════════════════════════
+    // T23 — FAQ
+    // ══════════════════════════════════════════════════
+    't23-faq' => [
+        ['section'=>'Hero',                     'icon'=>'fa-circle-question','color'=>'#6366f1','fields'=>[
+            ['key'=>'hero_eyebrow',  'label'=>'Eyebrow',                       'type'=>'text',    'hint'=>'Ex : FAQ'],
+            ['key'=>'hero_title',    'label'=>'Titre H1',                      'type'=>'text'],
+            ['key'=>'hero_subtitle', 'label'=>'Sous-titre',                    'type'=>'textarea'],
+        ]],
+        ['section'=>'Questions — Achat',        'icon'=>'fa-house',         'color'=>'#0d9488','fields'=>[
+            ['key'=>'cat_achat_title','label'=>'Titre catégorie Achat',        'type'=>'text'],
+            ['key'=>'faq1_q',   'label'=>'Question 1',                         'type'=>'text'],
+            ['key'=>'faq1_a',   'label'=>'Réponse 1',                          'type'=>'textarea'],
+            ['key'=>'faq2_q',   'label'=>'Question 2',                         'type'=>'text'],
+            ['key'=>'faq2_a',   'label'=>'Réponse 2',                          'type'=>'textarea'],
+            ['key'=>'faq3_q',   'label'=>'Question 3',                         'type'=>'text'],
+            ['key'=>'faq3_a',   'label'=>'Réponse 3',                          'type'=>'textarea'],
+        ]],
+        ['section'=>'Questions — Vente',        'icon'=>'fa-tag',           'color'=>'#f59e0b','fields'=>[
+            ['key'=>'cat_vente_title','label'=>'Titre catégorie Vente',        'type'=>'text'],
+            ['key'=>'faq4_q',   'label'=>'Question 4',                         'type'=>'text'],
+            ['key'=>'faq4_a',   'label'=>'Réponse 4',                          'type'=>'textarea'],
+            ['key'=>'faq5_q',   'label'=>'Question 5',                         'type'=>'text'],
+            ['key'=>'faq5_a',   'label'=>'Réponse 5',                          'type'=>'textarea'],
+            ['key'=>'faq6_q',   'label'=>'Question 6',                         'type'=>'text'],
+            ['key'=>'faq6_a',   'label'=>'Réponse 6',                          'type'=>'textarea'],
+        ]],
+        ['section'=>'Questions — Financement',  'icon'=>'fa-money-bill',    'color'=>'#10b981','fields'=>[
+            ['key'=>'cat_fin_title', 'label'=>'Titre catégorie Financement',   'type'=>'text'],
+            ['key'=>'faq7_q',   'label'=>'Question 7',                         'type'=>'text'],
+            ['key'=>'faq7_a',   'label'=>'Réponse 7',                          'type'=>'textarea'],
+            ['key'=>'faq8_q',   'label'=>'Question 8',                         'type'=>'text'],
+            ['key'=>'faq8_a',   'label'=>'Réponse 8',                          'type'=>'textarea'],
+        ]],
+        ['section'=>'Questions — Général',      'icon'=>'fa-circle-info',   'color'=>'#8b5cf6','fields'=>[
+            ['key'=>'cat_gen_title', 'label'=>'Titre catégorie Général',       'type'=>'text'],
+            ['key'=>'faq9_q',   'label'=>'Question 9',                         'type'=>'text'],
+            ['key'=>'faq9_a',   'label'=>'Réponse 9',                          'type'=>'textarea'],
+            ['key'=>'faq10_q',  'label'=>'Question 10',                        'type'=>'text'],
+            ['key'=>'faq10_a',  'label'=>'Réponse 10',                         'type'=>'textarea'],
+        ]],
+        ['section'=>'CTA Finale',               'icon'=>'fa-rocket',        'color'=>'#10b981','fields'=>[
+            ['key'=>'cta_title',    'label'=>'Titre',                          'type'=>'text'],
+            ['key'=>'cta_text',     'label'=>'Description',                    'type'=>'textarea'],
+            ['key'=>'cta_btn_text', 'label'=>'Texte bouton',                   'type'=>'text'],
+            ['key'=>'cta_btn_url',  'label'=>'Lien bouton',                    'type'=>'url'],
+        ]],
+    ],
+
+    // ══════════════════════════════════════════════════
     // STANDARD — Fallback générique
     // ══════════════════════════════════════════════════
     'standard' => [
@@ -590,6 +816,12 @@ $TPL['apropos']            = $TPL['t14-apropos'];
 $TPL['secteurs-listing']   = $TPL['t15-secteurs-listing'];
 $TPL['secteurs']           = $TPL['t15-secteurs-listing'];
 $TPL['rapport-marche']     = $TPL['t16-rapport-marche'];
+$TPL['financement']        = $TPL['t20-financement'];
+$TPL['rdv']                = $TPL['t21-rdv'];
+$TPL['rendez-vous']        = $TPL['t21-rdv'];
+$TPL['annuaire-partenaires'] = $TPL['t22-annuaire-partenaires'];
+$TPL['partenaires']        = $TPL['t22-annuaire-partenaires'];
+$TPL['faq']                = $TPL['t23-faq'];
 $TPL['default']            = $TPL['standard'];
 $TPL['page']               = $TPL['standard'];
 $TPL['Landing']            = $TPL['standard'];
