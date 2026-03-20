@@ -8,3 +8,5 @@ vendor/
 node_modules/
 .DS_Store
 error_log
+admin/error_log
+admin/error_log
