@@ -8,11 +8,22 @@ define('SITE_TITLE',    'Stephanie Hulen - Lannion');
 define('SITE_DOMAIN',   'stephanie-hulen-immobilier-lannion.fr');
 define('ADMIN_EMAIL',   'admin@stephanie-hulen-immobilier-lannion.fr');
 
-define('DB_HOST',    'localhost');
-define('DB_NAME',    'cool1933_cms-site-sh-lanion');
-define('DB_USER',    'cool1933_cms-sh-lannion');
-define('DB_PASS',    'qxJ4ij(22dmV');
-define('DB_CHARSET', 'utf8mb4');
+/* Charger .env si present */
+$envFile = dirname(__DIR__) . '/.env';
+if (file_exists($envFile)) {
+    foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+        if (strpos(trim($line), '#') === 0) continue;
+        if (strpos($line, '=') === false) continue;
+        [$key, $val] = explode('=', $line, 2);
+        $_ENV[trim($key)] = trim($val);
+    }
+}
+
+define('DB_HOST',    $_ENV['DB_HOST'] ?? 'localhost');
+define('DB_NAME',    $_ENV['DB_NAME'] ?? '');
+define('DB_USER',    $_ENV['DB_USER'] ?? '');
+define('DB_PASS',    $_ENV['DB_PASS'] ?? '');
+define('DB_CHARSET', $_ENV['DB_CHARSET'] ?? 'utf8mb4');
 
 function getDB() {
     static $pdo = null;
@@ -65,10 +76,15 @@ function isValidEmail($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
 }
 
-define('DEBUG_MODE', true);
+define('DEBUG_MODE', filter_var($_ENV['DEBUG_MODE'] ?? false, FILTER_VALIDATE_BOOLEAN));
 if (DEBUG_MODE) {
     ini_set('display_errors', 1);
     error_reporting(E_ALL);
+} else {
+    ini_set('display_errors', 0);
+    error_reporting(0);
 }
+
+define('SESSION_TIMEOUT', 3600); // 1 heure
 
 ?>
