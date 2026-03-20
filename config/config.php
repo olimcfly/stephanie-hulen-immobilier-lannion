@@ -29,7 +29,13 @@ function getDB() {
             ]
         );
     } catch (PDOException $e) {
-        die('Erreur DB: ' . $e->getMessage());
+        error_log('Erreur DB: ' . $e->getMessage());
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            die('Erreur DB: ' . $e->getMessage());
+        }
+        http_response_code(500);
+        include ROOT_PATH . '/front/500.php';
+        exit;
     }
     
     return $pdo;
@@ -65,10 +71,17 @@ function isValidEmail($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
 }
 
-define('DEBUG_MODE', true);
+define('DEBUG_MODE', (bool)(getenv('APP_DEBUG') ?: false));
+
 if (DEBUG_MODE) {
     ini_set('display_errors', 1);
     error_reporting(E_ALL);
+} else {
+    ini_set('display_errors', 0);
+    error_reporting(E_ALL);
 }
+
+ini_set('log_errors', 1);
+ini_set('error_log', ROOT_PATH . '/logs/php_errors.log');
 
 ?>
