@@ -176,7 +176,7 @@ if (!function_exists('renderHeader')) {
                 ['label' => 'Nos biens',    'url' => '/biens-immobiliers'],
                 ['label' => 'Estimation',   'url' => '/estimation'],
                 ['label' => 'Secteurs',     'url' => '/secteurs'],
-                ['label' => 'Financement',  'url' => '/financer'],
+                ['label' => 'Financement',  'url' => '/financement'],
                 ['label' => 'Blog',         'url' => '/blog'],
             ];
         }
