@@ -1,7 +1,10 @@
-/vendor
-/node_modules
+*.zip
+logs/
+tmp/
+cache/
+uploads/
 .env
-*.log
-/cache
-/tmp
-/uploads
+vendor/
+node_modules/
+.DS_Store
+error_log
