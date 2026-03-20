@@ -32,6 +32,15 @@ try {
 // Traiter suppression AJAX
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     header('Content-Type: application/json');
+
+    // Vérification CSRF
+    $csrfToken = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    if (empty($_SESSION['csrf_token']) || empty($csrfToken) || !hash_equals($_SESSION['csrf_token'], $csrfToken)) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Token CSRF invalide']);
+        exit;
+    }
+
     if ($_POST['action'] === 'delete') {
         $id = (int)($_POST['id'] ?? 0);
         try {
@@ -125,10 +134,11 @@ tr:hover { background:#f8f6f3; }
 <script>
 function deleteGuide(id, name) {
     if (!confirm(`Confirmer la suppression de "${name}" ?`)) return;
-    
+
     const data = new FormData();
     data.append('action', 'delete');
     data.append('id', id);
+    data.append('csrf_token', '<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>');
 
     fetch('', { method: 'POST', body: data })
         .then(r => r.json())

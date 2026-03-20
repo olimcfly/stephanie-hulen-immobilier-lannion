@@ -46,29 +46,40 @@ try {
     $tableExists = true;
 } catch (PDOException $e) {}
 
+// ─── CSRF ───
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // ─── ACTIONS POST ───
 $error = null;
 if ($tableExists && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $postAction = $_POST['action'] ?? '';
     $itemId     = (int)($_POST['id'] ?? 0);
 
-    if ($postAction === 'delete' && $itemId > 0) {
-        try {
-            $pdo->prepare("DELETE FROM annuaire WHERE id = ?")->execute([$itemId]);
-            header("Location: /admin/dashboard.php?page=annuaire&msg=deleted"); exit;
-        } catch (PDOException $e) { $error = $e->getMessage(); }
-    }
-    if ($postAction === 'toggle_status' && $itemId > 0) {
-        try {
-            $pdo->prepare("UPDATE annuaire SET status = IF(status='published','draft','published') WHERE id = ?")->execute([$itemId]);
-            header("Location: /admin/dashboard.php?page=annuaire&msg=updated"); exit;
-        } catch (PDOException $e) { $error = $e->getMessage(); }
-    }
-    if ($postAction === 'toggle_featured' && $itemId > 0) {
-        try {
-            $pdo->prepare("UPDATE annuaire SET is_featured = IF(is_featured=1,0,1) WHERE id = ?")->execute([$itemId]);
-            header("Location: /admin/dashboard.php?page=annuaire&msg=updated"); exit;
-        } catch (PDOException $e) { $error = $e->getMessage(); }
+    // Vérification CSRF pour toutes les actions POST
+    $csrfToken = $_POST['csrf_token'] ?? '';
+    if (empty($csrfToken) || !hash_equals($_SESSION['csrf_token'], $csrfToken)) {
+        $error = 'Token de sécurité invalide.';
+    } else {
+        if ($postAction === 'delete' && $itemId > 0) {
+            try {
+                $pdo->prepare("DELETE FROM annuaire WHERE id = ?")->execute([$itemId]);
+                header("Location: /admin/dashboard.php?page=annuaire&msg=deleted"); exit;
+            } catch (PDOException $e) { $error = $e->getMessage(); }
+        }
+        if ($postAction === 'toggle_status' && $itemId > 0) {
+            try {
+                $pdo->prepare("UPDATE annuaire SET status = IF(status='published','draft','published') WHERE id = ?")->execute([$itemId]);
+                header("Location: /admin/dashboard.php?page=annuaire&msg=updated"); exit;
+            } catch (PDOException $e) { $error = $e->getMessage(); }
+        }
+        if ($postAction === 'toggle_featured' && $itemId > 0) {
+            try {
+                $pdo->prepare("UPDATE annuaire SET is_featured = IF(is_featured=1,0,1) WHERE id = ?")->execute([$itemId]);
+                header("Location: /admin/dashboard.php?page=annuaire&msg=updated"); exit;
+            } catch (PDOException $e) { $error = $e->getMessage(); }
+        }
     }
 }
 

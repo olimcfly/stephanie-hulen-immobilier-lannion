@@ -17,9 +17,8 @@ if (isset($db) && !isset($pdo)) $pdo = $db;
 if (isset($pdo) && !isset($db)) $db  = $pdo;
 
 $routeAction = $_GET['action'] ?? '';
-if (in_array($routeAction, ['edit','create','delete'])) {
+if (in_array($routeAction, ['edit','create'])) {
     $editFile = __DIR__ . '/edit.php';
-    if ($routeAction === 'create') $editFile = __DIR__ . '/create.php';
     if (file_exists($editFile)) { require $editFile; return; }
 }
 

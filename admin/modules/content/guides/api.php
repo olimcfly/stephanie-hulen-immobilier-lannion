@@ -5,6 +5,13 @@
  * Endpoints AJAX pour actions : delete, toggle_status, duplicate, bulk actions
  */
 
+if (session_status() === PHP_SESSION_NONE) session_start();
+if (empty($_SESSION['admin_id'])) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Non authentifié']);
+    exit;
+}
+
 if (!isset($pdo) && !isset($db)) {
     if (!defined('ADMIN_ROUTER')) require_once dirname(dirname(dirname(__DIR__))) . '/includes/init.php';
 }
@@ -18,6 +25,16 @@ if (empty($_SERVER['HTTP_X_REQUESTED_WITH']) || $_SERVER['HTTP_X_REQUESTED_WITH'
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Invalid request']);
+        exit;
+    }
+}
+
+// ─── Vérifier CSRF pour les POST ───
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $csrfToken = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    if (empty($csrfToken) || empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrfToken)) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'Token CSRF invalide']);
         exit;
     }
 }

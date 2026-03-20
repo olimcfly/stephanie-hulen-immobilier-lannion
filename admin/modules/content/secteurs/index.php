@@ -74,8 +74,20 @@ if (($_GET['action'] ?? '') === 'create' && hash_equals($csrf, $_GET['csrf_token
     } catch (PDOException $e) {}
 }
 
+// ─── Helper CSRF pour les actions AJAX POST ───
+$_checkCsrf = function() use ($csrf) {
+    $token = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    if (empty($token) || !hash_equals($csrf, $token)) {
+        header('Content-Type: application/json');
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'Token CSRF invalide']);
+        exit;
+    }
+};
+
 // ─── AJAX delete ───
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'delete') {
+    $_checkCsrf();
     header('Content-Type: application/json');
     $id = (int)($_POST['id'] ?? 0);
     try {
@@ -88,6 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'dele
 
 // ─── AJAX toggle status ───
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'toggle_status') {
+    $_checkCsrf();
     header('Content-Type: application/json');
     $id     = (int)($_POST['id'] ?? 0);
     $status = $_POST['status'] === 'published' ? 'published' : 'draft';
@@ -101,6 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'togg
 
 // ─── AJAX duplicate ───
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'duplicate') {
+    $_checkCsrf();
     header('Content-Type: application/json');
     $id = (int)($_POST['id'] ?? 0);
     try {
