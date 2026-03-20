@@ -73,7 +73,7 @@ function renderSiteHeader($options = []) {
             ['label' => 'Accueil',   'url' => '/',              'type' => 'link'],
             ['label' => 'Acheter',   'url' => '/acheter',       'type' => 'link'],
             ['label' => 'Vendre',    'url' => '/vendre',        'type' => 'link'],
-            ['label' => 'Estimer',   'url' => '/estimer',       'type' => 'link'],
+            ['label' => 'Estimation','url' => '/estimation',    'type' => 'link'],
             ['label' => 'Secteurs',  'url' => '/secteurs',      'type' => 'link'],
             ['label' => 'Contact',   'url' => '/contact',       'type' => 'cta'],
         ];

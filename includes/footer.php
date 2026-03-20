@@ -36,16 +36,16 @@ function _fsRaw(string $key, string $fallback = ''): string {
 }
 
 // ── Préparer les données ──
-$agentName    = _fs('agent_name',    'Eduardo De Sul');
-$agentTitle   = _fs('agent_title',   'Conseiller immobilier professionnel');
-$agentCity    = _fs('agent_city',    'Bordeaux');
-$agentRegion  = _fs('agent_region',  'Gironde (33)');
+$agentName    = _fs('agent_name',    'Stéphanie Hulen');
+$agentTitle   = _fs('agent_title',   'Conseillère immobilière professionnelle');
+$agentCity    = _fs('agent_city',    'Lannion');
+$agentRegion  = _fs('agent_region',  'Côtes-d\'Armor (22)');
 $agentNetwork = _fs('agent_network', '');
 $agentPhone   = _fs('agent_phone',   '');
 $agentEmail   = _fs('agent_email',   '');
 $agentAddress = _fs('agent_address', '');
 $postalCode   = _fs('agent_postal_code', '');
-$siteName     = _fs('site_name',     'Eduardo De Sul Immobilier');
+$siteName     = _fs('site_name',     'Stéphanie Hulen Immobilier');
 $legalEntity  = _fs('legal_entity',  $agentName . ' Immobilier');
 $agentRsac    = _fs('agent_rsac',    '');
 $agentSiret   = _fs('agent_siret',   '');
@@ -137,9 +137,9 @@ $footerLegal = getMenu('footer-col3', $pdo ?? null);
                             ?>
                             <ul class="footer-links">
                                 <li><a href="/estimation">Estimation gratuite</a></li>
-                                <li><a href="/diagnostic">Diagnostic vendeur</a></li>
-                                <li><a href="/consultation">Consultation</a></li>
-                                <li><a href="/financement">Aide au financement</a></li>
+                                <li><a href="/acheter">Acheter</a></li>
+                                <li><a href="/vendre">Vendre</a></li>
+                                <li><a href="/biens-immobiliers">Nos biens</a></li>
                                 <li><a href="/contact">Me contacter</a></li>
                             </ul>
                             <?php
@@ -158,10 +158,9 @@ $footerLegal = getMenu('footer-col3', $pdo ?? null);
                             <ul class="footer-links">
                                 <li><a href="/">Accueil</a></li>
                                 <li><a href="/a-propos">À propos</a></li>
-                                <li><a href="/acheter">Acheter</a></li>
-                                <li><a href="/vendre">Vendre</a></li>
-                                <li><a href="/louer">Louer</a></li>
+                                <li><a href="/secteurs">Secteurs</a></li>
                                 <li><a href="/blog">Blog</a></li>
+                                <li><a href="/honoraires">Honoraires</a></li>
                             </ul>
                             <?php
                         }

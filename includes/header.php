@@ -32,11 +32,11 @@ function _hs(string $key, string $fallback = ''): string {
 }
 
 // ── Valeurs dynamiques ──
-$agentName  = _hs('agent_name',  'Eduardo De Sul');
+$agentName  = _hs('agent_name',  'Stéphanie Hulen');
 $agentPhone = _hs('agent_phone', '');
 $agentEmail = _hs('agent_email', '');
 $siteName   = _hs('site_name',   $agentName . ' Immobilier');
-$siteUrl    = _hs('site_url',    defined('SITE_URL') ? SITE_URL : 'https://eduardo-desul-immobilier.fr');
+$siteUrl    = _hs('site_url',    defined('SITE_URL') ? SITE_URL : 'https://stephanie-hulen-immobilier-lannion.fr');
 $logoUrl    = _hs('agent_logo_url', '');
 $logoAlt    = $siteName;
 
@@ -52,8 +52,8 @@ if (strlen($phoneClean) === 10 && $phoneClean[0] === '0') {
 
 // SEO (variables de page > settings par défaut)
 $pageTitle       = isset($pageTitle) ? $pageTitle : _hs('meta_default_title', $siteName);
-$pageDescription = isset($pageDescription) ? $pageDescription : _hs('meta_default_description', 'Conseiller immobilier professionnel à ' . _hs('agent_city', 'Bordeaux') . '.');
-$pageKeywords    = isset($pageKeywords) ? $pageKeywords : 'immobilier, ' . strtolower(_hs('agent_city', 'bordeaux')) . ', vente, location, conseil';
+$pageDescription = isset($pageDescription) ? $pageDescription : _hs('meta_default_description', 'Conseillère immobilière professionnelle à ' . _hs('agent_city', 'Lannion') . '.');
+$pageKeywords    = isset($pageKeywords) ? $pageKeywords : 'immobilier, ' . strtolower(_hs('agent_city', 'lannion')) . ', vente, location, conseil';
 $pageOgImage     = isset($pageOgImage) ? $pageOgImage : _hs('agent_photo_url', '');
 $canonicalUrl    = isset($canonicalUrl) ? $canonicalUrl : (isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] : $siteUrl);
 
@@ -201,13 +201,28 @@ $headerMenu = getMenu('header-main', $pdo ?? null);
                     ?>
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="/">🏠 Accueil</a>
+                            <a class="nav-link" href="/">Accueil</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/a-propos">À propos</a>
+                            <a class="nav-link" href="/acheter">Acheter</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/contact">📞 Contact</a>
+                            <a class="nav-link" href="/vendre">Vendre</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/biens-immobiliers">Nos biens</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/estimation">Estimation</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/secteurs">Secteurs</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blog">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/contact">Contact</a>
                         </li>
                     </ul>
                     <?php
