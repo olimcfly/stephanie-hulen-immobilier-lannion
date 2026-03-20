@@ -37,6 +37,8 @@ if ($action === 'create') {
         require_once __DIR__ . '/create.php';
         return;
     }
+    // Fallback: continue to listing page and auto-open create modal via JS
+    $autoOpenCreate = true;
 }
 
 if ($action === 'guide-wizard') {
@@ -849,4 +851,9 @@ const PGS = {
 };
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') PGS.closeModal(); });
+
+<?php if (!empty($autoOpenCreate)): ?>
+// Auto-open create modal when action=create
+document.addEventListener('DOMContentLoaded', () => PGS.openCreateModal());
+<?php endif; ?>
 </script>
