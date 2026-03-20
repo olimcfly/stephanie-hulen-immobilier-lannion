@@ -19,7 +19,6 @@ if (isset($pdo) && !isset($db)) $db  = $pdo;
 $routeAction = $_GET['action'] ?? '';
 if (in_array($routeAction, ['edit','create','delete'])) {
     $editFile = __DIR__ . '/edit.php';
-    if ($routeAction === 'create') $editFile = __DIR__ . '/create.php';
     if (file_exists($editFile)) { require $editFile; return; }
 }
 
@@ -448,7 +447,7 @@ if (!isset($_SESSION['csrf_token'])) {
             <i class="fas fa-search"></i>
             <input type="text" name="q" placeholder="Titre, slug…" value="<?= htmlspecialchars($searchQuery) ?>">
         </form>
-        <a href="?page=captures&action=create" class="cap-btn cap-btn-primary"><i class="fas fa-plus"></i> Nouvelle capture</a>
+        <a href="?page=captures&action=edit" class="cap-btn cap-btn-primary"><i class="fas fa-plus"></i> Nouvelle capture</a>
     </div>
 </div>
 
