@@ -19,10 +19,14 @@ if (file_exists($envFile)) {
     }
 }
 
+if (empty($_ENV['DB_NAME']) || empty($_ENV['DB_USER'])) {
+    die('Fichier .env manquant ou incomplet. Verifiez que .env existe a la racine du site.');
+}
+
 define('DB_HOST',    $_ENV['DB_HOST'] ?? 'localhost');
-define('DB_NAME',    $_ENV['DB_NAME'] ?? 'cool1933_cms-site-sh-lanion');
-define('DB_USER',    $_ENV['DB_USER'] ?? 'cool1933_cms-sh-lannion');
-define('DB_PASS',    $_ENV['DB_PASS'] ?? 'qxJ4ij(22dmV');
+define('DB_NAME',    $_ENV['DB_NAME']);
+define('DB_USER',    $_ENV['DB_USER']);
+define('DB_PASS',    $_ENV['DB_PASS'] ?? '');
 define('DB_CHARSET', $_ENV['DB_CHARSET'] ?? 'utf8mb4');
 
 function getDB() {
