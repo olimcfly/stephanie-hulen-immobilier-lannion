@@ -1,0 +1,228 @@
+/* ═══════════════════════════════════════════════════
+   T14 — À Propos : styles spécifiques
+   ═══════════════════════════════════════════════════ */
+
+/* ── Bio : grille photo + texte ─────────────────── */
+.ap-bio-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 56px;
+    align-items: start;
+}
+.ap-bio-content {
+    padding-top: 8px;
+}
+
+/* ── Photo / Placeholder portrait ────────────────── */
+.ap-photo-img {
+    width: 100%;
+    border-radius: var(--tp-radius);
+    box-shadow: var(--tp-shadow-lg);
+    object-fit: cover;
+    aspect-ratio: 3/4;
+}
+.ap-photo-placeholder {
+    background: linear-gradient(145deg, var(--tp-primary-d) 0%, var(--tp-primary) 55%, var(--tp-primary-l) 100%);
+    border-radius: var(--tp-radius);
+    padding: 56px 32px 48px;
+    text-align: center;
+    box-shadow: var(--tp-shadow-lg);
+    position: relative;
+    overflow: hidden;
+}
+.ap-photo-placeholder::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+}
+.ap-photo-initials {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(200, 169, 110, .2);
+    border: 2px solid rgba(200, 169, 110, .4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 3rem;
+    font-family: var(--tp-ff-display);
+    font-weight: 800;
+    color: var(--tp-white);
+    position: relative;
+}
+.ap-photo-name {
+    font-family: var(--tp-ff-display);
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--tp-white);
+    margin: 0 0 8px;
+    position: relative;
+}
+.ap-photo-role {
+    font-size: .85rem;
+    color: var(--tp-accent-l);
+    font-weight: 600;
+    margin: 0 0 4px;
+    position: relative;
+}
+.ap-photo-city {
+    font-size: .8rem;
+    color: rgba(255, 255, 255, .6);
+    margin: 0;
+    position: relative;
+}
+
+/* ── Parcours : grille 2x2 ──────────────────────── */
+.ap-parcours-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+.ap-parcours-card {
+    background: var(--tp-white);
+    border-radius: var(--tp-radius);
+    border: 1px solid var(--tp-border);
+    padding: 32px 28px;
+    box-shadow: var(--tp-shadow);
+    transition: transform .2s, box-shadow .2s;
+}
+.ap-parcours-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--tp-shadow-lg);
+}
+.ap-parcours-icon {
+    font-size: 2rem;
+    margin-bottom: 16px;
+}
+.ap-parcours-title {
+    font-family: var(--tp-ff-display);
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--tp-primary);
+    margin: 0 0 12px;
+}
+.ap-parcours-text {
+    font-size: .88rem;
+    color: var(--tp-text2);
+    line-height: 1.75;
+    margin: 0;
+}
+
+/* ── Valeurs : grille 2x2 ───────────────────────── */
+.ap-valeurs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+.ap-valeur-card {
+    background: var(--tp-bg);
+    border-radius: var(--tp-radius);
+    border: 1px solid var(--tp-border);
+    padding: 32px 28px;
+    transition: border-color .2s, box-shadow .2s;
+}
+.ap-valeur-card:hover {
+    border-color: var(--tp-accent);
+    box-shadow: var(--tp-shadow);
+}
+.ap-valeur-icon {
+    font-size: 2rem;
+    margin-bottom: 16px;
+}
+.ap-valeur-title {
+    font-family: var(--tp-ff-display);
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--tp-primary);
+    margin: 0 0 12px;
+}
+.ap-valeur-text {
+    font-size: .88rem;
+    color: var(--tp-text2);
+    line-height: 1.75;
+    margin: 0;
+}
+
+/* ── Réseau : grille badge + texte ──────────────── */
+.ap-reseau-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 56px;
+    align-items: start;
+}
+.ap-reseau-badge-col {
+    text-align: center;
+}
+.ap-reseau-badge {
+    background: linear-gradient(145deg, var(--tp-primary-d) 0%, var(--tp-primary) 100%);
+    border-radius: var(--tp-radius);
+    padding: 48px 32px;
+    box-shadow: var(--tp-shadow-lg);
+}
+.ap-reseau-logo {
+    font-family: var(--tp-ff-display);
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: var(--tp-accent);
+    letter-spacing: -.03em;
+    margin-bottom: 16px;
+    text-transform: lowercase;
+}
+.ap-reseau-badge h3 {
+    font-family: var(--tp-ff-display);
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--tp-white);
+    margin: 0 0 8px;
+}
+.ap-reseau-badge p {
+    font-size: .85rem;
+    color: rgba(255, 255, 255, .65);
+    margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 960px) {
+    .ap-bio-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    .ap-bio-grid .ap-bio-photo {
+        order: -1;
+        max-width: 380px;
+        margin: 0 auto;
+        width: 100%;
+    }
+    .ap-parcours-grid,
+    .ap-valeurs-grid {
+        grid-template-columns: 1fr;
+    }
+    .ap-reseau-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    .ap-reseau-badge-col {
+        max-width: 380px;
+        margin: 0 auto;
+        width: 100%;
+    }
+}
+@media (max-width: 600px) {
+    .ap-photo-placeholder {
+        padding: 40px 24px 36px;
+    }
+    .ap-photo-initials {
+        width: 90px;
+        height: 90px;
+        font-size: 2.2rem;
+    }
+    .ap-parcours-card,
+    .ap-valeur-card {
+        padding: 24px 20px;
+    }
+}
