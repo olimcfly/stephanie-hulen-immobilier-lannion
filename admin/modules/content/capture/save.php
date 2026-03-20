@@ -5,7 +5,7 @@
  *  /admin/modules/content/captures/save.php
  *
  *  Endpoint POST centralisé pour créer ou mettre à jour
- *  une capture. Utilisé par create.php et les appels AJAX.
+ *  une capture. Utilisé par edit.php et les appels AJAX.
  *
  *  Input  : POST multipart ou JSON
  *  Output : JSON  { success, id, message, errors? }
