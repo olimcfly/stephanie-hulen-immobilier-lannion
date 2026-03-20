@@ -34,9 +34,6 @@ if (isset($pdo)) {
     } catch (Exception $e) { $dbError = $e->getMessage(); }
 }
 
-// ─── API endpoint ───────────────────────────────────────────────
-// Toute la logique AJAX est dans api.php (même répertoire)
-
 // ─── FILTRAGE & PAGINATION ──────────────────────────────────────
 $filterStatut = $_GET['filter_statut'] ?? 'all';
 $filterSearch = trim($_GET['q'] ?? '');
@@ -352,7 +349,7 @@ table.est-tbl tbody tr.en-attente-row{background:#fffbeb}
 </div>
 
 <script>
-const API='/admin/modules/immobilier/estimation/api.php';
+const API='<?php echo dirname($_SERVER["SCRIPT_NAME"]); ?>/modules/immobilier/estimation/api.php';
 function toggleD(id){document.getElementById('d-'+id)?.classList.toggle('open');document.querySelectorAll('.quick-email-dropdown.open').forEach(e=>e.classList.remove('open'))}
 function toggleQE(id){const m=document.getElementById('qem-'+id);document.querySelectorAll('.quick-email-dropdown.open').forEach(e=>{if(e!==m)e.classList.remove('open')});m?.classList.toggle('open')}
 document.addEventListener('click',e=>{if(!e.target.closest('.ebtn-email')&&!e.target.closest('.quick-email-dropdown'))document.querySelectorAll('.quick-email-dropdown.open').forEach(e=>e.classList.remove('open'))});
