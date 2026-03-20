@@ -20,91 +20,33 @@ $db = Database::getInstance();
 if (empty($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 $csrf = $_SESSION['csrf_token'];
 
-$itemId = intval($_GET['id'] ?? 0);
-$action = $_GET['action'] ?? 'edit';
-
-function jsGo(string $url): never {
-    echo '<script>window.location.href="'.addslashes($url).'";</script>'; exit;
-}
+$itemId = (int)($_GET['id'] ?? 0);
+$isNew  = ($itemId === 0);
 
 // ── Colonnes DB ──
 $cols = [];
 try { $cols = $db->query("SHOW COLUMNS FROM secteurs")->fetchAll(PDO::FETCH_COLUMN); } catch(Throwable){}
 $has = fn(string $c): bool => in_array($c, $cols);
 
-// ── CRÉATION ──
-if ($action === 'create') {
-    if (!hash_equals($csrf, $_GET['csrf_token'] ?? '')) jsGo('/admin/dashboard.php?page=secteurs');
-    try {
-        $db->prepare("INSERT INTO secteurs (nom,slug,ville,type_secteur,status,created_at) VALUES (?,?,'Bordeaux','quartier','draft',NOW())")
-           ->execute(['Nouveau secteur','nouveau-secteur-'.time()]);
-        jsGo("/admin/modules/content/secteurs/edit.php?id=".$db->lastInsertId()."&msg=created");
-    } catch(PDOException $e){ die($e->getMessage()); }
-}
-
-// ── SUPPRESSION ──
-if ($action === 'delete' && $itemId) {
-    try { $db->prepare("DELETE FROM secteurs WHERE id=?")->execute([$itemId]); } catch(Throwable){}
-    jsGo('/admin/dashboard.php?page=secteurs&msg=deleted');
-}
-
-if ($itemId <= 0) { header('Location: /admin/dashboard.php?page=secteurs'); exit; }
-
-// ── CHARGEMENT ──
+// ── CHARGEMENT ou DÉFAUTS (mode création) ──
 $secteur = null;
-try {
-    $st = $db->prepare("SELECT * FROM secteurs WHERE id=?");
-    $st->execute([$itemId]);
-    $secteur = $st->fetch(PDO::FETCH_ASSOC);
-} catch(Throwable){}
-if (!$secteur) { header('Location: /admin/dashboard.php?page=secteurs&error=not_found'); exit; }
-
-// ── SAUVEGARDE ──
-$saveMsg = null; $saveErr = null;
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_secteur'])) {
-    if (!hash_equals($csrf, $_POST['csrf_token'] ?? '')) {
-        $saveErr = 'Token invalide.';
-    } else {
-        $statusEN = $_POST['status'] === 'published' ? 'published' : 'draft';
-        $data = [
-            'nom'              => trim($_POST['nom'] ?? ''),
-            'slug'             => trim($_POST['slug'] ?? ''),
-            'ville'            => trim($_POST['ville'] ?? ''),
-            'type_secteur'     => $_POST['type_secteur'] ?? 'quartier',
-            'description'      => trim($_POST['description'] ?? ''),
-            'content'          => $_POST['content'] ?? '',
-            'atouts'           => trim($_POST['atouts'] ?? ''),
-            'prix_moyen'       => trim($_POST['prix_moyen'] ?? ''),
-            'transport'        => trim($_POST['transport'] ?? ''),
-            'ambiance'         => trim($_POST['ambiance'] ?? ''),
-            'hero_image'       => trim($_POST['hero_image'] ?? ''),
-            'hero_title'       => trim($_POST['hero_title'] ?? ''),
-            'hero_subtitle'    => trim($_POST['hero_subtitle'] ?? ''),
-            'hero_cta_text'    => trim($_POST['hero_cta_text'] ?? ''),
-            'hero_cta_url'     => trim($_POST['hero_cta_url'] ?? ''),
-            'meta_title'       => trim($_POST['meta_title'] ?? ''),
-            'meta_description' => trim($_POST['meta_description'] ?? ''),
-            'meta_keywords'    => trim($_POST['meta_keywords'] ?? ''),
-            'status'           => $statusEN,
-            'template_id'      => intval($_POST['template_id'] ?? 0) ?: null,
-        ];
-        if ($has('statut')) $data['statut'] = $statusEN === 'published' ? 'publie' : 'brouillon';
-
-        // Auto-slug
-        if (empty($data['slug']) && !empty($data['nom'])) {
-            $sl = mb_strtolower($data['nom']);
-            $sl = strtr($sl,['à'=>'a','â'=>'a','é'=>'e','è'=>'e','ê'=>'e','î'=>'i','ô'=>'o','ù'=>'u','û'=>'u','ç'=>'c']);
-            $data['slug'] = trim(preg_replace('/[^a-z0-9]+/','-',$sl),'-');
-        }
-
-        $safe = array_filter($data, fn($k) => $has($k), ARRAY_FILTER_USE_KEY);
-        $sets = array_map(fn($c)=>"`$c`=?", array_keys($safe));
-        $vals = array_values($safe); $vals[] = $itemId;
-        try {
-            $db->prepare('UPDATE secteurs SET '.implode(',',$sets).' WHERE id=?')->execute($vals);
-            jsGo("/admin/modules/content/secteurs/edit.php?id=$itemId&msg=saved");
-        } catch(PDOException $e){ $saveErr = $e->getMessage(); }
-    }
+$saveErr = null;
+if ($isNew) {
+    $secteur = [
+        'nom'=>'', 'slug'=>'', 'ville'=>'', 'type_secteur'=>'quartier',
+        'description'=>'', 'content'=>'', 'atouts'=>'', 'prix_moyen'=>'',
+        'transport'=>'', 'ambiance'=>'', 'hero_image'=>'', 'hero_title'=>'',
+        'hero_subtitle'=>'', 'hero_cta_text'=>'', 'hero_cta_url'=>'',
+        'meta_title'=>'', 'meta_description'=>'', 'meta_keywords'=>'',
+        'status'=>'draft', 'template_id'=>0, 'created_at'=>'', 'updated_at'=>'',
+    ];
+} else {
+    try {
+        $st = $db->prepare("SELECT * FROM secteurs WHERE id=?");
+        $st->execute([$itemId]);
+        $secteur = $st->fetch(PDO::FETCH_ASSOC);
+    } catch(Throwable){}
+    if (!$secteur) { header('Location: /admin/dashboard.php?page=secteurs&error=not_found'); exit; }
 }
 
 // ── Données affichage ──
@@ -171,7 +113,7 @@ $flashOk  = ['saved'=>'✅ Contenu enregistré','created'=>'✅ Secteur créé �
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>✏️ Contenu — <?= htmlspecialchars($nom) ?></title>
+<title><?= $isNew ? '➕ Nouveau secteur' : '✏️ Contenu — ' . htmlspecialchars($nom) ?></title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -574,9 +516,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
 <body>
 
 <!-- ══ FORM ══ -->
-<form method="POST" id="ecForm">
-<input type="hidden" name="csrf_token"  value="<?= htmlspecialchars($csrf) ?>">
-<input type="hidden" name="save_secteur" value="1">
+<form id="ecForm" onsubmit="return false;">
 <input type="hidden" name="status"      id="ecStatusInput" value="<?= $status ?>">
 <input type="hidden" name="content"     id="ecContentInput" value="">
 <input type="hidden" name="template_id" id="ecTplIdInput"  value="<?= $tplId ?>">
@@ -588,8 +528,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       <i class="fas fa-arrow-left"></i> Secteurs
     </a>
     <div class="ec-title">
-      <i class="fas fa-pencil-alt" style="color:var(--blue)"></i>
-      <?= htmlspecialchars(mb_substr($nom,0,32) ?: 'Nouveau secteur') ?>
+      <i class="fas fa-<?= $isNew ? 'plus-circle' : 'pencil-alt' ?>" style="color:var(--blue)"></i>
+      <span id="ecTopTitle"><?= $isNew ? 'Nouveau secteur' : htmlspecialchars(mb_substr($nom,0,32) ?: 'Nouveau secteur') ?></span>
       <span class="ec-title-badge"><?= $typeS==='commune'?'🏙️ Commune':'🏘️ Quartier' ?></span>
       <span class="ec-status-badge <?= $status ?>" id="ecStatusBadge">
         <?= $status==='published'?'🟢 Publié':'🟡 Brouillon' ?>
@@ -597,6 +537,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
     </div>
   </div>
   <div class="ec-top-right">
+    <?php if (!$isNew): ?>
     <!-- Mode tabs : Contenu / Design -->
     <div class="ec-mode-tabs">
       <span class="ec-mode-tab active"><i class="fas fa-pencil-alt"></i> Contenu</span>
@@ -611,6 +552,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       <i class="fas fa-<?= $status==='published'?'external-link-alt':'eye' ?>"></i>
       <?= $status==='published'?'Voir':'Aperçu' ?>
     </a>
+    <?php endif; ?>
     <?php endif; ?>
 
     <button type="button" class="ec-btn ec-btn-draft" onclick="ecSave('draft')">
@@ -1023,10 +965,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
         </div>
 
         <div style="display:flex;flex-direction:column;gap:5px;margin-top:6px">
+          <?php if (!$isNew): ?>
           <a href="/admin/modules/builder/builder/editor.php?type=secteur&id=<?= $itemId ?>"
              class="ec-quick-item design-link">
             <i class="fas fa-paint-brush"></i> Ouvrir l'éditeur design
           </a>
+          <?php endif; ?>
           <?php if($currentTpl): ?>
           <a href="/admin/modules/builder/builder/editor.php?type=template&id=<?= $tplId ?>"
              class="ec-quick-item design-link">
@@ -1073,9 +1017,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
       </div>
       <div class="ec-side-body">
         <div class="ec-quick">
+          <?php if (!$isNew): ?>
           <a href="/admin/modules/builder/builder/editor.php?type=secteur&id=<?= $itemId ?>" class="ec-quick-item design-link">
             <i class="fas fa-paint-brush"></i> Éditeur design (Builder Pro)
           </a>
+          <?php endif; ?>
           <?php if($slug): ?>
           <a href="/<?= htmlspecialchars($slug) ?>" target="_blank" class="ec-quick-item"
              style="<?= $status!=='published'?'border-style:dashed;color:var(--t3)':'' ?>">
@@ -1086,13 +1032,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
           <a href="/admin/dashboard.php?page=secteurs" class="ec-quick-item">
             <i class="fas fa-list"></i> Tous les secteurs
           </a>
-          <a href="/admin/modules/content/secteurs/edit.php?action=create&csrf_token=<?= $csrf ?>" class="ec-quick-item">
+          <a href="/admin/dashboard.php?page=secteurs&action=edit" class="ec-quick-item">
             <i class="fas fa-plus"></i> Nouveau secteur
           </a>
         </div>
       </div>
     </div>
 
+    <?php if (!$isNew): ?>
     <!-- Danger zone -->
     <div class="ec-side-card">
       <div class="ec-side-hdr">
@@ -1106,6 +1053,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
         </div>
       </div>
     </div>
+    <?php endif; ?>
 
   </div><!-- /sidebar -->
 </div><!-- /layout -->
@@ -1163,9 +1111,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);font-si
 const EC = {
   csrf:    '<?= addslashes($csrf) ?>',
   itemId:  <?= $itemId ?>,
+  isNew:   <?= $isNew ? 'true' : 'false' ?>,
   nom:     <?= json_encode($nom) ?>,
   ville:   <?= json_encode($ville) ?>,
   typeS:   <?= json_encode($typeS) ?>,
+  apiUrl:  '/admin/modules/content/secteurs/api.php',
   aiEndpoint: '/admin/api/ai/generate.php',
 };
 
@@ -1288,19 +1238,61 @@ function ecChangeTpl(sel) {
   toast(sel.value > 0 ? `Template sélectionné — sauvegardez pour appliquer` : 'Template retiré', 'info');
 }
 
-// ── Save ──
-function ecSave(status) {
+// ── Save (AJAX via api.php) ──
+async function ecSave(status) {
   ecSetStatus(status);
-  // Sync Quill content
   sv('ecContentInput', quill.root.innerHTML);
-  g('ecForm').submit();
+
+  const form = g('ecForm');
+  const fd = new FormData(form);
+  fd.set('action', 'save');
+  fd.set('id', EC.itemId);
+  fd.set('content', quill.root.innerHTML);
+
+  toast('Sauvegarde en cours...', 'info', 2000);
+
+  try {
+    const r = await fetch(EC.apiUrl, { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.success) {
+      if (EC.isNew && d.id) {
+        // Redirect to edit mode with the new ID
+        window.location.href = `/admin/modules/content/secteurs/edit.php?id=${d.id}&msg=created`;
+        return;
+      }
+      toast(status === 'published' ? 'Secteur publié' : 'Brouillon enregistré', 'ok');
+      // Update top title with current name
+      const topTitle = g('ecTopTitle');
+      const nomVal = g('ecNom')?.value;
+      if (topTitle && nomVal) topTitle.textContent = nomVal.substring(0, 32) || 'Nouveau secteur';
+    } else {
+      toast(d.error || 'Erreur lors de la sauvegarde', 'err', 5000);
+    }
+  } catch (err) {
+    toast('Erreur réseau : ' + err.message, 'err', 5000);
+  }
 }
 
-// ── Delete ──
-function ecDelete() {
+// ── Delete (AJAX via api.php) ──
+async function ecDelete() {
   if (!confirm('Supprimer définitivement ce secteur ?')) return;
   if (!confirm('Confirmer la suppression — cette action est irréversible.')) return;
-  window.location.href = `/admin/modules/content/secteurs/edit.php?action=delete&id=${EC.itemId}&csrf_token=${EC.csrf}`;
+
+  try {
+    const fd = new FormData();
+    fd.append('action', 'delete');
+    fd.append('id', EC.itemId);
+    const r = await fetch(EC.apiUrl, { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.success) {
+      toast('Secteur supprimé', 'ok');
+      setTimeout(() => { window.location.href = '/admin/dashboard.php?page=secteurs&msg=deleted'; }, 800);
+    } else {
+      toast(d.error || 'Erreur suppression', 'err', 5000);
+    }
+  } catch (err) {
+    toast('Erreur réseau : ' + err.message, 'err', 5000);
+  }
 }
 
 // ── Variables panel ──
@@ -1454,7 +1446,7 @@ function toast(msg, type='ok', dur=3500) {
 
 // ── Ctrl+S ──
 document.addEventListener('keydown', e => {
-  if ((e.ctrlKey||e.metaKey) && e.key==='s') { e.preventDefault(); ecSave('draft'); toast('Sauvegarde...','info',1500); }
+  if ((e.ctrlKey||e.metaKey) && e.key==='s') { e.preventDefault(); ecSave('draft'); }
 });
 
 // ── Init ──

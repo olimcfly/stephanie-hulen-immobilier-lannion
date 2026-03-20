@@ -23,6 +23,15 @@ if (!isset($db)  && isset($pdo)) $db  = $pdo;
 if (empty($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 $csrf = $_SESSION['csrf_token'];
 
+// ─── ROUTING: action=edit &rarr; charger edit.php (mode cr&eacute;ation si pas d'id) ───
+$action = $_GET['action'] ?? '';
+if ($action === 'edit') {
+    if (file_exists(__DIR__ . '/edit.php')) {
+        require_once __DIR__ . '/edit.php';
+        return;
+    }
+}
+
 // ─── CREATE TABLE si absente ───
 try {
     $pdo->exec("CREATE TABLE IF NOT EXISTS `secteurs` (
@@ -62,66 +71,7 @@ $cols = [];
 try { $cols = $pdo->query("SHOW COLUMNS FROM secteurs")->fetchAll(PDO::FETCH_COLUMN); } catch (Throwable $e) {}
 $has = fn(string $c): bool => in_array($c, $cols);
 
-// ─── ACTION : cr&eacute;ation rapide ───
-if (($_GET['action'] ?? '') === 'create' && hash_equals($csrf, $_GET['csrf_token'] ?? '')) {
-    try {
-        $pdo->prepare("INSERT INTO secteurs (nom,slug,ville,type_secteur,status,created_at)
-                       VALUES (?,?,?,?,'draft',NOW())")
-            ->execute(['Nouveau secteur', 'nouveau-secteur-'.time(), 'Bordeaux', 'quartier']);
-        $newId = (int)$pdo->lastInsertId();
-        header("Location: /admin/modules/content/secteurs/edit.php?id={$newId}&msg=created");
-        exit;
-    } catch (PDOException $e) {}
-}
-
-// ─── AJAX delete ───
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'delete') {
-    header('Content-Type: application/json');
-    $id = (int)($_POST['id'] ?? 0);
-    try {
-        $pdo->prepare("DELETE FROM secteurs WHERE id=?")->execute([$id]);
-        echo json_encode(['success' => true]); exit;
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => $e->getMessage()]); exit;
-    }
-}
-
-// ─── AJAX toggle status ───
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'toggle_status') {
-    header('Content-Type: application/json');
-    $id     = (int)($_POST['id'] ?? 0);
-    $status = $_POST['status'] === 'published' ? 'published' : 'draft';
-    try {
-        $pdo->prepare("UPDATE secteurs SET status=? WHERE id=?")->execute([$status, $id]);
-        echo json_encode(['success' => true]); exit;
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => $e->getMessage()]); exit;
-    }
-}
-
-// ─── AJAX duplicate ───
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'duplicate') {
-    header('Content-Type: application/json');
-    $id = (int)($_POST['id'] ?? 0);
-    try {
-        $src = $pdo->prepare("SELECT * FROM secteurs WHERE id=?");
-        $src->execute([$id]);
-        $row = $src->fetch(PDO::FETCH_ASSOC);
-        if ($row) {
-            unset($row['id'], $row['created_at'], $row['updated_at']);
-            $row['nom']    = 'Copie — ' . $row['nom'];
-            $row['slug']   = $row['slug'] . '-copie-' . time();
-            $row['status'] = 'draft';
-            $cols2 = array_keys($row);
-            $pdo->prepare("INSERT INTO secteurs (`".implode('`,`',$cols2)."`) VALUES (".implode(',',array_fill(0,count($cols2),'?')).")")
-                ->execute(array_values($row));
-            echo json_encode(['success' => true, 'new_id' => (int)$pdo->lastInsertId()]); exit;
-        }
-        echo json_encode(['success' => false, 'error' => 'Not found']); exit;
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => $e->getMessage()]); exit;
-    }
-}
+// ─── Actions AJAX d&eacute;l&eacute;gu&eacute;es &agrave; api.php ───
 
 // ─── Filtres ───
 $filterStatus = $_GET['status']      ?? 'all';
@@ -758,9 +708,9 @@ $flash = $_GET['msg'] ?? '';
                 <input type="text" name="q" placeholder="Rechercher un secteur&hellip;"
                        value="<?= htmlspecialchars($searchQuery) ?>">
             </form>
-            <button type="button" class="btn btn-teal" onclick="SC.openModal()">
+            <a href="?page=secteurs&action=edit" class="btn btn-teal">
                 <i class="fas fa-plus"></i> Nouveau secteur
-            </button>
+            </a>
         </div>
     </div>
 
@@ -951,82 +901,10 @@ $flash = $_GET['msg'] ?? '';
 
 </div><!-- /.module-wrap -->
 
-<!-- ── MODAL NOUVEAU SECTEUR ────────────────────────────────── -->
-<div class="sc-modal-overlay" id="scModal" onclick="if(event.target===this)SC.closeModal()">
-    <div class="sc-modal">
-        <div class="sc-modal-head">
-            <h3><i class="fas fa-plus-circle"></i> Nouveau secteur</h3>
-            <button class="sc-modal-close" onclick="SC.closeModal()"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="sc-modal-body">
-            <label class="sc-modal-label">Nom du secteur / quartier</label>
-            <input type="text" id="scNewNom" class="sc-modal-input"
-                   placeholder="Ex&nbsp;: Bacalan, Les Chartrons, Talence Centre&hellip;"
-                   autocomplete="off">
-
-            <div class="sc-modal-row">
-                <div>
-                    <label class="sc-modal-label" style="margin-bottom:5px">Ville</label>
-                    <input type="text" id="scNewVille" class="sc-modal-input" style="margin-bottom:0"
-                           placeholder="Bordeaux, M&eacute;rignac&hellip;"
-                           value="<?= htmlspecialchars($villes[0] ?? 'Bordeaux') ?>">
-                </div>
-                <div>
-                    <label class="sc-modal-label" style="margin-bottom:5px">Type</label>
-                    <select id="scNewType" class="sc-modal-select">
-                        <option value="quartier">&#127968; Quartier</option>
-                        <option value="commune">&#127755; Commune</option>
-                    </select>
-                </div>
-            </div>
-
-            <p class="sc-modal-hint">
-                <i class="fas fa-info-circle"></i>
-                Le secteur est cr&eacute;&eacute; en brouillon et vous &ecirc;tes redirig&eacute; vers l&rsquo;&eacute;diteur de contenu.
-            </p>
-        </div>
-        <div class="sc-modal-foot">
-            <button type="button" class="btn btn-s" onclick="SC.closeModal()">Annuler</button>
-            <button type="button" class="btn btn-teal" onclick="SC.createSecteur()">
-                <i class="fas fa-map-location-dot"></i> Cr&eacute;er le secteur
-            </button>
-        </div>
-    </div>
-</div>
-
 <script>
 const SC = {
-    apiUrl: window.location.href.split('?')[0],
+    apiUrl: '/admin/modules/content/secteurs/api.php',
     csrf:   '<?= addslashes($csrf) ?>',
-
-    // ── Modal ──
-    openModal() {
-        document.getElementById('scModal').classList.add('open');
-        setTimeout(() => document.getElementById('scNewNom').focus(), 80);
-    },
-    closeModal() {
-        document.getElementById('scModal').classList.remove('open');
-    },
-
-    // ── Cr&eacute;er secteur (via redirect GET) ──
-    createSecteur() {
-        const nom   = document.getElementById('scNewNom').value.trim();
-        const ville = document.getElementById('scNewVille').value.trim() || 'Bordeaux';
-        const type  = document.getElementById('scNewType').value;
-        if (!nom) { document.getElementById('scNewNom').focus(); return; }
-        // POST form vers action=create (redirect edit.php)
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/admin/modules/content/secteurs/edit.php?action=create&csrf_token=' + this.csrf;
-        const fields = { nom, ville, type_secteur: type };
-        for (const [k,v] of Object.entries(fields)) {
-            const i = document.createElement('input');
-            i.type = 'hidden'; i.name = k; i.value = v;
-            form.appendChild(i);
-        }
-        document.body.appendChild(form);
-        form.submit();
-    },
 
     // ── Filtres ──
     filterBy(key, value) {
@@ -1058,36 +936,36 @@ const SC = {
         if (action === 'delete' && !confirm(`Supprimer ${ids.length} secteur(s) ?`)) return;
         for (const id of ids) {
             if (action === 'delete') {
-                await this._post({ _action: 'delete', id });
+                await this._post({ action: 'delete', id });
             } else {
                 const statusMap = { publish: 'published', draft: 'draft', archive: 'archived' };
-                await this._post({ _action: 'toggle_status', id, status: statusMap[action] });
+                await this._post({ action: 'toggle_status', id, status: statusMap[action] });
             }
         }
         location.reload();
     },
 
-    // ── Delete ──
+    // ── Delete (via api.php) ──
     async deleteSecteur(id, nom) {
-        if (!confirm(`Supprimer &laquo; ${nom} &raquo; ?\nCette action est irr&eacute;versible.`)) return;
-        const d = await this._post({ _action: 'delete', id });
+        if (!confirm(`Supprimer \u00ab ${nom} \u00bb ?\nCette action est irr\u00e9versible.`)) return;
+        const d = await this._post({ action: 'delete', id });
         if (d.success) {
             const row = document.querySelector(`tr[data-id="${id}"]`);
             if (row) { row.style.cssText = 'opacity:0;transform:translateX(20px);transition:all .3s'; setTimeout(() => row.remove(), 300); }
         } else alert(d.error || 'Erreur');
     },
 
-    // ── Toggle statut ──
+    // ── Toggle statut (via api.php) ──
     async toggleStatus(id, current) {
         const newStatus = current === 'published' ? 'draft' : 'published';
-        const d = await this._post({ _action: 'toggle_status', id, status: newStatus });
+        const d = await this._post({ action: 'toggle_status', id, status: newStatus });
         d.success ? location.reload() : alert(d.error || 'Erreur');
     },
 
-    // ── Duplicate ──
+    // ── Duplicate (via api.php) ──
     async duplicate(id) {
         if (!confirm('Dupliquer ce secteur ?')) return;
-        const d = await this._post({ _action: 'duplicate', id });
+        const d = await this._post({ action: 'duplicate', id });
         if (d.success) {
             window.location.href = `/admin/modules/content/secteurs/edit.php?id=${d.new_id}&msg=created`;
         } else alert(d.error || 'Erreur');
@@ -1100,13 +978,7 @@ const SC = {
             for (const [k,v] of Object.entries(data)) fd.append(k, v);
             const r = await fetch(this.apiUrl, { method: 'POST', body: fd });
             return await r.json();
-        } catch(e) { return { success: false, error: 'Erreur r&eacute;seau' }; }
+        } catch(e) { return { success: false, error: 'Erreur r\u00e9seau' }; }
     }
 };
-
-// Raccourcis
-document.addEventListener('keydown', e => { if (e.key === 'Escape') SC.closeModal(); });
-document.getElementById('scNewNom')?.addEventListener('keydown', e => {
-    if (e.key === 'Enter') SC.createSecteur();
-});
 </script>
