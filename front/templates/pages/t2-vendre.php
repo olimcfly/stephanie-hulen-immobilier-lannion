@@ -11,7 +11,7 @@ $site       = $site       ?? [];
 $pdo        = $pdo        ?? null;
 $siteUrl    = defined('SITE_URL') ? rtrim(SITE_URL, '/') : '';
 
-$advisorName    = $advisor['name']    ?? ($site['name']    ?? 'Votre conseiller');
+$advisorName    = $advisor['name']    ?? ($site['name']    ?? 'Votre conseillère');
 $advisorCity    = $advisor['city']    ?? ($site['city']    ?? 'votre ville');
 $advisorNetwork = $advisor['network'] ?? 'eXp France';
 $advisorPhone   = $advisor['phone']   ?? '';
@@ -22,23 +22,23 @@ $headerMenu = getMenu('header-main', $pdo ?? null) ?? [];
 // ────────────────────────────────────────────────────
 // CHAMPS VENDRE
 // ────────────────────────────────────────────────────
-$heroEyebrow   = $fields['hero_eyebrow']   ?? 'Vendre votre bien à ' . $advisorCity;
-$heroTitle     = $fields['hero_title']     ?? 'Vendez au meilleur prix avec un conseiller de confiance';
-$heroSubtitle  = $fields['hero_subtitle']  ?? 'Estimation gratuite, acheteurs qualifiés, accompagnement sécurisé jusqu\'à la signature.';
+$heroEyebrow   = $fields['hero_eyebrow']   ?? 'Vendre votre bien à Lannion, Trégor et Côtes-d\'Armor';
+$heroTitle     = $fields['hero_title']     ?? 'Vendez au meilleur prix avec une conseillère de confiance';
+$heroSubtitle  = $fields['hero_subtitle']  ?? 'Estimation gratuite, acheteurs qualifiés, accompagnement personnalisé de l\'estimation à la signature.';
 $heroCtaText   = $fields['hero_cta_text']  ?? 'Demander mon estimation gratuite';
 $heroCtaUrl    = $fields['hero_cta_url']   ?? _findMenuUrl($headerMenu['items'] ?? [], 'Estimation', $siteUrl . '/estimation');
 $heroCta2Text  = $fields['hero_cta2_text'] ?? 'Me contacter';
 $heroCta2Url   = $fields['hero_cta2_url']  ?? _findMenuUrl($headerMenu['items'] ?? [], 'Contact', $siteUrl . '/contact');
 
-$heroStat1Num  = $fields['hero_stat1_num'] ?? '98%';
-$heroStat1Lbl  = $fields['hero_stat1_lbl'] ?? 'clients satisfaits';
-$heroStat2Num  = $fields['hero_stat2_num'] ?? '45j';
+$heroStat1Num  = $fields['hero_stat1_num'] ?? '100%';
+$heroStat1Lbl  = $fields['hero_stat1_lbl'] ?? 'des mandats vendus';
+$heroStat2Num  = $fields['hero_stat2_num'] ?? '90j';
 $heroStat2Lbl  = $fields['hero_stat2_lbl'] ?? 'délai moyen de vente';
 
-$benTitle  = $fields['ben_title']  ?? 'Pourquoi confier votre vente à un conseiller ?';
+$benTitle  = $fields['ben_title']  ?? 'Pourquoi confier votre vente à une conseillère locale ?';
 $ben1Icon  = $fields['ben1_icon']  ?? '💰';
 $ben1Title = $fields['ben1_title'] ?? 'Estimation précise';
-$ben1Text  = $fields['ben1_text']  ?? 'Prix juste basé sur les données réelles du marché à ' . $advisorCity . '.';
+$ben1Text  = $fields['ben1_text']  ?? 'Prix juste basé sur les données réelles du marché à Lannion et dans le Trégor.';
 $ben2Icon  = $fields['ben2_icon']  ?? '🎯';
 $ben2Title = $fields['ben2_title'] ?? 'Acheteurs qualifiés';
 $ben2Text  = $fields['ben2_text']  ?? 'Vérification du financement avant chaque visite. Aucune perte de temps.';
@@ -46,20 +46,20 @@ $ben3Icon  = $fields['ben3_icon']  ?? '🛡️';
 $ben3Title = $fields['ben3_title'] ?? 'Sécurité juridique';
 $ben3Text  = $fields['ben3_text']  ?? 'Suivi complet du compromis à l\'acte authentique chez le notaire.';
 
-$methodTitle   = $fields['method_title']    ?? 'Mon processus de vente en 3 étapes';
+$methodTitle   = $fields['method_title']    ?? 'Ma méthode de vente en 3 étapes';
 $step1Num      = $fields['step1_num']       ?? '01';
-$step1Title    = $fields['step1_title']     ?? 'Estimation gratuite';
-$step1Text     = $fields['step1_text']      ?? 'Analyse du marché et avis de valeur sans engagement.';
+$step1Title    = $fields['step1_title']     ?? 'Rencontre & estimation';
+$step1Text     = $fields['step1_text']      ?? 'Je me déplace chez vous pour découvrir votre bien, comprendre votre projet et vous remettre une estimation précise basée sur le marché local de Lannion et du Trégor.';
 $step2Num      = $fields['step2_num']       ?? '02';
-$step2Title    = $fields['step2_title']     ?? 'Mise en valeur & diffusion';
-$step2Text     = $fields['step2_text']      ?? 'Photos pro, annonce optimisée, diffusion tous portails et réseau eXp.';
+$step2Title    = $fields['step2_title']     ?? 'Mise en valeur & commercialisation';
+$step2Text     = $fields['step2_text']      ?? 'Photos professionnelles, annonce soignée, diffusion sur tous les portails et le réseau eXp France. Je sélectionne les acquéreurs sérieux pour des visites efficaces.';
 $step3Num      = $fields['step3_num']       ?? '03';
-$step3Title    = $fields['step3_title']     ?? 'Négociation & signature';
-$step3Text     = $fields['step3_text']      ?? 'Qualification acheteurs, négociation du meilleur prix, suivi jusqu\'à la signature.';
+$step3Title    = $fields['step3_title']     ?? 'Accompagnement jusqu\'à la signature';
+$step3Text     = $fields['step3_text']      ?? 'Je vous accompagne à chaque étape : négociation, compromis, suivi du financement et signature chez le notaire en toute sérénité.';
 $methodCtaText = $fields['method_cta_text'] ?? 'Prendre rendez-vous';
 $methodCtaUrl  = $fields['method_cta_url']  ?? _findMenuUrl($headerMenu['items'] ?? [], 'Contact', $siteUrl . '/contact');
 
-$guideTitle = $fields['guide_title'] ?? 'Guide de vente immobilière à ' . $advisorCity;
+$guideTitle = $fields['guide_title'] ?? 'Guide de vente immobilière à Lannion et en Côtes-d\'Armor';
 $g1Num      = $fields['g1_num']   ?? '01';
 $g1Title    = $fields['g1_title'] ?? 'Les diagnostics obligatoires avant la vente';
 $g1Text     = $fields['g1_text']  ?? '<p>DPE, amiante, plomb, termites, gaz, électricité, ERNMT. Un dossier complet est essentiel pour sécuriser la vente et éviter les blocages.</p>';
