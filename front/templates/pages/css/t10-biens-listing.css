@@ -1,0 +1,335 @@
+/* ════════════════════════════════════════════════
+   T10 — Biens Listing
+   ════════════════════════════════════════════════ */
+
+/* ─── Hero ──────────────────────────────────── */
+.biens-hero {
+    background: linear-gradient(135deg, #1a4d7a 0%, #0f3a5a 100%);
+    color: #fff;
+    padding: 60px 20px;
+    text-align: center;
+}
+.biens-hero__inner {
+    max-width: 800px;
+    margin: 0 auto;
+}
+.biens-hero__title {
+    font-size: 2.6rem;
+    font-weight: 700;
+    margin: 0 0 12px;
+}
+.biens-hero__sub {
+    font-size: 1.15rem;
+    opacity: .9;
+    margin: 0 0 18px;
+}
+.biens-hero__count {
+    display: inline-block;
+    background: rgba(255,255,255,.15);
+    padding: 8px 22px;
+    border-radius: 30px;
+    font-size: .95rem;
+    font-weight: 600;
+}
+
+/* ─── Filtres ───────────────────────────────── */
+.biens-filters {
+    background: #f9f6f3;
+    padding: 30px 20px;
+    border-bottom: 1px solid #e8e0d8;
+}
+.biens-filters__form {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.biens-filters__row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+.biens-filters__field label {
+    display: block;
+    font-size: .8rem;
+    font-weight: 600;
+    color: #1a4d7a;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+.biens-filters__field input,
+.biens-filters__field select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #d0c8c0;
+    border-radius: 6px;
+    font-size: .95rem;
+    background: #fff;
+    color: #333;
+    transition: border-color .2s;
+    box-sizing: border-box;
+}
+.biens-filters__field input:focus,
+.biens-filters__field select:focus {
+    outline: none;
+    border-color: #1a4d7a;
+    box-shadow: 0 0 0 3px rgba(26,77,122,.1);
+}
+.biens-filters__actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+/* ─── Boutons ───────────────────────────────── */
+.biens-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-size: .95rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all .2s;
+}
+.biens-btn--primary {
+    background: #1a4d7a;
+    color: #fff;
+    border-color: #1a4d7a;
+}
+.biens-btn--primary:hover {
+    background: #0f3a5a;
+    border-color: #0f3a5a;
+}
+.biens-btn--outline {
+    background: transparent;
+    color: #1a4d7a;
+    border-color: #1a4d7a;
+}
+.biens-btn--outline:hover {
+    background: #1a4d7a;
+    color: #fff;
+}
+
+/* ─── Listing / Grid ────────────────────────── */
+.biens-listing {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+.biens-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 28px;
+}
+
+/* ─── Card ──────────────────────────────────── */
+.bien-card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,.08);
+    text-decoration: none;
+    color: inherit;
+    transition: transform .2s, box-shadow .2s;
+}
+.bien-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 28px rgba(0,0,0,.12);
+}
+
+/* Photo */
+.bien-card__photo {
+    position: relative;
+    aspect-ratio: 4/3;
+    background: #eee;
+    overflow: hidden;
+}
+.bien-card__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.bien-card__no-photo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: #e8e0d8;
+    color: #999;
+    font-size: 2rem;
+}
+
+/* Badges on photo */
+.bien-card__badges {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.bien-badge {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+.bien-badge--vente    { background: #1a4d7a; color: #fff; }
+.bien-badge--location { background: #d4a574; color: #fff; }
+.bien-badge--type     { background: rgba(255,255,255,.9); color: #333; }
+
+.bien-card__photo-count {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0,0,0,.65);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: .8rem;
+}
+
+/* Body */
+.bien-card__body {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.bien-card__price {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #d4a574;
+    margin-bottom: 6px;
+}
+.bien-card__title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #1a4d7a;
+    margin: 0 0 8px;
+    line-height: 1.3;
+}
+.bien-card__location {
+    font-size: .9rem;
+    color: #777;
+    margin-bottom: 14px;
+}
+.bien-card__location i {
+    color: #d4a574;
+    margin-right: 4px;
+}
+.bien-card__features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: .85rem;
+    color: #555;
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid #f0ebe6;
+}
+.bien-card__features span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.bien-card__features i {
+    color: #1a4d7a;
+    font-size: .8rem;
+}
+.bien-card__ref {
+    font-size: .78rem;
+    color: #aaa;
+    margin-top: 10px;
+}
+
+/* ─── DPE badge ──────────────────────────────── */
+.bien-dpe {
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: 700;
+    font-size: .75rem;
+}
+.bien-dpe--a { background: #319834; color: #fff; }
+.bien-dpe--b { background: #33cc31; color: #fff; }
+.bien-dpe--c { background: #cbfc34; color: #333; }
+.bien-dpe--d { background: #fbfe06; color: #333; }
+.bien-dpe--e { background: #fccc04; color: #333; }
+.bien-dpe--f { background: #fc9a07; color: #fff; }
+.bien-dpe--g { background: #fc1a10; color: #fff; }
+
+/* ─── Empty state ────────────────────────────── */
+.biens-empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: #888;
+}
+.biens-empty i {
+    font-size: 3rem;
+    color: #d0c8c0;
+    margin-bottom: 20px;
+}
+.biens-empty h2 {
+    font-size: 1.5rem;
+    color: #1a4d7a;
+    margin-bottom: 10px;
+}
+.biens-empty p {
+    margin-bottom: 24px;
+}
+
+/* ─── Pagination ─────────────────────────────── */
+.biens-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 50px;
+    flex-wrap: wrap;
+}
+.biens-pagination__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1px solid #d0c8c0;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #1a4d7a;
+    font-size: .9rem;
+    font-weight: 500;
+    transition: all .2s;
+}
+.biens-pagination__link:hover {
+    background: #1a4d7a;
+    color: #fff;
+    border-color: #1a4d7a;
+}
+.biens-pagination__link--active {
+    background: #1a4d7a;
+    color: #fff;
+    border-color: #1a4d7a;
+}
+
+/* ─── Responsive ─────────────────────────────── */
+@media (max-width: 768px) {
+    .biens-hero__title { font-size: 2rem; }
+    .biens-filters__row { grid-template-columns: 1fr 1fr; }
+    .biens-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+    .biens-hero { padding: 40px 16px; }
+    .biens-hero__title { font-size: 1.6rem; }
+    .biens-filters__row { grid-template-columns: 1fr; }
+    .biens-filters__actions { flex-direction: column; }
+    .biens-filters__actions .biens-btn { justify-content: center; }
+}
