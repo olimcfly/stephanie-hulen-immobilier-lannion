@@ -101,8 +101,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$_SESSION['otp_email']]);
             $admin=$stmt->fetch();
 
+            /* Régénérer l'ID de session pour éviter le session fixation */
+            session_regenerate_id(true);
+
             $_SESSION['admin_id']=$admin['id'];
             $_SESSION['admin_email']=$admin['email'];
+            $_SESSION['last_activity']=time();
 
             unset($_SESSION['otp']);
             unset($_SESSION['otp_email']);

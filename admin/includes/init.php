@@ -36,6 +36,20 @@ if (!defined('ADMIN_API')) {
         exit;
     }
 
+    /* Timeout de session admin */
+    if (defined('SESSION_TIMEOUT') && time() - ($_SESSION['last_activity'] ?? 0) > SESSION_TIMEOUT) {
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $p = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
+        }
+        session_destroy();
+        header('Location: /admin/login.php');
+        exit;
+    }
+
+    $_SESSION['last_activity'] = time();
+
 }
 
 
