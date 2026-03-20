@@ -3,16 +3,18 @@
  * /config/config.php — CONFIG CENTRALISÉE
  */
 
-define('INSTANCE_ID',   'stephanie-lannion');
-define('SITE_TITLE',    'Stephanie Hulen - Lannion');
-define('SITE_DOMAIN',   'stephanie-hulen-immobilier-lannion.fr');
-define('ADMIN_EMAIL',   'admin@stephanie-hulen-immobilier-lannion.fr');
+require_once __DIR__ . '/../includes/functions/env.php';
 
-define('DB_HOST',    'localhost');
-define('DB_NAME',    'cool1933_cms-site-sh-lanion');
-define('DB_USER',    'cool1933_cms-sh-lannion');
-define('DB_PASS',    'qxJ4ij(22dmV');
-define('DB_CHARSET', 'utf8mb4');
+define('INSTANCE_ID',   env('INSTANCE_ID', 'stephanie-lannion'));
+define('SITE_TITLE',    env('SITE_TITLE', 'Stephanie Hulen - Lannion'));
+define('SITE_DOMAIN',   env('SITE_DOMAIN', 'stephanie-hulen-immobilier-lannion.fr'));
+define('ADMIN_EMAIL',   env('ADMIN_EMAIL', 'admin@stephanie-hulen-immobilier-lannion.fr'));
+
+define('DB_HOST',    env('DB_HOST', 'localhost'));
+define('DB_NAME',    env('DB_NAME', ''));
+define('DB_USER',    env('DB_USER', ''));
+define('DB_PASS',    env('DB_PASS', ''));
+define('DB_CHARSET', env('DB_CHARSET', 'utf8mb4'));
 
 function getDB() {
     static $pdo = null;
@@ -65,7 +67,7 @@ function isValidEmail($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
 }
 
-define('DEBUG_MODE', true);
+define('DEBUG_MODE', env('DEBUG_MODE', 'false') === 'true');
 if (DEBUG_MODE) {
     ini_set('display_errors', 1);
     error_reporting(E_ALL);
