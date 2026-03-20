@@ -65,6 +65,15 @@ function isValidEmail($email) {
     return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
 }
 
+// ─── Rate limiting IA (appels par jour par provider) ────────────────────────
+define('AI_RATE_LIMITS', [
+    'claude'     => 100,
+    'openai'     => 100,
+    'dalle'      => 20,
+    'perplexity' => 50,
+]);
+define('AI_RATE_LIMIT_FILE', ROOT_PATH . '/logs/ai_usage.json');
+
 define('DEBUG_MODE', true);
 if (DEBUG_MODE) {
     ini_set('display_errors', 1);

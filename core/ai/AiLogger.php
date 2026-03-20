@@ -100,6 +100,21 @@ class AiLogger
     }
 
     // =========================================================================
+    //  Rate Limiting — log des événements de limitation
+    // =========================================================================
+
+    /**
+     * Log lorsqu'un provider atteint sa limite quotidienne.
+     */
+    public static function rateLimitHit(string $provider, int $limit, int $adminId = 0): void
+    {
+        self::write(self::LEVEL_WARN, "RATE_LIMIT_HIT — {$provider}", [
+            'limit'    => $limit,
+            'admin_id' => $adminId ?: ($_SESSION['admin_id'] ?? 0),
+        ]);
+    }
+
+    // =========================================================================
     //  Utilitaires
     // =========================================================================
 

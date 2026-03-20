@@ -42,6 +42,117 @@ class AiClient
         return self::$instance;
     }
 
+    // ─── Rate Limiting ────────────────────────────────────────────────────────
+
+    /**
+     * Vérifie si le provider a atteint sa limite d'appels journalière.
+     * Lève une RuntimeException si la limite est dépassée.
+     *
+     * @param  string $provider  claude | openai | dalle | perplexity
+     * @throws RuntimeException  si la limite quotidienne est atteinte
+     */
+    private function checkRateLimit(string $provider): void
+    {
+        $limits = defined('AI_RATE_LIMITS') ? AI_RATE_LIMITS : [
+            'claude' => 100, 'openai' => 100, 'dalle' => 20, 'perplexity' => 50,
+        ];
+
+        $maxCalls = $limits[$provider] ?? 100;
+        $file     = defined('AI_RATE_LIMIT_FILE')
+                  ? AI_RATE_LIMIT_FILE
+                  : (defined('ROOT_PATH') ? ROOT_PATH : dirname(__DIR__, 2)) . '/logs/ai_usage.json';
+
+        $today = date('Y-m-d');
+        $data  = $this->loadUsageData($file);
+
+        // Réinitialiser si on est un nouveau jour
+        if (($data['date'] ?? '') !== $today) {
+            $data = ['date' => $today, 'counters' => []];
+        }
+
+        $current = $data['counters'][$provider] ?? 0;
+
+        if ($current >= $maxCalls) {
+            AiLogger::warning("Rate limit atteint pour {$provider}", [
+                'limit'   => $maxCalls,
+                'current' => $current,
+                'admin_id' => $_SESSION['admin_id'] ?? 0,
+            ]);
+            throw new RuntimeException(
+                "Limite quotidienne atteinte pour {$provider} ({$maxCalls} appels/jour). "
+                . "Réessayez demain ou contactez l'administrateur."
+            );
+        }
+
+        // Incrémenter le compteur
+        $data['counters'][$provider] = $current + 1;
+        $this->saveUsageData($file, $data);
+    }
+
+    /**
+     * Charge les données d'usage depuis le fichier JSON.
+     */
+    private function loadUsageData(string $file): array
+    {
+        if (!file_exists($file)) {
+            return ['date' => date('Y-m-d'), 'counters' => []];
+        }
+
+        $json = @file_get_contents($file);
+        if ($json === false) {
+            return ['date' => date('Y-m-d'), 'counters' => []];
+        }
+
+        $data = json_decode($json, true);
+        return is_array($data) ? $data : ['date' => date('Y-m-d'), 'counters' => []];
+    }
+
+    /**
+     * Sauvegarde les données d'usage dans le fichier JSON (atomique via LOCK_EX).
+     */
+    private function saveUsageData(string $file, array $data): void
+    {
+        $dir = dirname($file);
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0755, true);
+        }
+
+        @file_put_contents(
+            $file,
+            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+            LOCK_EX
+        );
+    }
+
+    /**
+     * Retourne l'état actuel des compteurs de rate limiting.
+     *
+     * @return array{date:string, counters:array<string,int>, limits:array<string,int>}
+     */
+    public function getRateLimitStatus(): array
+    {
+        $file = defined('AI_RATE_LIMIT_FILE')
+              ? AI_RATE_LIMIT_FILE
+              : (defined('ROOT_PATH') ? ROOT_PATH : dirname(__DIR__, 2)) . '/logs/ai_usage.json';
+
+        $limits = defined('AI_RATE_LIMITS') ? AI_RATE_LIMITS : [
+            'claude' => 100, 'openai' => 100, 'dalle' => 20, 'perplexity' => 50,
+        ];
+
+        $data  = $this->loadUsageData($file);
+        $today = date('Y-m-d');
+
+        if (($data['date'] ?? '') !== $today) {
+            $data = ['date' => $today, 'counters' => []];
+        }
+
+        return [
+            'date'     => $today,
+            'counters' => $data['counters'] ?? [],
+            'limits'   => $limits,
+        ];
+    }
+
     // ─── Résolution des clés API ──────────────────────────────────────────────
     // Cherche dans les constantes PHP (config.php) puis dans les variables d'env
     private function key(string $provider): string
@@ -88,6 +199,8 @@ class AiClient
         string $model       = 'claude-opus-4-5'
     ): array {
         try {
+            $this->checkRateLimit('claude');
+
             $payload = [
                 'model'       => $model,
                 'max_tokens'  => $maxTokens,
@@ -154,6 +267,8 @@ class AiClient
         string $system    = ''
     ): array {
         try {
+            $this->checkRateLimit('openai');
+
             $messages = [];
             if (!empty($system)) {
                 $messages[] = ['role' => 'system', 'content' => $system];
@@ -211,6 +326,8 @@ class AiClient
         string $model = 'llama-3.1-sonar-large-128k-online'
     ): array {
         try {
+            $this->checkRateLimit('perplexity');
+
             $response = $this->httpPost(
                 'https://api.perplexity.ai/chat/completions',
                 [
@@ -267,6 +384,8 @@ class AiClient
         string $quality = 'standard'
     ): array {
         try {
+            $this->checkRateLimit('dalle');
+
             // Wrapper sécurisé : réduit les refus content policy DALL-E
             $safePrompt = "Professional real estate photography, {$prompt}, "
                         . "high quality, bright natural lighting, modern French architecture, "

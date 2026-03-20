@@ -98,13 +98,33 @@ class AiDispatcher
             );
         }
 
-        // 5. Logger l'appel entrant
+        // 5. Vérifier le rate limiting global avant exécution
+        $rateLimitStatus = AiClient::getInstance()->getRateLimitStatus();
+        $allExhausted = true;
+        foreach ($rateLimitStatus['limits'] as $prov => $limit) {
+            if (($rateLimitStatus['counters'][$prov] ?? 0) < $limit) {
+                $allExhausted = false;
+                break;
+            }
+        }
+        if ($allExhausted) {
+            AiLogger::warning("Rate limit global atteint — tous les providers épuisés", [
+                'admin_id' => $_SESSION['admin_id'] ?? 0,
+                'counters' => $rateLimitStatus['counters'],
+            ]);
+            AiResponse::error(
+                'Limite quotidienne IA atteinte pour tous les providers. Réessayez demain.',
+                429
+            );
+        }
+
+        // 6. Logger l'appel entrant
         AiLogger::info("→ {$module}.{$action}", [
             'admin_id' => $_SESSION['admin_id'] ?? 0,
             'ip'       => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
         ]);
 
-        // 6. Exécuter
+        // 7. Exécuter
         try {
             $handler->handle($action, $input);
 
