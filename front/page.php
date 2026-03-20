@@ -70,7 +70,7 @@ if (!function_exists('eduardoHead')) {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 :root{
-  --ed-primary:#1a4d7a;--ed-primary-dk:#0e3a5c;--ed-accent:#d4a574;--ed-accent-lt:#e8c49a;
+  --ed-primary:#1B3A4B;--ed-primary-dk:#122A37;--ed-accent:#d4a574;--ed-accent-lt:#e8c49a;
   --ed-text:#2d3748;--ed-text-light:#718096;--ed-card-bg:#f9f6f3;--ed-border:#e2d9ce;
   --ff-heading:"Playfair Display",serif;--ff-body:"DM Sans",sans-serif;
   --ed-radius:8px;--ed-radius-lg:12px;
@@ -135,7 +135,7 @@ if (!function_exists('renderHeader')) {
 
         $bg     = htmlspecialchars($header['bg_color']    ?? '#ffffff');
         $tc     = htmlspecialchars($header['text_color']  ?? '#1e293b');
-        $hv     = htmlspecialchars($header['hover_color'] ?? '#1a4d7a');
+        $hv     = htmlspecialchars($header['hover_color'] ?? '#1B3A4B');
         $ht     = max(50, (int)($header['height'] ?? 80));
         $sticky = !empty($header['sticky']) ? 'position:sticky;top:0;z-index:1000;' : 'position:relative;z-index:100;';
         $shadow = !empty($header['shadow'])  ? 'box-shadow:0 2px 12px rgba(0,0,0,.10);' : '';
@@ -204,10 +204,10 @@ if (!function_exists('renderHeader')) {
 
         // CTA
         $ctaStyles = [
-            'primary'  => "background:#1a4d7a;color:#fff;border:none;",
+            'primary'  => "background:#1B3A4B;color:#fff;border:none;",
             'secondary'=> "background:transparent;color:{$hv};border:2px solid {$hv};",
             'outline'  => "background:transparent;color:{$tc};border:2px solid {$tc};",
-            'gradient' => "background:linear-gradient(135deg,#1a4d7a,#2563a8);color:#fff;border:none;",
+            'gradient' => "background:linear-gradient(135deg,#1B3A4B,#2C5F7C);color:#fff;border:none;",
         ];
         $ctaHtml = '';
         if (!empty($header['cta_enabled']) && !empty($header['cta_text'])) {
@@ -270,7 +270,7 @@ if (!function_exists('renderHeader')) {
   .'.$uid.' .fh-mobile-nav{display:none;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:'.$bg.';padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.12);border-top:1px solid #e2d9ce;z-index:999}
   .'.$uid.' .fh-mobile-nav.open{display:flex}
   .'.$uid.' .fh-mobile-nav a{padding:10px 16px;border-radius:8px;font-size:14px}
-  .'.$uid.' .fh-mobile-nav a:hover{background:rgba(26,77,122,.06)}
+  .'.$uid.' .fh-mobile-nav a:hover{background:rgba(27,58,75,.06)}
 }
 @media(min-width:'.($bp+1).'px){
   .'.$uid.' .fh-burger{display:none !important}
@@ -363,9 +363,8 @@ if (!function_exists('renderFooter')) {
   <div style="max-width:1260px;margin:0 auto">
     '.$colsSection.'
     '.($socHtml ? '<div style="margin-bottom:24px">'.$socHtml.'</div>' : '').'
-    <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:20px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;font-size:12px">
-      <span>'.$copy.'</span>
-      '.($badge ? '<span style="color:rgba(255,255,255,.4)">'.$badge.'</span>' : '').'
+    <div style="border-top:1px solid rgba(255,255,255,.08);padding-top:20px;text-align:center;font-size:12px">
+      <span>'.$copy.($badge ? ' · '.$badge : '').'</span>
     </div>
   </div>
 </footer>';
