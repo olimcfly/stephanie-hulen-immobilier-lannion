@@ -48,6 +48,9 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS blog_articles (
     INDEX idx_published (published_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
+// Catégories prédéfinies du blog
+$blogCategories = ['Marché local', 'Conseils achat', 'Vie à Lannion', 'Investissement'];
+
 $flash = ''; $flashType = 'success';
 if (!isset($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
@@ -116,7 +119,10 @@ try {
 } catch(Exception $e) {}
 
 $categories = [];
-try { $categories = $pdo->query("SELECT DISTINCT category FROM blog_articles WHERE category IS NOT NULL AND category != '' ORDER BY category")->fetchAll(PDO::FETCH_COLUMN); } catch(Exception $e) {}
+try {
+    $dbCats = $pdo->query("SELECT DISTINCT category FROM blog_articles WHERE category IS NOT NULL AND category != '' ORDER BY category")->fetchAll(PDO::FETCH_COLUMN);
+    $categories = array_values(array_unique(array_merge($blogCategories, $dbCats)));
+} catch(Exception $e) { $categories = $blogCategories; }
 
 function blogSortUrl($col) { global $sort, $order; $nO = ($sort===$col && $order==='DESC') ? 'ASC' : 'DESC'; $p=$_GET; $p['sort']=$col; $p['order']=$nO; unset($p['pg']); return '?'.http_build_query($p); }
 function blogSortIcon($col) { global $sort, $order; if ($sort!==$col) return '<i class="fas fa-sort" style="opacity:.3"></i>'; return $order==='ASC' ? '<i class="fas fa-sort-up"></i>' : '<i class="fas fa-sort-down"></i>'; }

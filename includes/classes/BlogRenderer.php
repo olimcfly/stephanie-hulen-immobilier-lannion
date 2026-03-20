@@ -69,7 +69,7 @@ class BlogRenderer {
         }
         
         if (empty($cardsHtml)) {
-            $cardsHtml = '<div style="text-align:center;padding:60px 20px;grid-column:1/-1;"><p style="font-size:1.2rem;color:#64748b;">Aucun article trouvé</p></div>';
+            $cardsHtml = '<div style="text-align:center;padding:60px 20px;grid-column:1/-1;"><p style="font-size:1.4rem;font-weight:700;color:#1e293b;margin-bottom:8px;">Le blog arrive bientôt !</p><p style="font-size:1rem;color:#64748b;">Stéphanie prépare ses premiers articles sur le marché immobilier à Lannion et en Côtes-d\'Armor. Restez connectés !</p></div>';
         }
         
         $html = $this->injectCards($html, $cardsHtml);

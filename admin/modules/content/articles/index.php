@@ -99,13 +99,15 @@ $currentPage   = max(1, (int)($_GET['p'] ?? 1));
 $perPage       = 25;
 $offset        = ($currentPage - 1) * $perPage;
 
-// ─── Catégories ───
-$categories = [];
+// ─── Catégories prédéfinies + DB ───
+$blogCategories = ['Marché local', 'Conseils achat', 'Vie à Lannion', 'Investissement'];
+$categories = $blogCategories;
 if ($tableExists && $hasCategory) {
     try {
-        $categories = $pdo->query(
+        $dbCats = $pdo->query(
             "SELECT DISTINCT category FROM `{$tableName}` WHERE category IS NOT NULL AND category != '' ORDER BY category"
         )->fetchAll(PDO::FETCH_COLUMN);
+        $categories = array_values(array_unique(array_merge($blogCategories, $dbCats)));
     } catch (PDOException $e) {}
 }
 
