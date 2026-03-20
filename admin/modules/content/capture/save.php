@@ -4,6 +4,10 @@
  *  MODULE CAPTURES — Save (INSERT / UPDATE)  v1.0
  *  /admin/modules/content/captures/save.php
  *
+ *  @deprecated Utilisez api.php?action=save à la place.
+ *              Ce fichier est conservé pour rétro-compatibilité
+ *              et sera supprimé dans une version ultérieure.
+ *
  *  Endpoint POST centralisé pour créer ou mettre à jour
  *  une capture. Utilisé par create.php et les appels AJAX.
  *
