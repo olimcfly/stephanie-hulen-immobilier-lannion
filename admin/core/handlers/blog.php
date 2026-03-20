@@ -8,6 +8,9 @@
 $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 $action = CURRENT_ACTION;
 
+// Catégories prédéfinies du blog
+$blogCategories = ['Marché local', 'Conseils achat', 'Vie à Lannion', 'Investissement'];
+
 switch ($action) {
     case 'list':
         try {
@@ -106,6 +109,16 @@ switch ($action) {
             echo json_encode(['success' => true, 'message' => 'Article supprime']);
         } catch (PDOException $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+        break;
+
+    case 'categories':
+        try {
+            $dbCats = $pdo->query("SELECT DISTINCT category FROM blog_articles WHERE category IS NOT NULL AND category != '' ORDER BY category")->fetchAll(PDO::FETCH_COLUMN);
+            $all = array_values(array_unique(array_merge($blogCategories, $dbCats)));
+            echo json_encode(['success' => true, 'data' => $all]);
+        } catch (PDOException $e) {
+            echo json_encode(['success' => true, 'data' => $blogCategories]);
         }
         break;
 

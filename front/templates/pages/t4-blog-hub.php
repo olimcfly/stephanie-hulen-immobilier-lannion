@@ -190,8 +190,8 @@ if (file_exists(__DIR__ . '/../../page.php') && function_exists('renderHeader'))
         <?php else: ?>
         <div class="t4-empty">
             <div class="t4-empty-icon"><i class="fas fa-pen-nib"></i></div>
-            <h3>Aucun article pour le moment</h3>
-            <p>De nouveaux contenus seront bientot disponibles. Revenez nous voir prochainement !</p>
+            <h3>Le blog arrive bientôt !</h3>
+            <p>Stéphanie prépare ses premiers articles sur le marché immobilier à Lannion et en Côtes-d'Armor : conseils d'achat, tendances locales, vie à Lannion… Restez connectés !</p>
         </div>
         <?php endif; ?>
     </div>
