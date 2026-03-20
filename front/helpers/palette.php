@@ -3,9 +3,9 @@ if (!function_exists('eduardoCssVars')) {
     function eduardoCssVars(): string {
         return '<style>
 :root {
-    --ed-primary:      #1a4d7a;
-    --ed-primary-dk:   #0e3a5c;
-    --ed-primary-lt:   #1e5f8c;
+    --ed-primary:      #1B3A4B;
+    --ed-primary-dk:   #122A37;
+    --ed-primary-lt:   #2C5F7C;
     --ed-accent:       #d4a574;
     --ed-accent-dk:    #b8864a;
     --ed-accent-lt:    #e8c9a0;
@@ -17,9 +17,9 @@ if (!function_exists('eduardoCssVars')) {
     --ed-text-xlight:  #9ca3af;
     --ed-border:       #e8ddd4;
     --ed-border-lt:    #f0e8df;
-    --ed-shadow:       0 4px 20px rgba(26,77,122,.08);
-    --ed-shadow-lg:    0 12px 40px rgba(26,77,122,.14);
-    --ed-shadow-xl:    0 20px 60px rgba(26,77,122,.18);
+    --ed-shadow:       0 4px 20px rgba(27,58,75,.08);
+    --ed-shadow-lg:    0 12px 40px rgba(27,58,75,.14);
+    --ed-shadow-xl:    0 20px 60px rgba(27,58,75,.18);
     --ff-heading:      "Playfair Display", Georgia, serif;
     --ff-body:         "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
     --ed-radius:       12px;
@@ -59,7 +59,7 @@ button{font-family:var(--ff-body);cursor:pointer}
 .ed-section__header{margin-bottom:40px}
 .ed-badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
 .ed-badge--accent{background:rgba(212,165,116,.9);color:white}
-.ed-badge--primary{background:rgba(26,77,122,.85);color:white}
+.ed-badge--primary{background:rgba(27,58,75,.85);color:white}
 .ed-stat{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--ed-bg);border-radius:var(--ed-radius)}
 .ed-stat__icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .ed-stat__value{font-size:16px;font-weight:700;color:var(--ed-primary);line-height:1.2}

@@ -236,6 +236,8 @@ try {
     font-size: 12px;
     margin: 0;
     opacity: .8;
+    width: 100%;
+    text-align: center;
 }
 
 @media (max-width: 768px) {
