@@ -22,57 +22,57 @@ $headerMenu = getMenu('header-main', $pdo ?? null) ?? [];
 // ────────────────────────────────────────────────────
 // CHAMPS ACHETER
 // ────────────────────────────────────────────────────
-$heroEyebrow   = $fields['hero_eyebrow']   ?? 'Acheter votre bien à ' . $advisorCity;
-$heroTitle     = $fields['hero_title']     ?? 'Trouvez et achetez votre bien avec confiance et sécurité';
-$heroSubtitle  = $fields['hero_subtitle']  ?? 'Sélection de biens, négociation du prix, accompagnement jusqu\'à la signature.';
-$heroCtaText   = $fields['hero_cta_text']  ?? 'Consulter nos biens disponibles';
+$heroEyebrow   = $fields['hero_eyebrow']   ?? 'Acheter un bien immobilier à ' . $advisorCity;
+$heroTitle     = $fields['hero_title']     ?? 'Votre projet d\'achat à Lannion entre de bonnes mains';
+$heroSubtitle  = $fields['hero_subtitle']  ?? 'Conseillère immobilière à Lannion, je vous accompagne de la recherche du bien idéal jusqu\'à la remise des clés.';
+$heroCtaText   = $fields['hero_cta_text']  ?? 'Voir les biens disponibles à Lannion';
 $heroCtaUrl    = $fields['hero_cta_url']   ?? _findMenuUrl($headerMenu['items'] ?? [], 'Biens', $siteUrl . '/biens');
 $heroCta2Text  = $fields['hero_cta2_text'] ?? 'Me contacter';
 $heroCta2Url   = $fields['hero_cta2_url']  ?? _findMenuUrl($headerMenu['items'] ?? [], 'Contact', $siteUrl . '/contact');
 
-$heroStat1Num  = $fields['hero_stat1_num'] ?? '350+';
-$heroStat1Lbl  = $fields['hero_stat1_lbl'] ?? 'biens trouvés';
-$heroStat2Num  = $fields['hero_stat2_num'] ?? '92%';
-$heroStat2Lbl  = $fields['hero_stat2_lbl'] ?? 'satisfaction client';
+$heroStat1Num  = $fields['hero_stat1_num'] ?? '150+';
+$heroStat1Lbl  = $fields['hero_stat1_lbl'] ?? 'biens vendus sur le Trégor';
+$heroStat2Num  = $fields['hero_stat2_num'] ?? '98%';
+$heroStat2Lbl  = $fields['hero_stat2_lbl'] ?? 'clients satisfaits';
 
-$benTitle  = $fields['ben_title']  ?? 'Pourquoi faire appel à un conseiller pour acheter ?';
-$ben1Icon  = $fields['ben1_icon']  ?? '🔍';
-$ben1Title = $fields['ben1_title'] ?? 'Sélection ciblée';
-$ben1Text  = $fields['ben1_text']  ?? 'Découvrez des biens correspondant exactement à vos critères à ' . $advisorCity . '.';
+$benTitle  = $fields['ben_title']  ?? 'Pourquoi me confier votre projet d\'achat à Lannion ?';
+$ben1Icon  = $fields['ben1_icon']  ?? '🏡';
+$ben1Title = $fields['ben1_title'] ?? 'Connaissance du marché lannionnais';
+$ben1Text  = $fields['ben1_text']  ?? 'Quartiers prisés, prix au m², projets urbains : je connais Lannion et le Trégor pour vous orienter vers le bon bien.';
 $ben2Icon  = $fields['ben2_icon']  ?? '💰';
-$ben2Title = $fields['ben2_title'] ?? 'Négociation optimale';
-$ben2Text  = $fields['ben2_text']  ?? 'Je négocie le meilleur prix pour vous. Économies moyennes : 2-5%.';
-$ben3Icon  = $fields['ben3_icon']  ?? '✓';
-$ben3Title = $fields['ben3_title'] ?? 'Suivi complet';
-$ben3Text  = $fields['ben3_text']  ?? 'De la visite à la signature chez le notaire, je vous accompagne à chaque étape.';
+$ben2Title = $fields['ben2_title'] ?? 'Négociation au juste prix';
+$ben2Text  = $fields['ben2_text']  ?? 'Grâce à ma connaissance des prix pratiqués sur Lannion et ses environs, je négocie pour vous les meilleures conditions.';
+$ben3Icon  = $fields['ben3_icon']  ?? '🤝';
+$ben3Title = $fields['ben3_title'] ?? 'Accompagnement personnalisé';
+$ben3Text  = $fields['ben3_text']  ?? 'De la première visite à la signature chez le notaire, je suis votre interlocutrice unique à chaque étape.';
 
-$methodTitle   = $fields['method_title']    ?? 'Mon processus d\'achat en 3 étapes';
+$methodTitle   = $fields['method_title']    ?? 'Votre achat à Lannion en 3 étapes';
 $step1Num      = $fields['step1_num']       ?? '01';
 $step1Title    = $fields['step1_title']     ?? 'Définir votre projet';
-$step1Text     = $fields['step1_text']      ?? 'Localisation, budget, critères. Nous créons ensemble votre profil d\'acheteur.';
+$step1Text     = $fields['step1_text']      ?? 'Centre-ville, bord de mer, campagne trégorroise ? Définissons ensemble vos critères, votre budget et le secteur idéal.';
 $step2Num      = $fields['step2_num']       ?? '02';
 $step2Title    = $fields['step2_title']     ?? 'Visites et sélection';
-$step2Text     = $fields['step2_text']      ?? 'Visite exclusive des biens présélectionnés. Évaluation des points forts et faibles.';
+$step2Text     = $fields['step2_text']      ?? 'Je présélectionne les biens qui correspondent à vos attentes et organise les visites sur Lannion et alentours.';
 $step3Num      = $fields['step3_num']       ?? '03';
 $step3Title    = $fields['step3_title']     ?? 'Offre et signature';
-$step3Text     = $fields['step3_text']      ?? 'Négociation du prix, rédaction de l\'offre, suivi jusqu\'à la signature notariale.';
+$step3Text     = $fields['step3_text']      ?? 'Négociation du prix, rédaction de l\'offre, coordination avec le notaire : je vous accompagne jusqu\'à la remise des clés.';
 $methodCtaText = $fields['method_cta_text'] ?? 'Démarrer votre recherche';
 $methodCtaUrl  = $fields['method_cta_url']  ?? _findMenuUrl($headerMenu['items'] ?? [], 'Contact', $siteUrl . '/contact');
 
-$guideTitle = $fields['guide_title'] ?? 'Bien acheter à ' . $advisorCity;
+$guideTitle = $fields['guide_title'] ?? 'Guide : acheter un bien immobilier à Lannion';
 $g1Num      = $fields['g1_num']   ?? '01';
-$g1Title    = $fields['g1_title'] ?? 'Préparer son financement avant de chercher';
-$g1Text     = $fields['g1_text']  ?? '<p>Obtenir un avis de prêtabilité auprès de votre banque est essentiel. Cela rassure le vendeur et accélère la négociation. Connaître votre capacité d\'emprunt permet aussi de cibler les biens réalistes.</p>';
+$g1Title    = $fields['g1_title'] ?? 'Le marché immobilier à Lannion : ce qu\'il faut savoir';
+$g1Text     = $fields['g1_text']  ?? '<p>Lannion offre un cadre de vie attractif entre mer et campagne, avec des prix encore accessibles par rapport aux grandes métropoles bretonnes. Le bassin d\'emploi porté par le pôle télécom et numérique attire de nouveaux habitants, ce qui dynamise le marché. Bien se renseigner sur les quartiers (centre historique, Brélévenez, Servel) et les projets d\'aménagement est essentiel pour acheter au bon endroit.</p>';
 $g2Num      = $fields['g2_num']   ?? '02';
-$g2Title    = $fields['g2_title'] ?? 'Les diagnostics obligatoires avant l\'achat';
-$g2Text     = $fields['g2_text']  ?? '<p>DPE, amiante, plomb, termites, gaz, électricité, ERNMT. Le vendeur doit fournir un dossier complet. Demandez-le et faites-le vérifier avant de signer le compromis.</p>';
+$g2Title    = $fields['g2_title'] ?? 'Financement et diagnostics : bien préparer son achat';
+$g2Text     = $fields['g2_text']  ?? '<p>Avant de visiter, obtenez un accord de principe auprès de votre banque pour connaître votre capacité d\'emprunt. Côté vendeur, un dossier de diagnostics complet est obligatoire : DPE, amiante, plomb, électricité, gaz, ERNMT. En Bretagne, le diagnostic termites est rarement requis, mais le DPE prend une importance particulière dans les maisons anciennes du Trégor.</p>';
 $g3Num      = $fields['g3_num']   ?? '03';
-$g3Title    = $fields['g3_title'] ?? 'Délais et étapes après le compromis';
-$g3Text     = $fields['g3_text']  ?? '<p>Après signature du compromis : 10 jours de rétractation pour vous, 45-60 jours pour finaliser le financement, puis signature de l\'acte authentique chez le notaire avec remise des clés.</p>';
+$g3Title    = $fields['g3_title'] ?? 'Du compromis à la remise des clés';
+$g3Text     = $fields['g3_text']  ?? '<p>Après la signature du compromis, vous disposez de 10 jours de rétractation. Comptez ensuite 45 à 60 jours pour finaliser votre prêt. La signature de l\'acte authentique se fait chez un notaire, souvent à Lannion ou Guingamp. Je coordonne l\'ensemble des intervenants pour que votre achat se déroule sereinement jusqu\'à la remise des clés.</p>';
 
-$ctaTitle     = $fields['cta_title']      ?? 'Prêt à commencer votre recherche ?';
-$ctaText      = $fields['cta_text']       ?? 'Parlons de votre projet. Je vous aide à trouver le bien idéal.';
-$ctaBtnText   = $fields['cta_btn_text']   ?? 'Me contacter pour discuter';
+$ctaTitle     = $fields['cta_title']      ?? 'Prêt à acheter à Lannion ?';
+$ctaText      = $fields['cta_text']       ?? 'Parlons de votre projet. Je vous aide à trouver le bien idéal sur Lannion et le Trégor.';
+$ctaBtnText   = $fields['cta_btn_text']   ?? 'Me contacter';
 $ctaBtnUrl    = $fields['cta_btn_url']    ?? _findMenuUrl($headerMenu['items'] ?? [], 'Contact', $siteUrl . '/contact');
 $ctaPhoneText = $fields['cta_phone_text'] ?? 'Ou appelez-moi directement';
 
