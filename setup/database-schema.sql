@@ -133,14 +133,21 @@ CREATE TABLE IF NOT EXISTS `estimations` (
     `telephone` VARCHAR(30) DEFAULT NULL,
     `adresse` VARCHAR(255) DEFAULT NULL,
     `ville` VARCHAR(100) DEFAULT NULL,
+    `code_postal` VARCHAR(10) DEFAULT NULL,
     `surface` DECIMAL(10,2) DEFAULT NULL,
+    `pieces` INT DEFAULT NULL,
     `type_bien` VARCHAR(50) DEFAULT NULL,
+    `etat_bien` VARCHAR(30) DEFAULT NULL COMMENT 'neuf, bon, moyen, renovation',
     `valeur_estimee` DECIMAL(12,2) DEFAULT NULL,
+    `estimation_basse` DECIMAL(12,2) DEFAULT NULL,
+    `estimation_haute` DECIMAL(12,2) DEFAULT NULL,
     `statut` VARCHAR(30) DEFAULT 'en_attente' COMMENT 'en_attente, traitee, convertie',
     `notes` TEXT,
+    `rgpd_consent` TINYINT(1) DEFAULT 0,
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX `idx_statut` (`statut`)
+    INDEX `idx_statut` (`statut`),
+    INDEX `idx_ville` (`ville`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `rdv` (
