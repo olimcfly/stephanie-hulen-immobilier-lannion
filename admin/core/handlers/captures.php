@@ -9,7 +9,7 @@
 $action = $_GET['action'] ?? $_POST['action'] ?? 'index';
 $id     = (int)($_GET['id'] ?? 0);
 
-$baseDir = dirname(__DIR__, 2) . '/modules/content/pages-capture/';
+$baseDir = dirname(__DIR__, 2) . '/modules/content/capture/';
 
 switch ($action) {
     case 'edit':
