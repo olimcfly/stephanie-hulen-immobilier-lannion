@@ -271,6 +271,16 @@ const TEMPLATE_MAP = [
     'rapport-marche'      => 'pages/t16-rapport-marche.php',
     'capture-guide'       => 'captures/t5-capture-guide.php',
     'capture-merci'       => 'captures/t6-capture-merci.php',
+    't20-financement'     => 'pages/t20-financement.php',
+    't21-rdv'             => 'pages/t21-rdv.php',
+    't22-annuaire-partenaires' => 'pages/t22-annuaire-partenaires.php',
+    't23-faq'             => 'pages/t23-faq.php',
+    'financement'         => 'pages/t20-financement.php',
+    'rdv'                 => 'pages/t21-rdv.php',
+    'rendez-vous'         => 'pages/t21-rdv.php',
+    'annuaire-partenaires'=> 'pages/t22-annuaire-partenaires.php',
+    'partenaires'         => 'pages/t22-annuaire-partenaires.php',
+    'faq'                 => 'pages/t23-faq.php',
     'standard'            => 'pages/t2-edito.php',
 ];
 
