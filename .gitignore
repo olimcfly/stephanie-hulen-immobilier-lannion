@@ -10,3 +10,5 @@ node_modules/
 error_log
 admin/error_log
 admin/error_log
+*.log
+error_log
