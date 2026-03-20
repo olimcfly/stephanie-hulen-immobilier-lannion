@@ -6,12 +6,16 @@
 
 try {
     $pdo = getDB();
-    
+
+    // Charger le middleware menus dynamiques
+    $middlewarePath = dirname(__DIR__) . '/middleware/menu-middleware.php';
+    if (file_exists($middlewarePath)) require_once $middlewarePath;
+
     // Récupérer le header actif
     $stmt = $pdo->prepare("SELECT * FROM headers WHERE status='active' LIMIT 1");
     $stmt->execute();
     $header = $stmt->fetch();
-    
+
     if (!$header) {
         // Fallback si pas de header actif
         $header = [
@@ -26,14 +30,14 @@ try {
             'phone_number' => ''
         ];
     }
-    
-    // Décoder menu_items (JSON)
-    $menuItems = [];
-    if (!empty($header['menu_items'])) {
+
+    // Menu : priorite menus dynamiques → JSON header
+    $menuItems = function_exists('dynamicHeaderMenu') ? dynamicHeaderMenu($pdo) : [];
+    if (empty($menuItems) && !empty($header['menu_items'])) {
         $decoded = json_decode($header['menu_items'], true);
         $menuItems = is_array($decoded) ? $decoded : [];
     }
-    
+
 } catch (Exception $e) {
     die('Erreur header: ' . $e->getMessage());
 }

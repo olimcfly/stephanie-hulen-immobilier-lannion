@@ -6,12 +6,16 @@
 
 try {
     $pdo = getDB();
-    
+
+    // Charger le middleware menus dynamiques
+    $middlewarePath = dirname(__DIR__) . '/middleware/menu-middleware.php';
+    if (file_exists($middlewarePath)) require_once $middlewarePath;
+
     // Récupérer le footer actif
     $stmt = $pdo->prepare("SELECT * FROM footers WHERE status='active' LIMIT 1");
     $stmt->execute();
     $footer = $stmt->fetch();
-    
+
     if (!$footer) {
         // Fallback
         $footer = [
@@ -28,21 +32,21 @@ try {
             'social_links' => '[]'
         ];
     }
-    
-    // Décoder colonnes (JSON)
-    $columns = [];
-    if (!empty($footer['columns'])) {
+
+    // Colonnes : priorite menus dynamiques → JSON footer
+    $columns = function_exists('dynamicFooterColumns') ? dynamicFooterColumns($pdo) : [];
+    if (empty($columns) && !empty($footer['columns'])) {
         $decoded = json_decode($footer['columns'], true);
         $columns = is_array($decoded) ? $decoded : [];
     }
-    
+
     // Décoder réseaux (JSON)
     $socialLinks = [];
     if (!empty($footer['social_links'])) {
         $decoded = json_decode($footer['social_links'], true);
         $socialLinks = is_array($decoded) ? $decoded : [];
     }
-    
+
 } catch (Exception $e) {
     die('Erreur footer: ' . $e->getMessage());
 }
