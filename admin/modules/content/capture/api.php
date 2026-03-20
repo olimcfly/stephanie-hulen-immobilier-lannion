@@ -4,44 +4,51 @@
  *  MODULE CAPTURES — API unifiée  v1.0
  *  /admin/modules/content/capture/api.php
  *
- *  Endpoint POST centralisé pour toutes les opérations CRUD
+ *  Point d'entrée AJAX unique pour toutes les actions CRUD
  *  sur les pages de capture.
  *
- *  Actions supportées (POST : action=xxx) :
- *    save           → INSERT (id=0) ou UPDATE (id>0)
- *    delete         → Suppression + stats associées
- *    get            → SELECT * WHERE id = ?
- *    list           → SELECT avec pagination + filtres
- *    toggle_status  → Activer / désactiver une capture
- *    duplicate      → Dupliquer une page de capture
- *    stats          → Récupérer les stats (vues, conversions, taux)
+ *  Actions supportées :
+ *    save       — Créer ou mettre à jour une capture
+ *    delete     — Supprimer une capture (+ stats associées)
+ *    get        — Récupérer une capture par ID
+ *    list       — Liste avec pagination
+ *    toggle     — Activer/désactiver une capture
+ *    duplicate  — Dupliquer une capture
+ *    stats      — Récupérer les stats d'une capture
  *
- *  Retourne TOUJOURS du JSON :
- *    { success: bool, message: string, data?: mixed, errors?: object }
+ *  Input  : POST (FormData ou JSON)  |  GET pour actions de lecture
+ *  Output : JSON { success, id?, message?, error?, errors? }
  * ══════════════════════════════════════════════════════════════
  */
 
-// ─── Initialisation ───
-if (session_status() === PHP_SESSION_NONE) session_start();
-
 header('Content-Type: application/json; charset=utf-8');
 
+if (session_status() === PHP_SESSION_NONE) session_start();
 if (empty($_SESSION['admin_id'])) {
-    _jsonResponse(false, 'Non authentifié', null, 401);
+    _capApiRespond(false, null, 'Non authentifié', 401);
 }
 
 // ─── DB ───
 if (!isset($pdo) && !isset($db)) {
     if (!defined('ADMIN_ROUTER')) {
-        require_once __DIR__ . '/../../../config/config.php';
-        try {
-            $pdo = new PDO(
-                'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',
-                DB_USER, DB_PASS,
-                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-            );
-        } catch (PDOException $e) {
-            _jsonResponse(false, 'DB: ' . $e->getMessage(), null, 500);
+        $initFile = __DIR__ . '/../../../includes/init.php';
+        $configFile = __DIR__ . '/../../../config/config.php';
+        if (file_exists($initFile)) {
+            require_once $initFile;
+            try { $pdo = getDB(); } catch (Exception $e) {
+                _capApiRespond(false, null, 'Erreur BD', 500);
+            }
+        } elseif (file_exists($configFile)) {
+            require_once $configFile;
+            try {
+                $pdo = new PDO(
+                    'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',
+                    DB_USER, DB_PASS,
+                    [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+                );
+            } catch (PDOException $e) {
+                _capApiRespond(false, null, 'DB: ' . $e->getMessage(), 500);
+            }
         }
     }
 }
@@ -58,20 +65,24 @@ if (str_contains($contentType, 'application/json')) {
 
 $action = $input['action'] ?? $_GET['action'] ?? '';
 
-// ══════════════════════════════════════════════════════════════
-//  ROUTAGE
-// ══════════════════════════════════════════════════════════════
+if (!$action) {
+    _capApiRespond(false, null, 'Action manquante', 400);
+}
+
+// ════════════════════════════════════════════════════════════
+// DISPATCH
+// ════════════════════════════════════════════════════════════
+
+try {
+
 switch ($action) {
 
-    // ──────────────────────────────────────────────────────────
-    //  SAVE — INSERT (id=0) ou UPDATE (id>0)
-    // ──────────────────────────────────────────────────────────
+    // ─── SAVE (Create / Update) ───────────────────────────
     case 'save':
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            _jsonResponse(false, 'Méthode non autorisée', null, 405);
+            _capApiRespond(false, null, 'Méthode non autorisée', 405);
         }
 
-        // Récupérer les champs
         $id             = (int)($input['id']             ?? 0);
         $titre          = trim($input['titre']           ?? '');
         $slug           = trim($input['slug']            ?? '');
@@ -124,6 +135,8 @@ switch ($action) {
                 $errors['slug'] = 'Le slug est obligatoire.';
             }
         }
+        $slug = preg_replace('/[^a-z0-9-]/', '', strtolower($slug));
+
         if (!in_array($type, ['estimation', 'contact', 'newsletter', 'guide'])) {
             $errors['type'] = 'Type invalide.';
         }
@@ -131,17 +144,15 @@ switch ($action) {
             $errors['status'] = 'Statut invalide.';
         }
         if (!empty($errors)) {
-            _jsonResponse(false, 'Données invalides', null, 422, $errors);
+            _capApiRespond(false, null, 'Données invalides', 422, $errors);
         }
 
-        // Vérifier unicité du slug
-        try {
-            $slugCheck = $pdo->prepare("SELECT id FROM captures WHERE slug = ? AND id != ?");
-            $slugCheck->execute([$slug, $id]);
-            if ($slugCheck->fetch()) {
-                $slug = $slug . '-' . time();
-            }
-        } catch (PDOException $e) {}
+        // Unicité du slug
+        $slugCheck = $pdo->prepare("SELECT id FROM captures WHERE slug = ? AND id != ?");
+        $slugCheck->execute([$slug, $id]);
+        if ($slugCheck->fetch()) {
+            $slug = $slug . '-' . time();
+        }
 
         // Données à persister
         $data = [
@@ -163,484 +174,239 @@ switch ($action) {
             'actif'             => $actif,
         ];
 
-        try {
-            if ($id > 0) {
-                // UPDATE
-                $exists = $pdo->prepare("SELECT id FROM captures WHERE id = ?");
-                $exists->execute([$id]);
-                if (!$exists->fetch()) {
-                    _jsonResponse(false, 'Capture introuvable', null, 404);
-                }
-                $sets = implode(', ', array_map(fn($k) => "`$k` = ?", array_keys($data)));
-                $pdo->prepare("UPDATE captures SET $sets, updated_at = NOW() WHERE id = ?")
-                    ->execute([...array_values($data), $id]);
-                $resultId = $id;
-                $message  = 'Page de capture mise à jour avec succès.';
-            } else {
-                // INSERT
-                $cols = implode(', ', array_map(fn($k) => "`$k`", array_keys($data)));
-                $ph   = implode(', ', array_fill(0, count($data), '?'));
-                $pdo->prepare("INSERT INTO captures ($cols, created_at) VALUES ($ph, NOW())")
-                    ->execute(array_values($data));
-                $resultId = (int)$pdo->lastInsertId();
-                $message  = 'Page de capture créée avec succès.';
-            }
-            _jsonResponse(true, $message, ['id' => $resultId]);
-        } catch (PDOException $e) {
-            _jsonResponse(false, 'Erreur SQL : ' . $e->getMessage(), null, 500);
-        }
-        break;
-
-    // ──────────────────────────────────────────────────────────
-    //  DELETE — Suppression + stats associées
-    // ──────────────────────────────────────────────────────────
-    case 'delete':
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            _jsonResponse(false, 'Méthode non autorisée', null, 405);
-        }
-
-        $id = (int)($input['id'] ?? 0);
-        if ($id <= 0) {
-            _jsonResponse(false, 'ID invalide', null, 400);
-        }
-
-        // Vérifier que la capture existe
-        try {
-            $stmt = $pdo->prepare("SELECT id, titre FROM captures WHERE id = ?");
-            $stmt->execute([$id]);
-            $rec = $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            _jsonResponse(false, 'Erreur SQL : ' . $e->getMessage(), null, 500);
-        }
-
-        if (!$rec) {
-            _jsonResponse(false, 'Capture introuvable', null, 404);
-        }
-
-        try {
-            $pdo->beginTransaction();
-            // Supprimer les stats journalières (table optionnelle)
-            try {
-                $pdo->prepare("DELETE FROM captures_stats WHERE capture_id = ?")->execute([$id]);
-            } catch (PDOException $e) {}
-            // Supprimer la capture
-            $pdo->prepare("DELETE FROM captures WHERE id = ?")->execute([$id]);
-            $pdo->commit();
-            _jsonResponse(true, 'Page de capture supprimée avec succès.', ['id' => $id]);
-        } catch (PDOException $e) {
-            $pdo->rollBack();
-            _jsonResponse(false, 'Erreur SQL : ' . $e->getMessage(), null, 500);
-        }
-        break;
-
-    // ──────────────────────────────────────────────────────────
-    //  GET — Récupérer une capture par ID
-    // ──────────────────────────────────────────────────────────
-    case 'get':
-        $id = (int)($input['id'] ?? $_GET['id'] ?? 0);
-        if ($id <= 0) {
-            _jsonResponse(false, 'ID invalide', null, 400);
-        }
-
-        try {
-            $stmt = $pdo->prepare("SELECT * FROM captures WHERE id = ?");
-            $stmt->execute([$id]);
-            $capture = $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            _jsonResponse(false, 'Erreur SQL : ' . $e->getMessage(), null, 500);
-        }
-
-        if (!$capture) {
-            _jsonResponse(false, 'Capture introuvable', null, 404);
-        }
-
-        // Décoder les champs JSON
-        if (!empty($capture['guide_ids'])) {
-            $capture['guide_ids'] = json_decode($capture['guide_ids'], true);
-        }
-        if (!empty($capture['champs_formulaire'])) {
-            $capture['champs_formulaire'] = json_decode($capture['champs_formulaire'], true);
-        }
-
-        _jsonResponse(true, 'OK', $capture);
-        break;
-
-    // ──────────────────────────────────────────────────────────
-    //  LIST — Liste avec pagination et filtres
-    // ──────────────────────────────────────────────────────────
-    case 'list':
-        $page    = max(1, (int)($input['page'] ?? $_GET['page_num'] ?? 1));
-        $perPage = min(100, max(1, (int)($input['per_page'] ?? $_GET['per_page'] ?? 25)));
-        $offset  = ($page - 1) * $perPage;
-
-        $filterStatus = $input['status'] ?? $_GET['status'] ?? 'all';
-        $filterType   = $input['type']   ?? $_GET['type']   ?? 'all';
-        $search       = trim($input['q'] ?? $_GET['q'] ?? '');
-
-        $where = [];
-        $params = [];
-
-        if ($filterStatus !== 'all') {
-            if ($filterStatus === 'active') {
-                $where[] = "status = 'active'";
-            } elseif ($filterStatus === 'inactive') {
-                $where[] = "status IN('inactive','archived')";
-            }
-        }
-        if ($filterType !== 'all') {
-            $where[] = "type = ?";
-            $params[] = $filterType;
-        }
-        if ($search !== '') {
-            $where[] = "(titre LIKE ? OR slug LIKE ? OR description LIKE ?)";
-            $params[] = "%{$search}%";
-            $params[] = "%{$search}%";
-            $params[] = "%{$search}%";
-        }
-
-        $whereSQL = $where ? 'WHERE ' . implode(' AND ', $where) : '';
-
-        try {
-            // Total
-            $stmtC = $pdo->prepare("SELECT COUNT(*) FROM captures {$whereSQL}");
-            $stmtC->execute($params);
-            $total = (int)$stmtC->fetchColumn();
-            $totalPages = max(1, ceil($total / $perPage));
-
-            // Données
-            $stmt = $pdo->prepare("SELECT * FROM captures {$whereSQL} ORDER BY created_at DESC LIMIT {$perPage} OFFSET {$offset}");
-            $stmt->execute($params);
-            $captures = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            _jsonResponse(true, 'OK', [
-                'captures'    => $captures,
-                'total'       => $total,
-                'page'        => $page,
-                'per_page'    => $perPage,
-                'total_pages' => $totalPages,
-            ]);
-        } catch (PDOException $e) {
-            _jsonResponse(false, 'Erreur SQL : ' . $e->getMessage(), null, 500);
-        }
-        break;
-
-    // ──────────────────────────────────────────────────────────
-    //  TOGGLE_STATUS — Activer / désactiver
-    // ──────────────────────────────────────────────────────────
-    case 'toggle_status':
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            _jsonResponse(false, 'Méthode non autorisée', null, 405);
-        }
-
-        $id     = (int)($input['id'] ?? 0);
-        $status = $input['status'] ?? '';
-
-        if ($id <= 0) {
-            _jsonResponse(false, 'ID invalide', null, 400);
-        }
-        if (!in_array($status, ['active', 'inactive', 'archived'])) {
-            _jsonResponse(false, 'Statut invalide', null, 400);
-        }
-
-        $active = ($status === 'active') ? 1 : 0;
-
-        try {
+        if ($id > 0) {
+            // UPDATE
             $exists = $pdo->prepare("SELECT id FROM captures WHERE id = ?");
             $exists->execute([$id]);
             if (!$exists->fetch()) {
-                _jsonResponse(false, 'Capture introuvable', null, 404);
+                _capApiRespond(false, null, 'Capture introuvable', 404);
             }
-
-            $pdo->prepare("UPDATE captures SET status = ?, active = ?, actif = ?, updated_at = NOW() WHERE id = ?")
-                ->execute([$status, $active, $active, $id]);
-
-            _jsonResponse(true, 'Statut mis à jour.', ['id' => $id, 'status' => $status]);
-        } catch (PDOException $e) {
-            _jsonResponse(false, 'Erreur SQL : ' . $e->getMessage(), null, 500);
+            $sets = implode(', ', array_map(fn($k) => "`$k` = ?", array_keys($data)));
+            $pdo->prepare("UPDATE captures SET $sets, updated_at = NOW() WHERE id = ?")
+                ->execute([...array_values($data), $id]);
+            $resultId = $id;
+            $message  = 'Page de capture mise à jour avec succès.';
+        } else {
+            // INSERT
+            $cols = implode(', ', array_map(fn($k) => "`$k`", array_keys($data)));
+            $ph   = implode(', ', array_fill(0, count($data), '?'));
+            $pdo->prepare("INSERT INTO captures ($cols, created_at) VALUES ($ph, NOW())")
+                ->execute(array_values($data));
+            $resultId = (int)$pdo->lastInsertId();
+            $message  = 'Page de capture créée avec succès.';
         }
+
+        _capApiRespond(true, $resultId, $message);
         break;
 
-    // ──────────────────────────────────────────────────────────
-    //  DUPLICATE — Dupliquer une page de capture
-    // ──────────────────────────────────────────────────────────
-    case 'duplicate':
+    // ─── DELETE ───────────────────────────────────────────
+    case 'delete':
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            _jsonResponse(false, 'Méthode non autorisée', null, 405);
+            _capApiRespond(false, null, 'Méthode non autorisée', 405);
         }
 
         $id = (int)($input['id'] ?? 0);
         if ($id <= 0) {
-            _jsonResponse(false, 'ID invalide', null, 400);
+            _capApiRespond(false, null, 'ID invalide', 400);
         }
 
+        // Vérifier que la capture existe
+        $check = $pdo->prepare("SELECT id, titre FROM captures WHERE id = ?");
+        $check->execute([$id]);
+        $rec = $check->fetch(PDO::FETCH_ASSOC);
+        if (!$rec) {
+            _capApiRespond(false, null, 'Capture introuvable', 404);
+        }
+
+        $pdo->beginTransaction();
         try {
-            $stmt = $pdo->prepare("SELECT * FROM captures WHERE id = ?");
-            $stmt->execute([$id]);
-            $original = $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            _jsonResponse(false, 'Erreur SQL : ' . $e->getMessage(), null, 500);
-        }
-
-        if (!$original) {
-            _jsonResponse(false, 'Capture introuvable', null, 404);
-        }
-
-        // Préparer la copie
-        $newTitre = ($original['titre'] ?? 'Sans titre') . ' (copie)';
-        $newSlug  = ($original['slug'] ?? 'copie') . '-copie-' . time();
-
-        // Colonnes à copier (exclure id, created_at, updated_at, vues, conversions, taux)
-        $copyFields = [
-            'titre', 'slug', 'description', 'headline', 'sous_titre',
-            'contenu', 'image_url', 'cta_text', 'page_merci_url',
-            'guide_ids', 'champs_formulaire', 'type', 'template',
-        ];
-
-        $values = [];
-        $colsList = [];
-        $placeholders = [];
-
-        foreach ($copyFields as $field) {
-            if (!array_key_exists($field, $original)) continue;
-            $colsList[] = "`{$field}`";
-            $placeholders[] = '?';
-            if ($field === 'titre') {
-                $values[] = $newTitre;
-            } elseif ($field === 'slug') {
-                $values[] = $newSlug;
-            } else {
-                $values[] = $original[$field];
-            }
-        }
-
-        // Ajouter les champs de statut (toujours inactif pour la copie)
-        $colsList[]     = '`status`';
-        $placeholders[] = '?';
-        $values[]       = 'inactive';
-
-        $colsList[]     = '`active`';
-        $placeholders[] = '?';
-        $values[]       = 0;
-
-        $colsList[]     = '`actif`';
-        $placeholders[] = '?';
-        $values[]       = 0;
-
-        $colsList[]     = '`vues`';
-        $placeholders[] = '?';
-        $values[]       = 0;
-
-        $colsList[]     = '`conversions`';
-        $placeholders[] = '?';
-        $values[]       = 0;
-
-        $colsList[]     = '`taux_conversion`';
-        $placeholders[] = '?';
-        $values[]       = 0;
-
-        $colsList[]     = '`created_at`';
-        $placeholders[] = 'NOW()';
-
-        try {
-            $cols = implode(', ', $colsList);
-            $ph   = implode(', ', $placeholders);
-            $pdo->prepare("INSERT INTO captures ({$cols}) VALUES ({$ph})")
-                ->execute($values);
-            $newId = (int)$pdo->lastInsertId();
-            _jsonResponse(true, 'Page de capture dupliquée avec succès.', ['id' => $newId]);
-        } catch (PDOException $e) {
-            _jsonResponse(false, 'Erreur SQL : ' . $e->getMessage(), null, 500);
-        }
-        break;
-
-    // ──────────────────────────────────────────────────────────
-    //  STATS — Récupérer les stats (vues, conversions, taux)
-    // ──────────────────────────────────────────────────────────
-    case 'stats':
-        $id     = (int)($input['id'] ?? $_GET['id'] ?? 0);
-        $period = in_array($input['period'] ?? $_GET['period'] ?? '30', ['7', '30', '90'])
-                  ? (int)($input['period'] ?? $_GET['period'] ?? 30)
-                  : 30;
-
-        if ($id <= 0) {
-            _jsonResponse(false, 'ID invalide', null, 400);
-        }
-
-        // Charger la capture
-        try {
-            $stmt = $pdo->prepare("SELECT * FROM captures WHERE id = ?");
-            $stmt->execute([$id]);
-            $capture = $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            _jsonResponse(false, 'Erreur SQL : ' . $e->getMessage(), null, 500);
-        }
-
-        if (!$capture) {
-            _jsonResponse(false, 'Capture introuvable', null, 404);
-        }
-
-        // Stats cumulées
-        $totalVues = (int)($capture['vues']              ?? 0);
-        $totalConv = (int)($capture['conversions']        ?? 0);
-        $tauxMoyen = (float)($capture['taux_conversion']  ?? 0);
-
-        // Stats journalières
-        $dailyStats = [];
-        $statsAvail = false;
-        try {
-            $pdo->query("SELECT 1 FROM captures_stats LIMIT 1");
-            $statsAvail = true;
-        } catch (PDOException $e) {}
-
-        if ($statsAvail) {
+            // Supprimer les stats journalières
             try {
-                $rows = $pdo->prepare("
-                    SELECT
-                        date,
-                        COALESCE(SUM(vues), 0)          AS vues,
-                        COALESCE(SUM(conversions), 0)   AS conversions,
-                        COALESCE(MAX(taux_conversion),0) AS taux
-                    FROM captures_stats
-                    WHERE capture_id = ?
-                      AND date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
-                    GROUP BY date
-                    ORDER BY date ASC
-                ");
-                $rows->execute([$id, $period]);
-                $rawStats = $rows->fetchAll(PDO::FETCH_ASSOC);
+                $pdo->prepare("DELETE FROM captures_stats WHERE capture_id = ?")->execute([$id]);
+            } catch (PDOException $e) {} // table optionnelle
 
-                $dateMap = [];
-                foreach ($rawStats as $r) $dateMap[$r['date']] = $r;
-
-                for ($i = $period - 1; $i >= 0; $i--) {
-                    $d = date('Y-m-d', strtotime("-$i days"));
-                    $dailyStats[] = [
-                        'date'        => $d,
-                        'vues'        => (int)($dateMap[$d]['vues']        ?? 0),
-                        'conversions' => (int)($dateMap[$d]['conversions'] ?? 0),
-                        'taux'        => (float)($dateMap[$d]['taux']      ?? 0),
-                    ];
-                }
-            } catch (PDOException $e) {}
-        }
-
-        // Meilleur jour
-        $bestDay = null;
-        if (!empty($dailyStats)) {
-            $sorted = $dailyStats;
-            usort($sorted, fn($a, $b) => $b['conversions'] <=> $a['conversions']);
-            $bestDay = $sorted[0]['conversions'] > 0 ? $sorted[0] : null;
-        }
-
-        // Jours actif
-        $joursActif = 0;
-        if (!empty($capture['created_at'])) {
-            $diff = (new DateTime())->diff(new DateTime($capture['created_at']));
-            $joursActif = max(1, $diff->days);
-        }
-
-        _jsonResponse(true, 'OK', [
-            'capture'      => [
-                'id'     => (int)$capture['id'],
-                'titre'  => $capture['titre'] ?? '',
-                'slug'   => $capture['slug']  ?? '',
-                'type'   => $capture['type']  ?? '',
-                'status' => $capture['status'] ?? '',
-            ],
-            'totals'       => [
-                'vues'            => $totalVues,
-                'conversions'     => $totalConv,
-                'taux_conversion' => $tauxMoyen,
-                'vues_par_jour'   => $joursActif > 0 ? round($totalVues / $joursActif, 1) : 0,
-                'jours_actif'     => $joursActif,
-            ],
-            'best_day'     => $bestDay,
-            'daily_stats'  => $dailyStats,
-            'period'       => $period,
-            'stats_available' => $statsAvail,
-        ]);
-        break;
-
-    // ──────────────────────────────────────────────────────────
-    //  BULK_DELETE — Suppression groupée
-    // ──────────────────────────────────────────────────────────
-    case 'bulk_delete':
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            _jsonResponse(false, 'Méthode non autorisée', null, 405);
-        }
-
-        $idsRaw = $input['ids'] ?? '';
-        $ids = is_array($idsRaw) ? $idsRaw : (json_decode($idsRaw, true) ?: []);
-        $ids = array_filter(array_map('intval', $ids), fn($v) => $v > 0);
-
-        if (empty($ids)) {
-            _jsonResponse(false, 'Aucun ID fourni', null, 400);
-        }
-
-        try {
-            $pdo->beginTransaction();
-            $ph = implode(',', array_fill(0, count($ids), '?'));
-            try {
-                $pdo->prepare("DELETE FROM captures_stats WHERE capture_id IN ({$ph})")->execute($ids);
-            } catch (PDOException $e) {}
-            $pdo->prepare("DELETE FROM captures WHERE id IN ({$ph})")->execute($ids);
+            // Supprimer la capture
+            $pdo->prepare("DELETE FROM captures WHERE id = ?")->execute([$id]);
             $pdo->commit();
-            _jsonResponse(true, count($ids) . ' capture(s) supprimée(s).', ['count' => count($ids)]);
         } catch (PDOException $e) {
             $pdo->rollBack();
-            _jsonResponse(false, 'Erreur SQL : ' . $e->getMessage(), null, 500);
+            _capApiRespond(false, null, 'Erreur SQL : ' . $e->getMessage(), 500);
         }
+
+        _capApiRespond(true, $id, 'Page de capture supprimée avec succès.');
         break;
 
-    // ──────────────────────────────────────────────────────────
-    //  BULK_STATUS — Changement de statut groupé
-    // ──────────────────────────────────────────────────────────
-    case 'bulk_status':
+    // ─── GET ──────────────────────────────────────────────
+    case 'get':
+        $id = (int)($input['id'] ?? $_GET['id'] ?? 0);
+        if ($id <= 0) {
+            _capApiRespond(false, null, 'ID invalide', 400);
+        }
+
+        $stmt = $pdo->prepare("SELECT * FROM captures WHERE id = ?");
+        $stmt->execute([$id]);
+        $capture = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$capture) {
+            _capApiRespond(false, null, 'Capture introuvable', 404);
+        }
+
+        http_response_code(200);
+        echo json_encode(['success' => true, 'capture' => $capture], JSON_UNESCAPED_UNICODE);
+        exit;
+
+    // ─── LIST ─────────────────────────────────────────────
+    case 'list':
+        $status  = $_GET['status'] ?? $input['status'] ?? 'all';
+        $type    = $_GET['type']   ?? $input['type_filter'] ?? 'all';
+        $search  = $_GET['q']      ?? $input['q'] ?? '';
+        $pg      = max(1, (int)($_GET['pg'] ?? $input['pg'] ?? 1));
+        $perPage = max(1, min(100, (int)($_GET['per_page'] ?? $input['per_page'] ?? 20)));
+
+        $where = []; $params = [];
+        if ($status !== 'all' && in_array($status, ['active', 'inactive', 'archived'])) {
+            $where[] = "status = ?"; $params[] = $status;
+        }
+        if ($type !== 'all' && in_array($type, ['estimation', 'contact', 'newsletter', 'guide'])) {
+            $where[] = "type = ?"; $params[] = $type;
+        }
+        if ($search) {
+            $where[] = "(titre LIKE ? OR slug LIKE ? OR description LIKE ?)";
+            $params = array_merge($params, ["%{$search}%", "%{$search}%", "%{$search}%"]);
+        }
+        $wClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM captures {$wClause}");
+        $stmt->execute($params);
+        $total = (int)$stmt->fetchColumn();
+
+        $offset = ($pg - 1) * $perPage;
+        $stmt = $pdo->prepare("SELECT * FROM captures {$wClause} ORDER BY created_at DESC LIMIT {$perPage} OFFSET {$offset}");
+        $stmt->execute($params);
+        $captures = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        http_response_code(200);
+        echo json_encode([
+            'success'    => true,
+            'captures'   => $captures,
+            'pagination' => [
+                'total'       => $total,
+                'page'        => $pg,
+                'per_page'    => $perPage,
+                'total_pages' => max(1, ceil($total / $perPage)),
+            ],
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+
+    // ─── TOGGLE (activer/désactiver) ──────────────────────
+    case 'toggle':
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            _jsonResponse(false, 'Méthode non autorisée', null, 405);
+            _capApiRespond(false, null, 'Méthode non autorisée', 405);
         }
 
-        $idsRaw = $input['ids'] ?? '';
-        $ids = is_array($idsRaw) ? $idsRaw : (json_decode($idsRaw, true) ?: []);
-        $ids = array_filter(array_map('intval', $ids), fn($v) => $v > 0);
-        $status = $input['status'] ?? '';
-
-        if (empty($ids)) {
-            _jsonResponse(false, 'Aucun ID fourni', null, 400);
-        }
-        if (!in_array($status, ['active', 'inactive', 'archived'])) {
-            _jsonResponse(false, 'Statut invalide', null, 400);
+        $id = (int)($input['id'] ?? 0);
+        $newStatus = $input['status'] ?? '';
+        if ($id <= 0 || !in_array($newStatus, ['active', 'inactive'])) {
+            _capApiRespond(false, null, 'Paramètres invalides', 400);
         }
 
-        $active = ($status === 'active') ? 1 : 0;
+        $active = ($newStatus === 'active') ? 1 : 0;
+        $pdo->prepare("UPDATE captures SET status = ?, active = ?, actif = ? WHERE id = ?")
+            ->execute([$newStatus, $active, $active, $id]);
 
+        _capApiRespond(true, $id, 'Statut mis à jour.');
+        break;
+
+    // ─── DUPLICATE ────────────────────────────────────────
+    case 'duplicate':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            _capApiRespond(false, null, 'Méthode non autorisée', 405);
+        }
+
+        $id = (int)($input['id'] ?? 0);
+        if ($id <= 0) {
+            _capApiRespond(false, null, 'ID invalide', 400);
+        }
+
+        $stmt = $pdo->prepare("SELECT * FROM captures WHERE id = ?");
+        $stmt->execute([$id]);
+        $orig = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$orig) {
+            _capApiRespond(false, null, 'Capture introuvable', 404);
+        }
+
+        $newTitre = $orig['titre'] . ' (copie)';
+        $newSlug  = $orig['slug'] . '-copie-' . time();
+
+        $skip = ['id', 'created_at', 'updated_at', 'vues', 'conversions', 'taux_conversion', 'last_conversion_at'];
+        $copyData = [];
+        foreach ($orig as $col => $val) {
+            if (in_array($col, $skip)) continue;
+            $copyData[$col] = $val;
+        }
+        $copyData['titre']  = $newTitre;
+        $copyData['slug']   = $newSlug;
+        $copyData['status'] = 'inactive';
+        $copyData['active'] = 0;
+        $copyData['actif']  = 0;
+
+        $cols = implode(', ', array_map(fn($k) => "`$k`", array_keys($copyData)));
+        $ph   = implode(', ', array_fill(0, count($copyData), '?'));
+        $pdo->prepare("INSERT INTO captures ($cols, created_at) VALUES ($ph, NOW())")
+            ->execute(array_values($copyData));
+        $newId = (int)$pdo->lastInsertId();
+
+        _capApiRespond(true, $newId, 'Capture dupliquée avec succès.');
+        break;
+
+    // ─── STATS ────────────────────────────────────────────
+    case 'stats':
+        $id = (int)($input['id'] ?? $_GET['id'] ?? 0);
+        if ($id <= 0) {
+            _capApiRespond(false, null, 'ID invalide', 400);
+        }
+
+        $capture = $pdo->prepare("SELECT id, titre, vues, conversions, taux_conversion FROM captures WHERE id = ?");
+        $capture->execute([$id]);
+        $cap = $capture->fetch(PDO::FETCH_ASSOC);
+        if (!$cap) {
+            _capApiRespond(false, null, 'Capture introuvable', 404);
+        }
+
+        $daily = [];
         try {
-            $ph = implode(',', array_fill(0, count($ids), '?'));
-            $pdo->prepare("UPDATE captures SET status = ?, active = ?, actif = ?, updated_at = NOW() WHERE id IN ({$ph})")
-                ->execute([$status, $active, $active, ...$ids]);
-            _jsonResponse(true, count($ids) . ' capture(s) mise(s) à jour.', ['count' => count($ids)]);
-        } catch (PDOException $e) {
-            _jsonResponse(false, 'Erreur SQL : ' . $e->getMessage(), null, 500);
-        }
-        break;
+            $stmt = $pdo->prepare("SELECT date, vues, conversions FROM captures_stats WHERE capture_id = ? ORDER BY date DESC LIMIT 30");
+            $stmt->execute([$id]);
+            $daily = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {}
 
-    // ──────────────────────────────────────────────────────────
-    //  ACTION INCONNUE
-    // ──────────────────────────────────────────────────────────
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'capture' => $cap,
+            'daily'   => $daily,
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
+
+    // ─── DEFAULT ──────────────────────────────────────────
     default:
-        _jsonResponse(false, 'Action non reconnue : ' . $action, null, 400);
-        break;
+        _capApiRespond(false, null, 'Action inconnue : ' . $action, 400);
 }
 
-// ══════════════════════════════════════════════════════════════
-//  Helper — Réponse JSON unifiée
-// ══════════════════════════════════════════════════════════════
-function _jsonResponse(bool $success, string $message = '', $data = null, int $code = 200, array $errors = []): void
-{
+} catch (PDOException $e) {
+    error_log("Capture API [PDO]: " . $e->getMessage());
+    _capApiRespond(false, null, 'Erreur base de données', 500);
+} catch (Exception $e) {
+    error_log("Capture API: " . $e->getMessage());
+    _capApiRespond(false, null, 'Erreur serveur', 500);
+}
+
+// ─── Helper réponse ───────────────────────────────────────
+function _capApiRespond(bool $success, ?int $id = null, string $message = '', int $code = 200, array $errors = []): void {
     http_response_code($code);
+    header('Content-Type: application/json; charset=utf-8');
     $out = ['success' => $success, 'message' => $message];
-    if ($data !== null) $out['data'] = $data;
-    if ($errors)        $out['errors'] = $errors;
+    if ($id !== null) $out['id'] = $id;
+    if ($errors)      $out['errors'] = $errors;
     echo json_encode($out, JSON_UNESCAPED_UNICODE);
     exit;
 }

@@ -1,9 +1,23 @@
 <?php
 /**
  * /admin/api/content/pages.php
- * API Pages — create, save_page, create_with_ai, delete, check_slug, ai_slug
+ * API Pages — PROXY vers le api.php unifié du module Pages
+ *
+ * Ce fichier délègue désormais vers :
+ *   /admin/modules/content/pages/api.php
+ * pour centraliser toute la logique API Pages en un seul endroit.
+ *
+ * Conservé pour rétrocompatibilité des appels JS existants.
  */
 
+// ── Délégation vers api.php local ───
+$localApi = dirname(__DIR__, 2) . '/modules/content/pages/api.php';
+if (file_exists($localApi)) {
+    require $localApi;
+    exit;
+}
+
+// ── Fallback : ancien code si le fichier local n'existe pas ───
 header('Content-Type: application/json; charset=utf-8');
 
 // ── Init ──
