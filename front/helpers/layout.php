@@ -6,6 +6,10 @@
  * ============================================================
  */
 
+// ── Middleware : menus dynamiques ──
+$middlewarePath = dirname(__DIR__) . '/middleware/menu-middleware.php';
+if (file_exists($middlewarePath)) require_once $middlewarePath;
+
 if (!function_exists('getHeaderFooter')) {
     /**
      * Charge le header et footer actifs depuis la DB.
@@ -74,8 +78,9 @@ if (!function_exists('renderHeader')) {
         $isSticky = !empty($h['sticky']);
         $breakpt  = intval($h['mobile_breakpoint'] ?? 1024);
 
-        $menuItems = [];
-        if (!empty($h['menu_items'])) {
+        // Menu : priorite menus dynamiques → JSON header → fallback
+        $menuItems = function_exists('dynamicHeaderMenu') ? dynamicHeaderMenu() : [];
+        if (empty($menuItems) && !empty($h['menu_items'])) {
             $decoded = json_decode($h['menu_items'], true);
             if (is_array($decoded)) $menuItems = $decoded;
         }
@@ -172,8 +177,9 @@ if (!function_exists('renderFooter')) {
 
         $socialLinks = [];
         if (!empty($f['social_links'])) { $d = json_decode($f['social_links'], true); if (is_array($d)) $socialLinks = $d; }
-        $columns = [];
-        if (!empty($f['columns']))      { $d = json_decode($f['columns'], true);      if (is_array($d)) $columns = $d; }
+        // Colonnes : priorite menus dynamiques → JSON footer
+        $columns = function_exists('dynamicFooterColumns') ? dynamicFooterColumns() : [];
+        if (empty($columns) && !empty($f['columns'])) { $d = json_decode($f['columns'], true); if (is_array($d)) $columns = $d; }
         $legalLinks = [];
         if (!empty($f['legal_links']))  { $d = json_decode($f['legal_links'], true);  if (is_array($d)) $legalLinks = $d; }
 

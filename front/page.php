@@ -19,6 +19,9 @@ $renderers = __DIR__ . '/renderers/';
 $helperPath = __DIR__ . '/helpers/site-config.php';
 if (file_exists($helperPath)) require_once $helperPath;
 
+// ─── Middleware : menus dynamiques ──────────────────────
+require_once __DIR__ . '/middleware/menu-middleware.php';
+
 // ─────────────────────────────────────────────────────────
 // Helpers globaux
 // ─────────────────────────────────────────────────────────
@@ -157,15 +160,17 @@ if (!function_exists('renderHeader')) {
             $logoHtml = '<a href="'.$logoLink.'" style="flex-shrink:0;font-family:\'Playfair Display\',serif;font-size:22px;font-weight:800;color:'.$hv.';text-decoration:none;white-space:nowrap">'.$lt.'</a>';
         }
 
-        // Menu — depuis DB ou fallback générique
-        $menuItems = [];
-        foreach (['nav_links','menu_items'] as $col) {
-            $raw = $header[$col] ?? '';
-            if (!$raw) continue;
-            $decoded = json_decode($raw, true);
-            if (is_array($decoded) && !empty($decoded) && isset($decoded[0]['label'])) {
-                $menuItems = $decoded;
-                break;
+        // Menu — priorite : menus dynamiques (table menus/menu_items) → JSON header → fallback
+        $menuItems = dynamicHeaderMenu();
+        if (empty($menuItems)) {
+            foreach (['nav_links','menu_items'] as $col) {
+                $raw = $header[$col] ?? '';
+                if (!$raw) continue;
+                $decoded = json_decode($raw, true);
+                if (is_array($decoded) && !empty($decoded) && isset($decoded[0]['label'])) {
+                    $menuItems = $decoded;
+                    break;
+                }
             }
         }
         if (empty($menuItems)) {
@@ -314,7 +319,11 @@ if (!function_exists('renderFooter')) {
         $tc = htmlspecialchars($footer['text_color']   ?? '#94a3b8');
         $ac = htmlspecialchars($footer['accent_color'] ?? $footer['hover_color'] ?? '#d4a574');
 
-        $cols = json_decode($footer['columns_json'] ?? '[]', true) ?: [];
+        // Colonnes : priorite menus dynamiques → JSON footer
+        $cols = dynamicFooterColumns();
+        if (empty($cols)) {
+            $cols = json_decode($footer['columns_json'] ?? '[]', true) ?: [];
+        }
         $colsHtml = '';
         foreach ($cols as $col) {
             if (empty($col['title']) && empty($col['links'])) continue;
