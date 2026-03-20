@@ -123,6 +123,7 @@ function getNavGroups() {
             ['slug'=>'maintenance',     'icon'=>'fa-wrench',              'label'=>'Maintenance'],
             ['slug'=>'module-health',   'icon'=>'fa-stethoscope',         'label'=>'Santé système'],
             ['slug'=>'logs',            'icon'=>'fa-terminal',            'label'=>'Logs'],
+            ['slug'=>'audit-logs',      'icon'=>'fa-clipboard-list',      'label'=>'Audit admin',          'badge'=>'NEW'],
             ['slug'=>'license',         'icon'=>'fa-shield-check',        'label'=>'Licence'],
         ]],
     ];
@@ -143,6 +144,7 @@ function getSubRoutes() {
         'system/emails'   => ['file'=>'system/emails/index.php',              'title'=>'Templates emails'],
         'license'         => ['file'=>'license/index.php',                    'title'=>'Licence'],
         'logs'            => ['file'=>'system/logs/index.php',                'title'=>'Logs système'],
+        'audit-logs'      => ['file'=>'system/audit-logs/index.php',           'title'=>'Audit admin'],
         'module-health'   => ['file'=>'system/diagnostic/index.php',          'title'=>'Santé modules'],
 
         // ── DESIGN ───────────────────────────────────────

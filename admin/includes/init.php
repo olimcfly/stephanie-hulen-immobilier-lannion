@@ -77,3 +77,16 @@ $adminName = $_SESSION['admin_name']
 $adminInitial = strtoupper(substr($adminName, 0, 1));
 
 $adminId = $_SESSION['admin_id'] ?? null;
+
+
+/* MIGRATIONS AUTO */
+
+$migratorPath = dirname(__DIR__) . '/core/Migrator.php';
+$migrationsDir = dirname(__DIR__, 2) . '/database/migrations';
+if (file_exists($migratorPath) && is_dir($migrationsDir)) {
+    require_once $migratorPath;
+    $migrator = new Migrator($pdo);
+    $sqlFiles = glob($migrationsDir . '/*.sql');
+    sort($sqlFiles);
+    $migrator->applyMany($sqlFiles, 'core:');
+}

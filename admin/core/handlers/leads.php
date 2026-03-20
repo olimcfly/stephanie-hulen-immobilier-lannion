@@ -69,7 +69,9 @@ switch ($action) {
                 $input['budget_min'] ?? null, $input['budget_max'] ?? null,
                 $input['property_type'] ?? null, $input['notes'] ?? null, $input['tags'] ?? null
             ]);
-            echo json_encode(['success' => true, 'message' => 'Lead cree', 'id' => $pdo->lastInsertId()]);
+            $newLeadId = (int)$pdo->lastInsertId();
+            auditLog('create', 'lead', $newLeadId, ['email' => $input['email'] ?? '', 'firstname' => $input['firstname'] ?? '', 'lastname' => $input['lastname'] ?? '']);
+            echo json_encode(['success' => true, 'message' => 'Lead cree', 'id' => $newLeadId]);
         } catch (PDOException $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
@@ -86,6 +88,7 @@ switch ($action) {
             if (empty($sets)) { echo json_encode(['success' => false, 'message' => 'Aucun champ']); break; }
             $params[] = $id;
             $pdo->prepare("UPDATE leads SET " . implode(', ', $sets) . " WHERE id = ?")->execute($params);
+            auditLog('update', 'lead', $id, array_intersect_key($input, array_flip(['firstname','lastname','email','status','temperature'])));
             echo json_encode(['success' => true, 'message' => 'Lead mis a jour']);
         } catch (PDOException $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
@@ -98,6 +101,7 @@ switch ($action) {
             $id = (int)($input['id'] ?? 0);
             if (!$id) { echo json_encode(['success' => false, 'message' => 'ID requis']); break; }
             $pdo->prepare("DELETE FROM leads WHERE id = ?")->execute([$id]);
+            auditLog('delete', 'lead', $id);
             echo json_encode(['success' => true, 'message' => 'Lead supprime']);
         } catch (PDOException $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);

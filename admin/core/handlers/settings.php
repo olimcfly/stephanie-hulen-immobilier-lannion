@@ -50,6 +50,7 @@ switch ($action) {
                 $stmt->execute([$key, $value, $category, $value, $category]);
                 $updated++;
             }
+            auditLog('update', 'setting', null, ['category' => $category, 'count' => $updated]);
             echo json_encode(['success' => true, 'message' => "{$updated} parametres sauvegardes"]);
         } catch (PDOException $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
@@ -61,6 +62,7 @@ switch ($action) {
             $key = $input['key'] ?? '';
             if (!$key) { echo json_encode(['success' => false, 'message' => 'Cle requise']); break; }
             $pdo->prepare("DELETE FROM settings WHERE setting_key = ?")->execute([$key]);
+            auditLog('delete', 'setting', null, ['key' => $key]);
             echo json_encode(['success' => true, 'message' => 'Parametre supprime']);
         } catch (PDOException $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
@@ -111,6 +113,7 @@ switch ($action) {
                 $stmt->execute([$key, $s['setting_value'] ?? '', $s['category'] ?? 'general', $s['setting_value'] ?? '', $s['category'] ?? 'general']);
                 $imported++;
             }
+            auditLog('import', 'setting', null, ['count' => $imported]);
             echo json_encode(['success' => true, 'message' => "{$imported} parametres importes"]);
         } catch (PDOException $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);

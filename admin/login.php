@@ -109,6 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             unset($_SESSION['otp_phone']);
             unset($_SESSION['otp_time']);
 
+            require_once ROOT_PATH . '/includes/functions/helpers.php';
+            auditLog('login', 'admin', (int)$admin['id'], ['email' => $admin['email']]);
+
             header("Location: /admin/dashboard.php");
             exit;
         }

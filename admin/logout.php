@@ -8,6 +8,12 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+/* audit log avant destruction session */
+define('ROOT_PATH', dirname(__DIR__));
+require_once ROOT_PATH . '/config/config.php';
+require_once ROOT_PATH . '/includes/functions/helpers.php';
+auditLog('logout', 'admin', (int)($_SESSION['admin_id'] ?? 0), ['email' => $_SESSION['admin_email'] ?? '']);
+
 /* vider la session */
 $_SESSION = [];
 

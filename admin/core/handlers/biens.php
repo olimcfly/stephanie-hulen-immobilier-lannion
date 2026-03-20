@@ -29,6 +29,9 @@ if (file_exists($controllerPath)) {
 
         case 'create':
             $result = $controller->create($input);
+            if (!empty($result['success'])) {
+                auditLog('create', 'bien', (int)($result['id'] ?? 0), ['title' => $input['title'] ?? '']);
+            }
             echo json_encode($result);
             break;
 
@@ -36,6 +39,9 @@ if (file_exists($controllerPath)) {
             $id = (int)($input['id'] ?? 0);
             if (!$id) { echo json_encode(['success' => false, 'message' => 'ID requis']); break; }
             $result = $controller->update($id, $input);
+            if (!empty($result['success'])) {
+                auditLog('update', 'bien', $id, ['title' => $input['title'] ?? '']);
+            }
             echo json_encode($result);
             break;
 
@@ -43,6 +49,9 @@ if (file_exists($controllerPath)) {
             $id = (int)($input['id'] ?? 0);
             if (!$id) { echo json_encode(['success' => false, 'message' => 'ID requis']); break; }
             $deleted = $controller->delete($id);
+            if ($deleted) {
+                auditLog('delete', 'bien', $id);
+            }
             echo json_encode($deleted ? ['success' => true, 'message' => 'Bien supprime'] : ['success' => false, 'message' => 'Bien non trouve']);
             break;
 

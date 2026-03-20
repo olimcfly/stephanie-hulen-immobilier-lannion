@@ -64,7 +64,9 @@ switch ($action) {
 
             $stmt = $pdo->prepare("INSERT INTO email_messages (folder, from_email, from_name, to_email, cc, subject, body_text, body_html, sent_at) VALUES ('sent', ?, ?, ?, ?, ?, ?, ?, NOW())");
             $stmt->execute([$fromEmail, $fromName, $toEmail, $cc, $subject, $bodyText, $bodyHtml]);
-            echo json_encode(['success' => true, 'message' => 'Email envoye', 'id' => $pdo->lastInsertId()]);
+            $emailId = (int)$pdo->lastInsertId();
+            auditLog('send', 'email', $emailId, ['to' => $toEmail, 'subject' => $subject]);
+            echo json_encode(['success' => true, 'message' => 'Email envoye', 'id' => $emailId]);
         } catch (PDOException $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
@@ -125,6 +127,7 @@ switch ($action) {
             } else {
                 $pdo->prepare("UPDATE email_messages SET folder = 'trash' WHERE id = ?")->execute([$id]);
             }
+            auditLog('delete', 'email', $id);
             echo json_encode(['success' => true, 'message' => 'Email supprime']);
         } catch (PDOException $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);

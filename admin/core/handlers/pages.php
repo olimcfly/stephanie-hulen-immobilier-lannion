@@ -210,6 +210,7 @@ switch ($action) {
         if (!$page) pagesResponse(false, ['error' => 'Page introuvable'], 404);
 
         $pdo->prepare("DELETE FROM `{$tableName}` WHERE id = ?")->execute([$id]);
+        auditLog('delete', 'page', $id, ['title' => $page['title'] ?? '']);
 
         try {
             $pdo->prepare("DELETE FROM seo_scores WHERE context = 'landing' AND entity_id = ?")->execute([$id]);
@@ -398,6 +399,7 @@ switch ($action) {
         if ($status === 'published')           $data['published_at']     = date('Y-m-d H:i:s');
 
         $newId = pagesSafeInsert($pdo, $tableName, $data, $existingCols);
+        auditLog('create', 'page', $newId, ['title' => $title, 'slug' => $slug]);
         pagesResponse(true, ['message' => 'Page creee', 'id' => $newId], 201);
         break;
 
@@ -441,6 +443,7 @@ switch ($action) {
         }
 
         pagesSafeUpdate($pdo, $tableName, $id, $data, $existingCols);
+        auditLog('update', 'page', $id, ['title' => $title, 'slug' => $slug]);
         pagesResponse(true, ['message' => 'Page mise a jour']);
         break;
 
