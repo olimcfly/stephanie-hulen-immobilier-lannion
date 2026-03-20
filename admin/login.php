@@ -6,6 +6,24 @@
 define('ROOT_PATH', dirname(__DIR__));
 require_once ROOT_PATH . '/config/config.php';
 
+/* Headers de sécurité */
+
+header('X-Frame-Options: DENY');
+header('X-Content-Type-Options: nosniff');
+header('X-XSS-Protection: 1; mode=block');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+
+/* Cookie de session sécurisé */
+
+if (session_status() === PHP_SESSION_ACTIVE) {
+    $params = session_get_cookie_params();
+    if (!$params['secure'] || !$params['httponly']) {
+        ini_set('session.cookie_secure', '1');
+        ini_set('session.cookie_httponly', '1');
+        ini_set('session.cookie_samesite', 'Strict');
+    }
+}
+
 /* Déjà connecté */
 
 if (!empty($_SESSION['admin_id'])) {
@@ -20,20 +38,48 @@ try {
 } catch (Exception $e) {
     die("Erreur connexion base");
 }
+
+/* Anti brute-force : max 5 tentatives par 15 minutes */
+
+$maxAttempts = 5;
+$lockoutTime = 900; // 15 minutes
+
+if (!isset($_SESSION['login_attempts'])) {
+    $_SESSION['login_attempts'] = 0;
+    $_SESSION['login_first_attempt'] = time();
+}
+
+if ($_SESSION['login_attempts'] >= $maxAttempts && (time() - $_SESSION['login_first_attempt']) < $lockoutTime) {
+    $remainingTime = ceil(($lockoutTime - (time() - $_SESSION['login_first_attempt'])) / 60);
+    $error = "Trop de tentatives. Réessayez dans {$remainingTime} minute(s).";
+    $step = 'blocked';
+} else {
+    if ((time() - ($_SESSION['login_first_attempt'] ?? 0)) >= $lockoutTime) {
+        $_SESSION['login_attempts'] = 0;
+        $_SESSION['login_first_attempt'] = time();
+    }
+}
+
 /* Variables */
 
-$error = '';
+$error = $error ?? '';
 $success = '';
-$step = $_POST['step'] ?? 'email';
+$step = $step ?? ($_POST['step'] ?? 'email');
 
 /* Traitement */
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($step ?? '') !== 'blocked') {
 
-    if ($step === 'email') {
+    /* Vérification CSRF */
+    $token = $_POST['csrf_token'] ?? '';
+    if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
+        $error = "Jeton de sécurité invalide. Rechargez la page.";
+        $step = 'email';
+    }
+
+    elseif ($step === 'email') {
 
         $email = sanitize($_POST['email'] ?? '', 'email');
-        $phone = sanitize($_POST['phone'] ?? '');
 
         if (!$email || !isValidEmail($email)) {
 
@@ -47,16 +93,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (!$admin) {
 
-                $error = "Email non autorisé";
+                /* Message générique pour ne pas révéler si l'email existe */
+                $success = "Si cette adresse est autorisée, un code a été envoyé.";
+                $step = "otp";
+                $_SESSION['otp_email'] = $email;
+                $_SESSION['otp_time'] = time();
 
             } else {
 
                 $otp = str_pad(random_int(0,999999),6,'0',STR_PAD_LEFT);
 
-                $_SESSION['otp'] = $otp;
+                $_SESSION['otp'] = password_hash($otp, PASSWORD_DEFAULT);
                 $_SESSION['otp_email'] = $email;
-                $_SESSION['otp_phone'] = $phone;
                 $_SESSION['otp_time'] = time();
+                $_SESSION['otp_attempts'] = 0;
 
                 $subject = '[' . SITE_TITLE . '] Code de connexion';
                 $message = "Votre code : $otp\nValide 10 minutes.";
@@ -64,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 mail($email,$subject,$message,$headers);
 
-                $success = "Code envoyé par email";
+                $success = "Si cette adresse est autorisée, un code a été envoyé.";
                 $step = "otp";
             }
         }
@@ -73,6 +123,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     elseif ($step === 'otp') {
 
         $otp = sanitize($_POST['otp'] ?? '');
+
+        $_SESSION['login_attempts'] = ($_SESSION['login_attempts'] ?? 0) + 1;
 
         if (!isset($_SESSION['otp'])) {
 
@@ -85,12 +137,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $error="Code expiré";
             $step='email';
-            unset($_SESSION['otp']);
+            unset($_SESSION['otp'], $_SESSION['otp_email'], $_SESSION['otp_time'], $_SESSION['otp_attempts']);
 
         }
 
-        elseif ($otp !== $_SESSION['otp']) {
+        elseif (($_SESSION['otp_attempts'] ?? 0) >= 5) {
 
+            $error="Trop de tentatives. Demandez un nouveau code.";
+            $step='email';
+            unset($_SESSION['otp'], $_SESSION['otp_email'], $_SESSION['otp_time'], $_SESSION['otp_attempts']);
+
+        }
+
+        elseif (!password_verify($otp, $_SESSION['otp'])) {
+
+            $_SESSION['otp_attempts'] = ($_SESSION['otp_attempts'] ?? 0) + 1;
             $error="Code incorrect";
 
         }
@@ -101,16 +162,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$_SESSION['otp_email']]);
             $admin=$stmt->fetch();
 
-            $_SESSION['admin_id']=$admin['id'];
-            $_SESSION['admin_email']=$admin['email'];
+            if (!$admin) {
+                $error = "Erreur d'authentification";
+                $step = 'email';
+            } else {
+                /* Régénérer l'ID de session pour éviter la fixation de session */
+                session_regenerate_id(true);
 
-            unset($_SESSION['otp']);
-            unset($_SESSION['otp_email']);
-            unset($_SESSION['otp_phone']);
-            unset($_SESSION['otp_time']);
+                $_SESSION['admin_id']=$admin['id'];
+                $_SESSION['admin_email']=$admin['email'];
+                $_SESSION['admin_login_time']=time();
 
-            header("Location: /admin/dashboard.php");
-            exit;
+                unset($_SESSION['otp'], $_SESSION['otp_email'], $_SESSION['otp_time'], $_SESSION['otp_attempts']);
+                unset($_SESSION['login_attempts'], $_SESSION['login_first_attempt']);
+
+                header("Location: /admin/dashboard.php");
+                exit;
+            }
         }
     }
 }
@@ -214,11 +282,11 @@ text-align:center;
 <h2>🔐 Administration</h2>
 
 <?php if($error): ?>
-<div class="error"><?= $error ?></div>
+<div class="error"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
 <?php endif ?>
 
 <?php if($success): ?>
-<div class="success"><?= $success ?></div>
+<div class="success"><?= htmlspecialchars($success, ENT_QUOTES, 'UTF-8') ?></div>
 <?php endif ?>
 
 <?php if($step==='email'): ?>
@@ -226,36 +294,37 @@ text-align:center;
 <form method="POST">
 
 <input type="hidden" name="step" value="email">
+<input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
 
 <input type="email"
 name="email"
-placeholder="<?= ADMIN_EMAIL ?>"
-required>
-
-<input type="tel"
-name="phone"
-placeholder="Numéro de téléphone"
-required>
+placeholder="Votre adresse email"
+required
+autocomplete="email">
 
 <button>Recevoir le code</button>
 
 </form>
 
-<?php else: ?>
+<?php elseif($step==='otp'): ?>
 
 <form method="POST">
 
 <input type="hidden" name="step" value="otp">
+<input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
 
 <p class="info">
 Code envoyé à<br>
-<strong><?= htmlspecialchars($_SESSION['otp_email'] ?? '') ?></strong>
+<strong><?= htmlspecialchars($_SESSION['otp_email'] ?? '', ENT_QUOTES, 'UTF-8') ?></strong>
 </p>
 
 <input type="text"
 name="otp"
 placeholder="000000"
 maxlength="6"
+pattern="[0-9]{6}"
+inputmode="numeric"
+autocomplete="one-time-code"
 required>
 
 <button>Connexion</button>
