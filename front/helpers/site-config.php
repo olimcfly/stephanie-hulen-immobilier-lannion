@@ -95,12 +95,12 @@ if (!function_exists('getSiteConfig')) {
 
     function _siteConfigDefaults(): array {
         return [
-            'advisor_name'      => 'Votre Conseiller',
+            'advisor_name'      => 'Stephanie Hulen',
             'advisor_firstname' => '',
             'advisor_phone'     => '',
             'advisor_email'     => '',
             'advisor_photo'     => '',
-            'advisor_city'      => '',
+            'advisor_city'      => 'Lannion',
             'advisor_network'   => '',
             'advisor_zone'      => '',
             'advisor_card'      => '',
@@ -108,7 +108,7 @@ if (!function_exists('getSiteConfig')) {
             'advisor_style'     => '',
             'advisor_signature' => '',
             'advisor_whatsapp'  => '',
-            'site_name'         => 'Immobilier',
+            'site_name'         => 'Stephanie Hulen Immobilier Lannion',
             'site_url'          => '',
             'color_primary'     => '#1a4d7a',
             'color_secondary'   => '#d4a574',
