@@ -139,9 +139,35 @@
 | Session admin verifiee | OK | Tous les points d'entree verifient la session |
 | Router central fonctionnel | OK | Corrige : fonction CSRF, handlers complets, code nettoye |
 
-### Actions restantes (non-bloquantes, amelioration future)
+---
+
+## 6. Modules non-content — Anomalies detectees
+
+| Module | Probleme | Severite |
+|--------|----------|----------|
+| **design** | `edit.php` poste vers `/admin/api/design/save.php` qui n'existe pas | CASSE |
+| **strategy/neuropersona** | `api.php` existe mais est vide (0 octets) | MORT |
+| **system/templates** | `api.php` vide (0 octets) + `save.php` separe au lieu de api.php | INCOHERENT |
+| **builder/menus** | `api/` est un repertoire au lieu d'un `api.php` | NON-STANDARD |
+| **social/instagram** | Handlers POST inline dans index.php (delete/publish/schedule) | A MIGRER |
+| **social/linkedin** | Handlers POST inline dans index.php (delete/publish/schedule) | A MIGRER |
+| **marketing/sequences** | Handler `create_sequence_form` inline dans index.php | A MIGRER |
+
+### Fichiers supplementaires a nettoyer (futur)
+
+- `admin/modules/system/templates/save.php` — devrait etre dans api.php
+- `admin/modules/system/api/builder/save.php` — devrait etre dans handler builder
+- `admin/modules/system/api/system/maintenance/save.php` — devrait etre dans handler maintenance
+
+---
+
+## 7. Actions restantes (non-bloquantes, amelioration future)
 
 - Migrer les handlers inline de `annuaire/index.php` vers un `annuaire/api.php` dedie
 - Migrer les handlers inline de `secteurs/index.php` vers le handler central `secteurs`
 - Ajouter CSRF a `capture/edit.php` pour le POST inline
 - Creer un `blog/edit.php` pour l'edition d'articles de blog
+- Corriger `design/edit.php` : creer le fichier cible ou rediriger vers api.php
+- Peupler ou supprimer `strategy/neuropersona/api.php` (fichier vide)
+- Remplacer `system/templates/save.php` par un `api.php` fonctionnel
+- Migrer les POST inline de `instagram/index.php` et `linkedin/index.php` vers des api.php
