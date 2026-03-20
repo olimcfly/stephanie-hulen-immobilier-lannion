@@ -13,10 +13,11 @@ $site       = $site       ?? [];
 $pdo        = $pdo        ?? null;
 $siteUrl    = defined('SITE_URL') ? rtrim(SITE_URL, '/') : '';
 
-$advisorName    = $advisor['name']    ?? ($site['name']    ?? 'Votre conseiller');
+$advisorName    = $advisor['name']    ?? ($site['name']    ?? 'Votre conseillère');
 $advisorCity    = $advisor['city']    ?? ($site['city']    ?? 'votre ville');
 $advisorNetwork = $advisor['network'] ?? 'eXp France';
 $advisorPhone   = $advisor['phone']   ?? '';
+$advisorPhoto   = $advisor['photo']   ?? ($advisor['avatar'] ?? '');
 
 require_once __DIR__ . '/../../helpers/menu-helper.php';
 $headerMenu = getMenu('header-main', $pdo ?? null) ?? [];
@@ -24,7 +25,7 @@ $headerMenu = getMenu('header-main', $pdo ?? null) ?? [];
 // ────────────────────────────────────────────────────
 // CHAMPS HERO
 // ────────────────────────────────────────────────────
-$heroEyebrow  = $fields['hero_eyebrow']  ?? 'Conseiller immobilier à ' . $advisorCity;
+$heroEyebrow  = $fields['hero_eyebrow']  ?? 'Conseillère immobilière à ' . $advisorCity;
 $heroTitle    = $fields['hero_title']     ?? 'Votre projet immobilier à ' . $advisorCity . ', accompagné par ' . $advisorName;
 $heroSubtitle = $fields['hero_subtitle']  ?? 'Estimation gratuite, accompagnement personnalisé et résultat garanti avec le réseau ' . $advisorNetwork . '.';
 $heroCtaText  = $fields['hero_cta_text']  ?? 'Demander mon estimation gratuite';
@@ -33,12 +34,12 @@ $heroCta2Text = $fields['hero_cta2_text'] ?? 'Me contacter';
 $heroCta2Url  = $fields['hero_cta2_url']  ?? _findMenuUrl($headerMenu['items'] ?? [], 'Contact', $siteUrl . '/contact');
 
 // ── Stats ──
-$heroStat1Num = $fields['hero_stat1_num'] ?? '98%';
-$heroStat1Lbl = $fields['hero_stat1_lbl'] ?? 'clients satisfaits';
-$heroStat2Num = $fields['hero_stat2_num'] ?? '45j';
-$heroStat2Lbl = $fields['hero_stat2_lbl'] ?? 'délai moyen de vente';
-$heroStat3Num = $fields['hero_stat3_num'] ?? '15+';
-$heroStat3Lbl = $fields['hero_stat3_lbl'] ?? 'ans d\'expérience';
+$heroStat1Num = $fields['hero_stat1_num'] ?? '100+';
+$heroStat1Lbl = $fields['hero_stat1_lbl'] ?? 'transactions accompagnées';
+$heroStat2Num = $fields['hero_stat2_num'] ?? '10+';
+$heroStat2Lbl = $fields['hero_stat2_lbl'] ?? 'ans d\'expérience';
+$heroStat3Num = $fields['hero_stat3_num'] ?? '5/5';
+$heroStat3Lbl = $fields['hero_stat3_lbl'] ?? 'avis clients';
 
 // ── Bénéfices ──
 $benTitle  = $fields['ben_title']  ?? 'Pourquoi me faire confiance ?';
@@ -53,10 +54,10 @@ $ben3Title = $fields['ben3_title'] ?? 'Réseau ' . $advisorNetwork;
 $ben3Text  = $fields['ben3_text']  ?? 'La force d\'un réseau international au service de votre projet local.';
 
 // ── Présentation conseiller ──
-$presTitle   = $fields['pres_title']    ?? 'Votre conseiller à ' . $advisorCity;
+$presTitle   = $fields['pres_title']    ?? 'Votre conseillère à ' . $advisorCity;
 $presSub     = $fields['pres_sub']      ?? $advisorName . ' — ' . $advisorNetwork;
-$presText    = $fields['pres_text']     ?? '<p>Passionné(e) par l\'immobilier et ancré(e) sur le territoire, je mets mon expertise et mon énergie au service de votre projet. Vente, achat ou investissement : je vous accompagne avec transparence et engagement.</p>';
-$presTag1    = $fields['pres_tag1']     ?? '✓ Conseiller certifié';
+$presText    = $fields['pres_text']     ?? '<p>Passionnée par l\'immobilier et ancrée sur le territoire de ' . htmlspecialchars($advisorCity) . ', je mets mon expertise et mon énergie au service de votre projet. Vente, achat ou investissement : je vous accompagne avec transparence et engagement.</p>';
+$presTag1    = $fields['pres_tag1']     ?? '✓ Conseillère certifiée';
 $presTag2    = $fields['pres_tag2']     ?? '✓ Réseau ' . $advisorNetwork;
 $presTag3    = $fields['pres_tag3']     ?? '✓ Avis clients 5/5';
 $presCtaText = $fields['pres_cta_text'] ?? 'En savoir plus';
@@ -218,9 +219,13 @@ require_once __DIR__ . '/_tpl-common.php';
                 </a>
             </div>
             <div style="background:var(--tp-bg);border-radius:var(--tp-radius);padding:48px;text-align:center;border:1px solid var(--tp-border)">
+                <?php if ($advisorPhoto): ?>
+                <img src="<?= htmlspecialchars($advisorPhoto) ?>" alt="Photo de <?= htmlspecialchars($advisorName) ?>" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin:0 auto 24px;display:block;border:3px solid var(--tp-accent)">
+                <?php else: ?>
                 <div style="width:120px;height:120px;border-radius:50%;background:var(--tp-primary);margin:0 auto 24px;display:flex;align-items:center;justify-content:center">
                     <span style="font-size:3rem;color:var(--tp-white);font-family:var(--tp-ff-display);font-weight:800"><?= mb_substr($advisorName, 0, 1) ?></span>
                 </div>
+                <?php endif; ?>
                 <h3 style="font-family:var(--tp-ff-display);font-size:1.3rem;font-weight:800;color:var(--tp-primary);margin-bottom:8px"><?= htmlspecialchars($advisorName) ?></h3>
                 <p style="font-size:.85rem;color:var(--tp-text2);margin-bottom:16px"><?= htmlspecialchars($advisorNetwork) ?> &mdash; <?= htmlspecialchars($advisorCity) ?></p>
                 <?php if ($advisorPhone): ?>
@@ -364,6 +369,8 @@ require_once __DIR__ . '/_tpl-common.php';
     "@context": "https://schema.org",
     "@type": "RealEstateAgent",
     "name": <?= json_encode($advisorName, JSON_UNESCAPED_UNICODE) ?>,
+    "description": <?= json_encode('Conseillère immobilière à ' . $advisorCity . ' — ' . $advisorNetwork, JSON_UNESCAPED_UNICODE) ?>,
+    "url": <?= json_encode($siteUrl ?: ('https://' . ($_SERVER['HTTP_HOST'] ?? '')), JSON_UNESCAPED_UNICODE) ?>,
     "areaServed": {
         "@type": "City",
         "name": <?= json_encode($advisorCity, JSON_UNESCAPED_UNICODE) ?>
@@ -372,7 +379,8 @@ require_once __DIR__ . '/_tpl-common.php';
         "@type": "Organization",
         "name": <?= json_encode($advisorNetwork, JSON_UNESCAPED_UNICODE) ?>
     }<?php endif; ?><?php if ($advisorPhone): ?>,
-    "telephone": <?= json_encode($advisorPhone, JSON_UNESCAPED_UNICODE) ?><?php endif; ?>
+    "telephone": <?= json_encode($advisorPhone, JSON_UNESCAPED_UNICODE) ?><?php endif; ?><?php if ($advisorPhoto): ?>,
+    "image": <?= json_encode($advisorPhoto, JSON_UNESCAPED_UNICODE) ?><?php endif; ?>
 }
 </script>
 
