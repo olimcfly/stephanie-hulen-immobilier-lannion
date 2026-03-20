@@ -26,6 +26,10 @@ if (!file_exists($configPath)) {
 
 require_once $configPath;
 
+/* SECURITY FUNCTIONS */
+
+require_once dirname(dirname(__DIR__)) . '/includes/functions/security.php';
+
 
 /* AUTH ADMIN */
 
@@ -41,9 +45,7 @@ if (!defined('ADMIN_API')) {
 
 /* CSRF */
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+generateCsrfToken();
 
 
 /* DB */

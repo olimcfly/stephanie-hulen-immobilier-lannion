@@ -122,6 +122,7 @@ $pages = [
         <div class="mod-card-header"><h3><i class="fas fa-cog" style="color:var(--accent);margin-right:6px"></i> Configuration</h3></div>
         <div class="mod-card-body">
             <form method="POST" id="contentForm">
+                <?= csrfField() ?>
                 <div class="mod-form-grid">
                     <div class="mod-form-group full">
                         <label>Sélectionner une page *</label>

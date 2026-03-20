@@ -40,6 +40,7 @@ if ($editId) {
     </div>
     <div class="card-body">
         <form method="POST" action="api/local-seo/save-publication.php" id="pubForm">
+            <?= csrfField() ?>
             <input type="hidden" name="id" value="<?php echo $editPub['id'] ?? ''; ?>">
             
             <!-- Type de publication -->

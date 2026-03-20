@@ -477,7 +477,8 @@ $sample_result = [
         
         <!-- Form -->
         <form method="POST" onsubmit="showLoading()">
-            
+            <?= csrfField() ?>
+
             <?php if ($step == 1): ?>
             <!-- STEP 1: Propriété -->
             <h3 style="margin-bottom: 24px; font-size: 16px; color: #111827; font-weight: 700;">Votre Propriété</h3>

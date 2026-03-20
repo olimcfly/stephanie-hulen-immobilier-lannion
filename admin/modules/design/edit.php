@@ -148,6 +148,7 @@ if (!$data) {
     <h1><?= $title ?></h1>
     
     <form method="POST" action="/admin/api/design/save.php">
+        <?= csrfField() ?>
         <input type="hidden" name="type" value="<?= $type ?>">
         <input type="hidden" name="id" value="<?= $data['id'] ?? '' ?>">
         

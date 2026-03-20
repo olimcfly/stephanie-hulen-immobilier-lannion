@@ -259,6 +259,7 @@ $capUrl = '/capture/' . ($v['slug'] ?: 'draft');
 </div>
 
 <form id="capeditForm" method="POST">
+<?= csrfField() ?>
 <input type="hidden" name="_edit_submit" value="1">
 
 <div class="capedit-grid">

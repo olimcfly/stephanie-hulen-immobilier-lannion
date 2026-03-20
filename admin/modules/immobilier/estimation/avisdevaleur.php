@@ -243,7 +243,8 @@ $submitted = isset($_POST['submit']);
         
         <!-- FORM -->
         <form method="POST" id="valuation-form">
-            
+            <?= csrfField() ?>
+
             <?php if ($step == 1 && !$submitted): ?>
             <!-- STEP 1: PROPERTY DETAILS -->
             <h3 style="margin-bottom: 24px; font-size: 16px; color: #111827; font-weight: 700;">1️⃣ Votre Propriété</h3>

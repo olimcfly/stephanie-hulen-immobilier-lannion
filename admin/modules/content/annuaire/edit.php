@@ -317,6 +317,7 @@ $pageTitle = $isNew ? 'Nouveau partenaire' : 'Modifier : ' . htmlspecialchars($i
 </div>
 
 <form method="POST" id="gleForm" action="">
+<?= csrfField() ?>
 <input type="hidden" name="id" value="<?= $itemId ?>">
 
 <div class="gle-grid">

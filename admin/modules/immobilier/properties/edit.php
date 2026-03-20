@@ -375,6 +375,7 @@ if ($photosJson) {
 </div>
 
 <form id="bef-form" method="POST" action="">
+<?= csrfField() ?>
 
 <div class="bef-layout">
 <!-- ══ Colonne principale ══════════════════════════ -->

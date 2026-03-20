@@ -59,6 +59,7 @@ if ($editId) {
     </div>
     <div class="card-body">
         <form method="POST" action="api/local-seo/save-partner.php">
+            <?= csrfField() ?>
             <input type="hidden" name="id" value="<?php echo $editPartner['id'] ?? ''; ?>">
             
             <div class="form-row">

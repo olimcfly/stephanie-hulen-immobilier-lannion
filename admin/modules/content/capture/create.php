@@ -286,6 +286,7 @@ $captureTemplates = [
 <?php endif; ?>
 
 <form method="POST" id="capForm">
+<?= csrfField() ?>
 <div class="cap-grid">
 
     <!-- ════ GAUCHE ════ -->
