@@ -20,7 +20,7 @@ $headerMenu = getMenu('header-main', $pdo ?? null) ?? [];
 
 $articleTitle     = $fields['article_title']     ?? 'Titre de l\'article';
 $articleDate      = $fields['article_date']      ?? date('d/m/Y');
-$articleAuthor    = $fields['article_author']    ?? $advisorName;
+$articleAuthor    = $fields['article_author']    ?? 'Stephanie Hulen';
 $articleCategory  = $fields['article_category']  ?? 'Actualités';
 $articleImage     = $fields['article_image']     ?? '';
 $articleContent   = $fields['article_content']   ?? 'Contenu de l\'article';
@@ -74,11 +74,11 @@ ob_start();
             <?= nl2br(htmlspecialchars($articleContent)) ?>
         </div>
 
-        <!-- FOOTER -->
+        <!-- FOOTER — Bloc auteur -->
         <footer style="background: #f9f6f3; padding: 30px; border-radius: 8px; border-left: 4px solid #d4a574;">
             <p style="margin: 0; color: #666;">
                 <strong>À propos de l\'auteur:</strong><br>
-                <?= htmlspecialchars($articleAuthor) ?> est un conseiller immobilier expérimenté avec une passion pour aider ses clients à trouver le bien idéal.
+                Stephanie Hulen est conseillere en immobilier a Lannion, specialisee dans l\'accompagnement personnalise des projets d\'achat, de vente et d\'estimation sur la cote de Granit Rose et les Cotes-d\'Armor. Passionnee par son metier, elle met son expertise du marche local au service de chaque client pour transformer leurs projets immobiliers en reussite.
             </p>
         </footer>
 
