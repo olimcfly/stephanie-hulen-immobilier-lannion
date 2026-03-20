@@ -8,8 +8,8 @@ class ArticleController {
     
     private $db;
     
-    public function __construct() {
-        $this->db = Database::getInstance();
+    public function __construct($pdo = null) {
+        $this->db = $pdo ?? Database::getInstance();
     }
 
     /**
@@ -353,6 +353,78 @@ class ArticleController {
         } catch (Exception $e) {
             error_log("Erreur getArticlesByPersona: " . $e->getMessage());
             return [];
+        }
+    }
+
+    /**
+     * Toggle le statut d'un article (published/draft)
+     */
+    public function toggleStatus($id, $status) {
+        try {
+            if (!in_array($status, ['published', 'draft'])) {
+                return ['success' => false, 'message' => 'Statut invalide'];
+            }
+
+            $article = $this->getArticleById($id);
+            if (!$article) {
+                return ['success' => false, 'message' => 'Article non trouvé'];
+            }
+
+            $stmt = $this->db->prepare("UPDATE articles SET status = ?, updated_at = NOW() WHERE id = ?");
+            $result = $stmt->execute([$status, $id]);
+
+            if ($result) {
+                return ['success' => true, 'message' => 'Statut mis à jour', 'status' => $status];
+            }
+
+            return ['success' => false, 'message' => 'Erreur lors de la mise à jour du statut'];
+
+        } catch (Exception $e) {
+            error_log("Erreur toggleStatus: " . $e->getMessage());
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Duplique un article existant
+     */
+    public function duplicateArticle($id) {
+        try {
+            $original = $this->getArticleById($id);
+            if (!$original) {
+                return ['success' => false, 'message' => 'Article non trouvé'];
+            }
+
+            $timestamp = date('YmdHis');
+            $newSlug = $original['slug'] . '-copy-' . $timestamp;
+
+            if ($this->slugExists($newSlug)) {
+                return ['success' => false, 'message' => 'Slug déjà existant'];
+            }
+
+            $stmt = $this->db->prepare(
+                "INSERT INTO articles (title, slug, content, excerpt, metadata, status, featured, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, 'draft', ?, NOW(), NOW())"
+            );
+            $result = $stmt->execute([
+                $original['title'] . ' (copie)',
+                $newSlug,
+                $original['content'],
+                $original['excerpt'],
+                is_array($original['metadata']) ? json_encode($original['metadata']) : ($original['metadata'] ?? '{}'),
+                $original['featured'] ?? 0
+            ]);
+
+            if ($result) {
+                $newId = $this->db->lastInsertId();
+                return ['success' => true, 'message' => 'Article dupliqué', 'id' => $newId];
+            }
+
+            return ['success' => false, 'message' => 'Erreur lors de la duplication'];
+
+        } catch (Exception $e) {
+            error_log("Erreur duplicateArticle: " . $e->getMessage());
+            return ['success' => false, 'message' => $e->getMessage()];
         }
     }
 }

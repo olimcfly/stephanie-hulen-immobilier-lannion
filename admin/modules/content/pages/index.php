@@ -653,7 +653,7 @@ try {
 
 <script>
 const PGS = {
-    apiUrl: '/admin/api/content/pages.php',
+    apiUrl: '/admin/modules/content/pages/api.php',
     csrf: <?php echo json_encode($csrfToken) ?>,
     selectedTpl: <?= json_encode($pageTemplates[0]['slug'] ?? 'standard') ?>,
     

@@ -4,6 +4,11 @@
  *  MODULE CAPTURES — Suppression sécurisée  v1.0
  *  /admin/modules/content/captures/delete.php
  *
+ *  @deprecated Utilisez api.php?action=delete à la place.
+ *              Ce fichier est conservé pour rétro-compatibilité
+ *              (page de confirmation visuelle) et sera supprimé
+ *              dans une version ultérieure.
+ *
  *  GET  ?id=X          → page de confirmation visuelle
  *  POST ?id=X confirm=1 → suppression + redirect
  *  POST action=delete (AJAX) → retour JSON (via api.php)

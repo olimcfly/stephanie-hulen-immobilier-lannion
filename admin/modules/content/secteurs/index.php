@@ -74,55 +74,6 @@ if (($_GET['action'] ?? '') === 'create' && hash_equals($csrf, $_GET['csrf_token
     } catch (PDOException $e) {}
 }
 
-// ─── AJAX delete ───
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'delete') {
-    header('Content-Type: application/json');
-    $id = (int)($_POST['id'] ?? 0);
-    try {
-        $pdo->prepare("DELETE FROM secteurs WHERE id=?")->execute([$id]);
-        echo json_encode(['success' => true]); exit;
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => $e->getMessage()]); exit;
-    }
-}
-
-// ─── AJAX toggle status ───
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'toggle_status') {
-    header('Content-Type: application/json');
-    $id     = (int)($_POST['id'] ?? 0);
-    $status = $_POST['status'] === 'published' ? 'published' : 'draft';
-    try {
-        $pdo->prepare("UPDATE secteurs SET status=? WHERE id=?")->execute([$status, $id]);
-        echo json_encode(['success' => true]); exit;
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => $e->getMessage()]); exit;
-    }
-}
-
-// ─── AJAX duplicate ───
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'duplicate') {
-    header('Content-Type: application/json');
-    $id = (int)($_POST['id'] ?? 0);
-    try {
-        $src = $pdo->prepare("SELECT * FROM secteurs WHERE id=?");
-        $src->execute([$id]);
-        $row = $src->fetch(PDO::FETCH_ASSOC);
-        if ($row) {
-            unset($row['id'], $row['created_at'], $row['updated_at']);
-            $row['nom']    = 'Copie — ' . $row['nom'];
-            $row['slug']   = $row['slug'] . '-copie-' . time();
-            $row['status'] = 'draft';
-            $cols2 = array_keys($row);
-            $pdo->prepare("INSERT INTO secteurs (`".implode('`,`',$cols2)."`) VALUES (".implode(',',array_fill(0,count($cols2),'?')).")")
-                ->execute(array_values($row));
-            echo json_encode(['success' => true, 'new_id' => (int)$pdo->lastInsertId()]); exit;
-        }
-        echo json_encode(['success' => false, 'error' => 'Not found']); exit;
-    } catch (PDOException $e) {
-        echo json_encode(['success' => false, 'error' => $e->getMessage()]); exit;
-    }
-}
-
 // ─── Filtres ───
 $filterStatus = $_GET['status']      ?? 'all';
 $filterType   = $_GET['type_secteur']?? 'all';
@@ -996,7 +947,7 @@ $flash = $_GET['msg'] ?? '';
 
 <script>
 const SC = {
-    apiUrl: window.location.href.split('?')[0],
+    apiUrl: '/admin/modules/content/secteurs/api.php',
     csrf:   '<?= addslashes($csrf) ?>',
 
     // ── Modal ──
@@ -1058,36 +1009,50 @@ const SC = {
         if (action === 'delete' && !confirm(`Supprimer ${ids.length} secteur(s) ?`)) return;
         for (const id of ids) {
             if (action === 'delete') {
-                await this._post({ _action: 'delete', id });
+                await this._post({ action: 'delete', id });
             } else {
                 const statusMap = { publish: 'published', draft: 'draft', archive: 'archived' };
-                await this._post({ _action: 'toggle_status', id, status: statusMap[action] });
+                await this._post({ action: 'toggle_status', id, status: statusMap[action] });
             }
         }
         location.reload();
     },
 
     // ── Delete ──
-    async deleteSecteur(id, nom) {
-        if (!confirm(`Supprimer &laquo; ${nom} &raquo; ?\nCette action est irr&eacute;versible.`)) return;
-        const d = await this._post({ _action: 'delete', id });
-        if (d.success) {
-            const row = document.querySelector(`tr[data-id="${id}"]`);
-            if (row) { row.style.cssText = 'opacity:0;transform:translateX(20px);transition:all .3s'; setTimeout(() => row.remove(), 300); }
-        } else alert(d.error || 'Erreur');
+    deleteSecteur(id, nom) {
+        if (!confirm(`Supprimer \u00ab ${nom} \u00bb ?\nCette action est irr\u00e9versible.`)) return;
+        const fd = new FormData();
+        fd.append('action', 'delete');
+        fd.append('id', id);
+        fd.append('csrf_token', this.csrf);
+        fetch(this.apiUrl, {
+            method: 'POST', body: fd
+        }).then(r=>r.json()).then(d => {
+            if (d.success) location.reload();
+            else alert(d.error || 'Erreur');
+        });
     },
 
     // ── Toggle statut ──
-    async toggleStatus(id, current) {
+    toggleStatus(id, current) {
         const newStatus = current === 'published' ? 'draft' : 'published';
-        const d = await this._post({ _action: 'toggle_status', id, status: newStatus });
-        d.success ? location.reload() : alert(d.error || 'Erreur');
+        const fd = new FormData();
+        fd.append('action', 'toggle_status');
+        fd.append('id', id);
+        fd.append('status', newStatus);
+        fd.append('csrf_token', this.csrf);
+        fetch(this.apiUrl, {
+            method: 'POST', body: fd
+        }).then(r=>r.json()).then(d => {
+            if (d.success) location.reload();
+            else alert(d.error || 'Erreur');
+        });
     },
 
     // ── Duplicate ──
     async duplicate(id) {
         if (!confirm('Dupliquer ce secteur ?')) return;
-        const d = await this._post({ _action: 'duplicate', id });
+        const d = await this._post({ action: 'duplicate', id });
         if (d.success) {
             window.location.href = `/admin/modules/content/secteurs/edit.php?id=${d.new_id}&msg=created`;
         } else alert(d.error || 'Erreur');
@@ -1097,10 +1062,11 @@ const SC = {
     async _post(data) {
         try {
             const fd = new FormData();
+            fd.append('csrf_token', this.csrf);
             for (const [k,v] of Object.entries(data)) fd.append(k, v);
             const r = await fetch(this.apiUrl, { method: 'POST', body: fd });
             return await r.json();
-        } catch(e) { return { success: false, error: 'Erreur r&eacute;seau' }; }
+        } catch(e) { return { success: false, error: 'Erreur r\u00e9seau' }; }
     }
 };
 
