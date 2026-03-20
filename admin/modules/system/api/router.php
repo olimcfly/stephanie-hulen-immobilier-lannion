@@ -156,6 +156,18 @@ $moduleMap = [
 
     // ── IA (dispatcher vers /core/ai/) ───
     'ai'        => $handlersDir . 'ai.php',
+
+    // ── MODULES COMPLÉMENTAIRES ─────────
+    'guides'      => $handlersDir . 'ressources.php',
+    'annuaire'    => $handlersDir . 'annuaire.php',
+    'estimation'  => $handlersDir . 'estimation.php',
+    'blog'        => $handlersDir . 'blog.php',
+    'scoring'     => $handlersDir . 'scoring.php',
+    'sequences'   => $handlersDir . 'sequences.php',
+    'rdv'         => $handlersDir . 'rdv.php',
+    'financement' => $handlersDir . 'financement.php',
+    'crm'         => $handlersDir . 'crm.php',
+    'journal'     => $handlersDir . 'journal.php',
 ];
 
 // ── VALIDATION ───────────────────────────────────────────────
