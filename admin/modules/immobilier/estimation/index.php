@@ -34,70 +34,8 @@ if (isset($pdo)) {
     } catch (Exception $e) { $dbError = $e->getMessage(); }
 }
 
-// ─── ACTIONS AJAX ───────────────────────────────────────────────
-if (isset($_GET['ajax_action']) && isset($pdo) && $tableExists) {
-    header('Content-Type: application/json; charset=utf-8');
-    switch ($_GET['ajax_action']) {
-        case 'update_statut':
-            try {
-                $id = (int)($_POST['id'] ?? 0);
-                $s = $_POST['statut'] ?? '';
-                if ($id > 0 && in_array($s, ['en_attente','traitee','convertie'])) {
-                    $pdo->prepare("UPDATE estimations SET statut=:s WHERE id=:id")->execute([':s'=>$s,':id'=>$id]);
-                    echo json_encode(['success'=>true,'message'=>'Statut mis à jour']);
-                } else echo json_encode(['success'=>false,'message'=>'Paramètres invalides']);
-            } catch (Exception $e) { echo json_encode(['success'=>false,'message'=>$e->getMessage()]); }
-            exit;
-        case 'update_notes':
-            try {
-                $id = (int)($_POST['id'] ?? 0);
-                if ($id > 0) {
-                    $pdo->prepare("UPDATE estimations SET notes=:n WHERE id=:id")->execute([':n'=>trim($_POST['notes']??''),':id'=>$id]);
-                    echo json_encode(['success'=>true]);
-                }
-            } catch (Exception $e) { echo json_encode(['success'=>false,'message'=>$e->getMessage()]); }
-            exit;
-        case 'delete':
-            try {
-                $id = (int)($_POST['id'] ?? 0);
-                if ($id > 0) { $pdo->prepare("DELETE FROM estimations WHERE id=:id")->execute([':id'=>$id]); echo json_encode(['success'=>true]); }
-            } catch (Exception $e) { echo json_encode(['success'=>false,'message'=>$e->getMessage()]); }
-            exit;
-        case 'send_quick_email':
-            try {
-                $eid = (int)($_POST['estimation_id'] ?? 0);
-                $ttype = $_POST['template_type'] ?? 'confirmation';
-                $mailerPath = realpath(__DIR__.'/../../../').'/includes/estimation_mailer.php';
-                if ($eid > 0 && file_exists($mailerPath)) {
-                    require_once $mailerPath;
-                    $est = $pdo->prepare("SELECT * FROM estimations WHERE id=:id"); $est->execute([':id'=>$eid]);
-                    $estimation = $est->fetch(PDO::FETCH_ASSOC);
-                    if ($estimation && !empty($estimation['email'])) {
-                        $tpl = $pdo->prepare("SELECT * FROM estimation_templates WHERE type=:t AND status='actif' LIMIT 1");
-                        $tpl->execute([':t'=>$ttype]); $template = $tpl->fetch(PDO::FETCH_ASSOC);
-                        if ($template) {
-                            $vars = [
-                                'prenom'=>$estimation['prenom']??'','nom'=>$estimation['nom']??'',
-                                'email'=>$estimation['email']??'','telephone'=>$estimation['telephone']??'',
-                                'type_bien'=>ucfirst($estimation['type_bien']??''),'surface'=>$estimation['surface']??'',
-                                'pieces'=>$estimation['pieces']??'','adresse'=>$estimation['adresse']??'',
-                                'ville'=>$estimation['ville']??'','code_postal'=>$estimation['code_postal']??'',
-                                'estimation_basse'=>$estimation['estimation_basse']?number_format((float)$estimation['estimation_basse'],0,',',' '):'—',
-                                'estimation_haute'=>$estimation['estimation_haute']?number_format((float)$estimation['estimation_haute'],0,',',' '):'—',
-                                'date_creation'=>$estimation['date_creation']?date('d/m/Y',strtotime($estimation['date_creation'])):date('d/m/Y'),
-                            ];
-                            $subj = replaceVariables($template['subject'], $vars);
-                            $body = replaceVariables($template['body'], $vars);
-                            $sent = sendHtmlEmail($estimation['email'], $subj, $body, $pdo);
-                            if ($sent) { logEmailContact($pdo, $eid, $subj, $body, 'out'); echo json_encode(['success'=>true,'message'=>'Email envoyé à '.$estimation['email']]); }
-                            else echo json_encode(['success'=>false,'message'=>'Échec envoi']);
-                        } else echo json_encode(['success'=>false,'message'=>'Aucun template actif "'.$ttype.'"']);
-                    } else echo json_encode(['success'=>false,'message'=>'Email manquant']);
-                } else echo json_encode(['success'=>false,'message'=>'Mailer non trouvé ou ID invalide']);
-            } catch (Exception $e) { echo json_encode(['success'=>false,'message'=>$e->getMessage()]); }
-            exit;
-    }
-}
+// ─── API endpoint ───────────────────────────────────────────────
+// Toute la logique AJAX est dans api.php (même répertoire)
 
 // ─── FILTRAGE & PAGINATION ──────────────────────────────────────
 $filterStatut = $_GET['filter_statut'] ?? 'all';
@@ -414,20 +352,20 @@ table.est-tbl tbody tr.en-attente-row{background:#fffbeb}
 </div>
 
 <script>
-const MU='<?php echo $moduleUrl; ?>';
+const API='/admin/modules/immobilier/estimation/api.php';
 function toggleD(id){document.getElementById('d-'+id)?.classList.toggle('open');document.querySelectorAll('.quick-email-dropdown.open').forEach(e=>e.classList.remove('open'))}
 function toggleQE(id){const m=document.getElementById('qem-'+id);document.querySelectorAll('.quick-email-dropdown.open').forEach(e=>{if(e!==m)e.classList.remove('open')});m?.classList.toggle('open')}
 document.addEventListener('click',e=>{if(!e.target.closest('.ebtn-email')&&!e.target.closest('.quick-email-dropdown'))document.querySelectorAll('.quick-email-dropdown.open').forEach(e=>e.classList.remove('open'))});
 
-function ajax(a,b){return fetch(MU+'&ajax_action='+a,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:b}).then(r=>r.json())}
+function api(action,body){return fetch(API+'?action='+action,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body}).then(r=>r.json())}
 
-function updStatut(id){const v=document.getElementById('ss-'+id)?.value;if(!v)return;ajax('update_statut','id='+id+'&statut='+encodeURIComponent(v)).then(d=>{if(d.success){const b=document.querySelector('#row-'+id+' .b');const m={'en_attente':'🆕 En attente','traitee':'✅ Traitée','convertie':'🎯 Convertie'};if(b){b.className='b '+v;b.textContent=m[v]||v}toast('✅ Statut mis à jour')}else toast('❌ '+(d.message||'Erreur'),'e')}).catch(()=>toast('❌ Erreur réseau','e'))}
+function updStatut(id){const v=document.getElementById('ss-'+id)?.value;if(!v)return;api('update_status','id='+id+'&statut='+encodeURIComponent(v)).then(d=>{if(d.success){const b=document.querySelector('#row-'+id+' .b');const m={'en_attente':'🆕 En attente','traitee':'✅ Traitée','convertie':'🎯 Convertie'};if(b){b.className='b '+v;b.textContent=m[v]||v}toast('✅ Statut mis à jour')}else toast('❌ '+(d.message||'Erreur'),'e')}).catch(()=>toast('❌ Erreur réseau','e'))}
 
-function saveNotes(id){const v=document.getElementById('notes-'+id)?.value||'';ajax('update_notes','id='+id+'&notes='+encodeURIComponent(v)).then(d=>{d.success?toast('💾 Notes sauvegardées'):toast('❌ Erreur','e')})}
+function saveNotes(id){const v=document.getElementById('notes-'+id)?.value||'';api('update_notes','id='+id+'&notes='+encodeURIComponent(v)).then(d=>{d.success?toast('💾 Notes sauvegardées'):toast('❌ Erreur','e')})}
 
-function archiveReq(id){if(!confirm('Supprimer cette demande ?'))return;ajax('delete','id='+id).then(d=>{if(d.success){document.getElementById('row-'+id).style.display='none';document.getElementById('d-'+id).style.display='none';toast('✅ Supprimé')}})}
+function archiveReq(id){if(!confirm('Supprimer cette demande ?'))return;api('delete','id='+id).then(d=>{if(d.success){document.getElementById('row-'+id).style.display='none';document.getElementById('d-'+id).style.display='none';toast('✅ Supprimé')}})}
 
-function sendQE(eid,type){if(!confirm('Envoyer email "'+type+'" ?'))return;document.querySelectorAll('.quick-email-dropdown.open').forEach(e=>e.classList.remove('open'));ajax('send_quick_email','estimation_id='+eid+'&template_type='+encodeURIComponent(type)).then(d=>{d.success?toast('✅ '+d.message):toast('❌ '+(d.message||'Erreur'),'e')}).catch(()=>toast('❌ Erreur réseau','e'))}
+function sendQE(eid,type){if(!confirm('Envoyer email "'+type+'" ?'))return;document.querySelectorAll('.quick-email-dropdown.open').forEach(e=>e.classList.remove('open'));api('send_email','estimation_id='+eid+'&template_type='+encodeURIComponent(type)).then(d=>{d.success?toast('✅ '+d.message):toast('❌ '+(d.message||'Erreur'),'e')}).catch(()=>toast('❌ Erreur réseau','e'))}
 
 function toast(m,t){const o=document.querySelector('.et');if(o)o.remove();const e=document.createElement('div');e.className='et';e.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:11px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 6px 20px rgba(0,0,0,.15);color:white;transition:opacity .3s';e.style.background=t==='e'?'#991b1b':'#065f46';e.textContent=m;document.body.appendChild(e);setTimeout(()=>{e.style.opacity='0';setTimeout(()=>e.remove(),300)},3000)}
 </script>

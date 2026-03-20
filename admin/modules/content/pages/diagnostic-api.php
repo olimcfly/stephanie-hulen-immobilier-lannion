@@ -17,7 +17,7 @@ if (!isset($pdo)) {
 }
 
 $results = [];
-$apiBase = '/admin/api/content/pages.php';
+$apiBase = '/admin/modules/content/pages/api.php';
 
 // ── Helper ──
 function testResult($name, $ok, $detail = '', $fix = '') {

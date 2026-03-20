@@ -184,6 +184,7 @@ function getSubRoutes() {
         'analytics'       => ['file'=>'seo/modules/analytics/index.php',      'title'=>'Statistiques'],
         
         // Publicité & Réseaux
+        'google-ads'      => ['file'=>'marketing/pub-google/index.php',       'title'=>'Publicité Google'],
         'facebook-ads'    => ['file'=>'marketing/pub-facebook/index.php',     'title'=>'Publicité Facebook'],
         'reseaux-sociaux' => ['file'=>'social/reseaux-sociaux/index.php',     'title'=>'Réseaux sociaux'],
         'facebook'        => ['file'=>'social/facebook/index.php',            'title'=>'Facebook'],
@@ -240,7 +241,6 @@ function getRouteAliases() {
         
         // Visibilité & SEO
         'seo-hub'=>'seo',
-        'seo-pages'=>'seo',
         'seo-semantic'=>'seo-semantic',
         'guide-seo'=>'seo-guide',
         'local-seo'=>'local-seo',
