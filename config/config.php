@@ -3,6 +3,28 @@
  * /config/config.php — CONFIG CENTRALISÉE
  */
 
+// Charger les variables .env
+$envFile = dirname(__DIR__) . '/.env';
+if (file_exists($envFile)) {
+    $envLines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($envLines as $line) {
+        $line = trim($line);
+        if ($line === '' || $line[0] === '#') continue;
+        if (strpos($line, '=') === false) continue;
+        [$name, $value] = explode('=', $line, 2);
+        $name = trim($name);
+        $value = trim($value);
+        if (!isset($_ENV[$name])) {
+            $_ENV[$name] = $value;
+            putenv("{$name}={$value}");
+        }
+    }
+}
+
+if (!empty($_ENV['ENCRYPTION_KEY'])) {
+    define('ENCRYPTION_KEY', $_ENV['ENCRYPTION_KEY']);
+}
+
 define('INSTANCE_ID',   'stephanie-lannion');
 define('SITE_TITLE',    'Stephanie Hulen - Lannion');
 define('SITE_DOMAIN',   'stephanie-hulen-immobilier-lannion.fr');

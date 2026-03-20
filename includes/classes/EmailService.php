@@ -8,12 +8,18 @@ class EmailService
 {
     private array $config;
     private ?PDO $pdo;
+    private ?Encryption $encryption = null;
 
     public function __construct(?PDO $pdo = null)
     {
         $this->pdo = $pdo;
         $configFile = dirname(__DIR__, 2) . '/config/smtp.php';
         $this->config = file_exists($configFile) ? (include $configFile) : [];
+        try {
+            $this->encryption = Encryption::getInstance();
+        } catch (RuntimeException $e) {
+            // Encryption non configurée — les emails seront stockés en clair
+        }
     }
 
     public function getConfig(): array
@@ -531,6 +537,15 @@ class EmailService
 
         try {
             $this->ensureTable();
+
+            // Chiffrer les adresses email PII avant stockage
+            if ($this->encryption) {
+                foreach (['from_email', 'to_email'] as $field) {
+                    if (!empty($data[$field])) {
+                        $data[$field] = $this->encryption->encrypt($data[$field]);
+                    }
+                }
+            }
 
             $fields = [
                 'direction', 'from_email', 'from_name', 'to_email', 'to_name',

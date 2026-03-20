@@ -41,7 +41,7 @@ class Database {
     }
 
     /**
-     * Get PDO instance
+     * Get Database instance
      */
     public static function getInstance() {
 
@@ -49,7 +49,14 @@ class Database {
             self::$instance = new self();
         }
 
-        return self::$instance->connection;
+        return self::$instance;
+    }
+
+    /**
+     * Get PDO connection
+     */
+    public function getConnection() {
+        return $this->connection;
     }
 
     /**
@@ -159,6 +166,14 @@ class Database {
 
         return $this->connection->lastInsertId();
 
+    }
+
+    /**
+     * Proxy les appels PDO pour compatibilité arrière
+     * Permet d'utiliser Database::getInstance()->prepare(), ->query(), etc.
+     */
+    public function __call($method, $args) {
+        return call_user_func_array([$this->connection, $method], $args);
     }
 
     /**
