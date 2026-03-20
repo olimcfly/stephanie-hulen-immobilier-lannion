@@ -1101,7 +1101,7 @@ function savePage() {
         csrf_token: CSRF_TOKEN,
     };
 
-    fetch('/admin/api/content/pages.php', {
+    fetch('/admin/modules/content/pages/api.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -1145,7 +1145,7 @@ function publishPage() {
         csrf_token: CSRF_TOKEN,
     };
 
-    fetch('/admin/api/content/pages.php', {
+    fetch('/admin/modules/content/pages/api.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
