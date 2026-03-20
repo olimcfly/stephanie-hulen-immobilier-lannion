@@ -10,48 +10,48 @@
 
 return [
     // SMTP (envoi)
-    'smtp_host'      => 'eduardo-desul-immobilier.fr',
+    'smtp_host'      => 'stephanie-hulen-immobilier-lannion.fr',
     'smtp_port'      => 465,
     'smtp_secure'    => 'ssl',
-    'smtp_user'      => 'admin@eduardo-desul-immobilier.fr',
+    'smtp_user'      => 'admin@stephanie-hulen-immobilier-lannion.fr',
     'smtp_pass'      => 'JQP_4}J)dNIy',
-    'smtp_from'      => 'contact@eduardo-desul-immobilier.fr',
-    'smtp_from_name' => 'Eduardo De Sul Immobilier',
+    'smtp_from'      => 'contact@stephanie-hulen-immobilier-lannion.fr',
+    'smtp_from_name' => 'Stephanie Hulen Immobilier Lannion',
 
     // IMAP (reception)
-    'imap_host'   => 'eduardo-desul-immobilier.fr',
+    'imap_host'   => 'stephanie-hulen-immobilier-lannion.fr',
     'imap_port'   => 993,
     'imap_secure' => 'ssl',
-    'imap_user'   => 'admin@eduardo-desul-immobilier.fr',
+    'imap_user'   => 'admin@stephanie-hulen-immobilier-lannion.fr',
     'imap_pass'   => 'JQP_4}J)dNIy',
 
     // Comptes email du domaine
     'email_accounts' => [
-        'admin@eduardo-desul-immobilier.fr',
-        'contact@eduardo-desul-immobilier.fr',
-        'info@eduardo-desul-immobilier.fr',
-        'estimation@eduardo-desul-immobilier.fr',
-        'guide@eduardo-desul-immobilier.fr',
-        'support@eduardo-desul-immobilier.fr',
-        'ne-pas-repondre@eduardo-desul-immobilier.fr',
-        'bounce@eduardo-desul-immobilier.fr',
-        'replit2@eduardo-desul-immobilier.fr',
+        'admin@stephanie-hulen-immobilier-lannion.fr',
+        'contact@stephanie-hulen-immobilier-lannion.fr',
+        'info@stephanie-hulen-immobilier-lannion.fr',
+        'estimation@stephanie-hulen-immobilier-lannion.fr',
+        'guide@stephanie-hulen-immobilier-lannion.fr',
+        'support@stephanie-hulen-immobilier-lannion.fr',
+        'ne-pas-repondre@stephanie-hulen-immobilier-lannion.fr',
+        'bounce@stephanie-hulen-immobilier-lannion.fr',
+        'replit2@stephanie-hulen-immobilier-lannion.fr',
     ],
 
     // Alias .com
     'email_aliases' => [
-        'contact@eduardo-desul-immobilier.com',
-        'info@eduardo-desul-immobilier.com',
-        'support@eduardo-desul-immobilier.com',
-        'ne-pas-repondre@eduardo-desul-immobilier.com',
-        'bounce@eduardo-desul-immobilier.com',
+        'contact@stephanie-hulen-immobilier-lannion.com',
+        'info@stephanie-hulen-immobilier-lannion.com',
+        'support@stephanie-hulen-immobilier-lannion.com',
+        'ne-pas-repondre@stephanie-hulen-immobilier-lannion.com',
+        'bounce@stephanie-hulen-immobilier-lannion.com',
     ],
 
     // Roles
     'email_roles' => [
-        'primary' => 'contact@eduardo-desul-immobilier.fr',
-        'system'  => 'ne-pas-repondre@eduardo-desul-immobilier.fr',
-        'support' => 'support@eduardo-desul-immobilier.fr',
-        'bounce'  => 'bounce@eduardo-desul-immobilier.fr',
+        'primary' => 'contact@stephanie-hulen-immobilier-lannion.fr',
+        'system'  => 'ne-pas-repondre@stephanie-hulen-immobilier-lannion.fr',
+        'support' => 'support@stephanie-hulen-immobilier-lannion.fr',
+        'bounce'  => 'bounce@stephanie-hulen-immobilier-lannion.fr',
     ],
 ];
