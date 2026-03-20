@@ -137,8 +137,8 @@ case 'create':
 
     $pdo->prepare(
         "INSERT INTO pages (title, slug, template, layout, status, fields, sections_json, template_id, created_at, updated_at)
-         VALUES (?, ?, ?, ?, 'draft', ?, '{}', ?, NOW(), NOW())"
-    )->execute([$title, $slug, $template, $template, $fieldsJSON, $templateId]);
+         VALUES (?, ?, ?, ?, 'draft', ?, ?, ?, NOW(), NOW())"
+    )->execute([$title, $slug, $template, $template, $fieldsJSON, $fieldsJSON, $templateId]);
 
     $newId = (int)$pdo->lastInsertId();
     respond(['success' => true, 'page_id' => $newId, 'id' => $newId, 'message' => 'Page créée']);
@@ -277,12 +277,14 @@ case 'create_with_ai':
     }
 
     $fieldsJSON = json_encode($fieldsData, JSON_UNESCAPED_UNICODE);
+    // sections_json = same data for the editor to load
+    $sectionsJSON = $fieldsJSON;
 
     $pdo->prepare(
         "INSERT INTO pages
         (title, slug, template, layout, status, fields, sections_json, template_id, meta_title, meta_description, created_at, updated_at)
-        VALUES (?, ?, ?, ?, 'draft', ?, '{}', ?, ?, ?, NOW(), NOW())"
-    )->execute([$title, $slug, $template, $template, $fieldsJSON, $templateId, $seoT, $seoD]);
+        VALUES (?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?, NOW(), NOW())"
+    )->execute([$title, $slug, $template, $template, $fieldsJSON, $sectionsJSON, $templateId, $seoT, $seoD]);
 
     $newId = (int)$pdo->lastInsertId();
     respond([

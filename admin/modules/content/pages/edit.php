@@ -7,14 +7,26 @@
 
 if (!defined('ADMIN_ROUTER')) {
     define('ADMIN_ROUTER', true);
+    require_once dirname(dirname(dirname(dirname(__DIR__)))) . '/includes/init.php';
 }
-require_once dirname(dirname(dirname(dirname(__DIR__)))) . '/includes/init.php';
+
+// Auth check for fullscreen mode
+if (session_status() === PHP_SESSION_NONE) session_start();
+if (empty($_SESSION['admin_id'])) {
+    header('Location: /admin/login.php');
+    exit;
+}
 
 try {
-    $pdo = getDB();
+    if (!isset($pdo) || !$pdo) $pdo = getDB();
 } catch (Exception $e) {
     die('Erreur BD');
 }
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrfToken = $_SESSION['csrf_token'];
 
 // ── Charger $TPL ────────────────────────────────────────────
 require_once __DIR__ . '/tpl.php'; // Fichier contenant le tableau $TPL complet
@@ -37,12 +49,21 @@ if ($pageId) {
     if ($page) {
         $pageTitle    = $page['title'] ?? '';
         $pageSlug     = $page['slug'] ?? '';
-        $pageTemplate = $page['template'] ?? 't1-accueil';
+        $pageTemplate = $page['template'] ?? $page['layout'] ?? 't1-accueil';
         $pageStatus   = $page['status'] ?? 'draft';
         $metaTitle    = $page['meta_title'] ?? '';
         $metaDesc     = $page['meta_description'] ?? '';
-        if (!empty($page['sections_json'])) {
+        // Load sections data: prefer sections_json, fallback to fields column
+        if (!empty($page['sections_json']) && $page['sections_json'] !== '{}') {
             $sectionsData = json_decode($page['sections_json'], true) ?: [];
+        }
+        if (empty($sectionsData) && !empty($page['fields'])) {
+            $decoded = json_decode($page['fields'], true) ?: [];
+            // Filter out meta keys that aren't template fields
+            unset($decoded['persona'], $decoded['objective']);
+            if (!empty($decoded)) {
+                $sectionsData = $decoded;
+            }
         }
     }
 }
@@ -429,11 +450,12 @@ $tplList = [
         </div>
 
         <div class="topbar-actions">
-            <button class="btn btn-ghost" onclick="history.back()"><i class="fas fa-arrow-left"></i> Retour</button>
+            <button class="btn btn-ghost" onclick="window.location.href='?page=pages'"><i class="fas fa-arrow-left"></i> Retour</button>
             <button class="btn btn-ghost" id="btnPreview" onclick="window.open('/<?= htmlspecialchars($pageSlug) ?>', '_blank')">
                 <i class="fas fa-external-link-alt"></i> Voir
             </button>
-            <button class="btn btn-primary" onclick="savePage()"><i class="fas fa-save"></i> Sauvegarder</button>
+            <button class="btn btn-ghost" onclick="savePage()" style="border-color:var(--green);color:var(--green)"><i class="fas fa-save"></i> Sauvegarder</button>
+            <button class="btn btn-primary" onclick="publishPage()" style="background:var(--green)"><i class="fas fa-globe"></i> Publier</button>
         </div>
     </div>
 
@@ -523,7 +545,8 @@ $tplList = [
 // ════════════════════════════════════════════════════════════
 // DATA
 // ════════════════════════════════════════════════════════════
-const PAGE_ID = <?= $pageId ? $pageId : 'null' ?>;
+let PAGE_ID = <?= $pageId ? $pageId : 'null' ?>;
+const CSRF_TOKEN = <?= json_encode($csrfToken) ?>;
 const TPL_ALL = <?= $tplJson ?>;
 const TPL_LABELS = <?= json_encode($tplList, JSON_UNESCAPED_UNICODE) ?>;
 
@@ -1067,7 +1090,7 @@ function toggleMeta() {
 function savePage() {
     const payload = {
         action: 'save_page',
-        id: PAGE_ID,
+        id: window.PAGE_ID_UPDATED || PAGE_ID,
         title: document.getElementById('metaPageTitle').value,
         slug: document.getElementById('metaSlug').value,
         template: currentTemplate,
@@ -1075,6 +1098,7 @@ function savePage() {
         meta_title: document.getElementById('metaSeoTitle').value,
         meta_description: document.getElementById('metaSeoDesc').value,
         sections_json: JSON.stringify(fieldsData),
+        csrf_token: CSRF_TOKEN,
     };
 
     fetch('/admin/api/content/pages.php', {
@@ -1086,8 +1110,58 @@ function savePage() {
     .then(d => {
         if (d.success) {
             showToast('Page sauvegardée avec succès');
+            // Update browser URL if slug changed
+            if (d.slug) {
+                document.getElementById('browserUrl').textContent = d.slug;
+                document.getElementById('btnPreview').onclick = () => window.open('/' + d.slug, '_blank');
+            }
             if (!PAGE_ID && d.id) {
-                window.history.replaceState({}, '', `?page=content/pages/edit&id=${d.id}`);
+                window.history.replaceState({}, '', `?page=pages&action=edit&id=${d.id}`);
+                // Update PAGE_ID so next save is an update, not insert
+                window.PAGE_ID_UPDATED = d.id;
+            }
+        } else {
+            showToast('Erreur : ' + (d.error || 'inconnue'), 'err');
+        }
+    })
+    .catch(() => showToast('Erreur de connexion', 'err'));
+}
+
+// ════════════════════════════════════════════════════════════
+// PUBLISH — save + set status to published
+// ════════════════════════════════════════════════════════════
+function publishPage() {
+    document.getElementById('metaStatus').value = 'published';
+    const payload = {
+        action: 'save_page',
+        id: window.PAGE_ID_UPDATED || PAGE_ID,
+        title: document.getElementById('metaPageTitle').value,
+        slug: document.getElementById('metaSlug').value,
+        template: currentTemplate,
+        status: 'published',
+        meta_title: document.getElementById('metaSeoTitle').value,
+        meta_description: document.getElementById('metaSeoDesc').value,
+        sections_json: JSON.stringify(fieldsData),
+        csrf_token: CSRF_TOKEN,
+    };
+
+    fetch('/admin/api/content/pages.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            showToast('Page publiee ! Visible sur /' + (d.slug || document.getElementById('metaSlug').value));
+            if (d.slug) {
+                document.getElementById('browserUrl').textContent = d.slug;
+                document.getElementById('btnPreview').onclick = () => window.open('/' + d.slug, '_blank');
+            }
+            if (!PAGE_ID && d.id) {
+                PAGE_ID = d.id;
+                window.PAGE_ID_UPDATED = d.id;
+                window.history.replaceState({}, '', `?page=pages&action=edit&id=${d.id}`);
             }
         } else {
             showToast('Erreur : ' + (d.error || 'inconnue'), 'err');

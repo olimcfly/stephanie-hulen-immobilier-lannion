@@ -82,7 +82,15 @@ if (!$module_file && $module !== 'dashboard') {
 
 // Fullscreen routes
 $fullscreenRoutes = [];
-if (in_array($module, $fullscreenRoutes) && $module_file) {
+// Pages editor runs fullscreen (has its own layout: topbar, sidebar, preview)
+$fullscreenActions = [
+    'pages' => ['edit'],
+];
+$currentAction = $_GET['action'] ?? '';
+$isFullscreen = in_array($module, $fullscreenRoutes)
+    || (isset($fullscreenActions[$module]) && in_array($currentAction, $fullscreenActions[$module]) && !empty($_GET['id']));
+
+if ($isFullscreen && $module_file) {
     include $module_file;
     exit;
 }
