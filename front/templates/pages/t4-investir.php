@@ -22,57 +22,57 @@ $headerMenu = getMenu('header-main', $pdo ?? null) ?? [];
 // ────────────────────────────────────────────────────
 // CHAMPS INVESTIR
 // ────────────────────────────────────────────────────
-$heroEyebrow   = $fields['hero_eyebrow']   ?? 'Investir dans l\'immobilier à ' . $advisorCity;
-$heroTitle     = $fields['hero_title']     ?? 'Constituez votre patrimoine avec des investissements immobiliers rentables';
-$heroSubtitle  = $fields['hero_subtitle']  ?? 'Analyse de rentabilité, sélection de biens à potentiel, montage complet du dossier.';
-$heroCtaText   = $fields['hero_cta_text']  ?? 'Consulter nos biens d\'investissement';
+$heroEyebrow   = $fields['hero_eyebrow']   ?? 'Investir dans l\'immobilier dans le Trégor — Côtes-d\'Armor';
+$heroTitle     = $fields['hero_title']     ?? 'Investissement locatif à Lannion et dans le Trégor : des rendements attractifs en Côtes-d\'Armor';
+$heroSubtitle  = $fields['hero_subtitle']  ?? 'Marché accessible, rendements locatifs parmi les plus intéressants de Bretagne, forte demande étudiante et professionnelle. Analyse de rentabilité et accompagnement complet.';
+$heroCtaText   = $fields['hero_cta_text']  ?? 'Découvrir les opportunités dans le Trégor';
 $heroCtaUrl    = $fields['hero_cta_url']   ?? _findMenuUrl($headerMenu['items'] ?? [], 'Investir', $siteUrl . '/investir');
-$heroCta2Text  = $fields['hero_cta2_text'] ?? 'Discuter de votre stratégie';
+$heroCta2Text  = $fields['hero_cta2_text'] ?? 'Étudier votre projet d\'investissement';
 $heroCta2Url   = $fields['hero_cta2_url']  ?? _findMenuUrl($headerMenu['items'] ?? [], 'Contact', $siteUrl . '/contact');
 
-$heroStat1Num  = $fields['hero_stat1_num'] ?? '5.2%';
-$heroStat1Lbl  = $fields['hero_stat1_lbl'] ?? 'rentabilité moyenne';
-$heroStat2Num  = $fields['hero_stat2_num'] ?? '180+';
-$heroStat2Lbl  = $fields['hero_stat2_lbl'] ?? 'investisseurs conseillés';
+$heroStat1Num  = $fields['hero_stat1_num'] ?? '6 à 9%';
+$heroStat1Lbl  = $fields['hero_stat1_lbl'] ?? 'rendement brut moyen à Lannion';
+$heroStat2Num  = $fields['hero_stat2_num'] ?? '1 400 €/m²';
+$heroStat2Lbl  = $fields['hero_stat2_lbl'] ?? 'prix médian — un des plus accessibles de Bretagne';
 
-$benTitle  = $fields['ben_title']  ?? 'Pourquoi investir dans l\'immobilier avec un conseiller ?';
+$benTitle  = $fields['ben_title']  ?? 'Pourquoi investir dans le Trégor et les Côtes-d\'Armor ?';
 $ben1Icon  = $fields['ben1_icon']  ?? '📊';
-$ben1Title = $fields['ben1_title'] ?? 'Analyse de rentabilité';
-$ben1Text  = $fields['ben1_text']  ?? 'Calcul précis des rendements locatifs bruts et nets, étude de la fiscalité à ' . $advisorCity . '.';
+$ben1Title = $fields['ben1_title'] ?? 'Rendements locatifs élevés';
+$ben1Text  = $fields['ben1_text']  ?? 'À Lannion, le rendement brut moyen se situe entre 6 et 9 % grâce à des prix d\'achat contenus (environ 1 400 €/m²) et une demande locative soutenue par le bassin technologique (Lannion Trégor Communauté, pôle télécoms).';
 $ben2Icon  = $fields['ben2_icon']  ?? '🎯';
-$ben2Title = $fields['ben2_title'] ?? 'Sélection stratégique';
-$ben2Text  = $fields['ben2_text']  ?? 'Identification des biens avec fort potentiel de plus-value et rendement régulier.';
+$ben2Title = $fields['ben2_title'] ?? 'Marché accessible et porteur';
+$ben2Text  = $fields['ben2_text']  ?? 'Les prix immobiliers dans le Trégor restent parmi les plus abordables de Bretagne, offrant une porte d\'entrée idéale pour les primo-investisseurs. La côte de Granit Rose et la proximité de Brest et Saint-Brieuc renforcent l\'attractivité.';
 $ben3Icon  = $fields['ben3_icon']  ?? '⚙️';
-$ben3Title = $fields['ben3_title'] ?? 'Montage complet';
-$ben3Text  = $fields['ben3_text']  ?? 'Aide sur le financement, la fiscalité, la gestion locative et le suivi de l\'investissement.';
+$ben3Title = $fields['ben3_title'] ?? 'Accompagnement fiscal et montage';
+$ben3Text  = $fields['ben3_text']  ?? 'Optimisation via le régime réel, le dispositif Denormandie dans l\'ancien (applicable à Lannion en zone éligible), ou le statut LMNP. Montage financier et gestion locative adaptés à votre projet.';
 
-$methodTitle   = $fields['method_title']    ?? 'Mon processus d\'investissement en 3 étapes';
+$methodTitle   = $fields['method_title']    ?? 'Investir dans le Trégor en 3 étapes';
 $step1Num      = $fields['step1_num']       ?? '01';
-$step1Title    = $fields['step1_title']     ?? 'Définir votre stratégie';
-$step1Text     = $fields['step1_text']      ?? 'Budget, objectifs de rendement, préférences géographiques et types de biens.';
+$step1Title    = $fields['step1_title']     ?? 'Définir votre stratégie locale';
+$step1Text     = $fields['step1_text']      ?? 'Budget, objectifs de rendement, choix du secteur (Lannion centre, Perros-Guirec, Tréguier, Paimpol) et type de location (longue durée, saisonnière, meublée LMNP).';
 $step2Num      = $fields['step2_num']       ?? '02';
-$step2Title    = $fields['step2_title']     ?? 'Analyser les opportunités';
-$step2Text     = $fields['step2_text']      ?? 'Évaluation de rentabilité, analyse du marché locatif et potentiel de plus-value.';
+$step2Title    = $fields['step2_title']     ?? 'Analyser le marché trégorois';
+$step2Text     = $fields['step2_text']      ?? 'Étude de la demande locative locale (étudiants IUT/ENSSAT, salariés du pôle télécoms, tourisme côte de Granit Rose), calcul du rendement net et simulation fiscale.';
 $step3Num      = $fields['step3_num']       ?? '03';
-$step3Title    = $fields['step3_title']     ?? 'Finaliser l\'investissement';
-$step3Text     = $fields['step3_text']      ?? 'Montage du dossier, financement, optimisation fiscale et signature notariale.';
-$methodCtaText = $fields['method_cta_text'] ?? 'Étudier une opportunité';
+$step3Title    = $fields['step3_title']     ?? 'Concrétiser votre investissement';
+$step3Text     = $fields['step3_text']      ?? 'Négociation, montage du financement, choix du dispositif fiscal adapté (Denormandie, LMNP, régime réel), mise en gestion locative et suivi de la rentabilité.';
+$methodCtaText = $fields['method_cta_text'] ?? 'Étudier une opportunité dans le Trégor';
 $methodCtaUrl  = $fields['method_cta_url']  ?? _findMenuUrl($headerMenu['items'] ?? [], 'Contact', $siteUrl . '/contact');
 
-$guideTitle = $fields['guide_title'] ?? 'Guide de l\'investissement immobilier';
+$guideTitle = $fields['guide_title'] ?? 'Guide de l\'investissement immobilier dans le Trégor';
 $g1Num      = $fields['g1_num']   ?? '01';
-$g1Title    = $fields['g1_title'] ?? 'Comprendre la rentabilité brute et nette';
-$g1Text     = $fields['g1_text']  ?? '<p><strong>Rentabilité brute</strong> = loyer annuel / prix d\'achat. Exemple : 6000€ loyer / 100 000€ bien = 6%.<br><strong>Rentabilité nette</strong> = après impôts, charges et frais de gestion. Généralement 3-4% pour les petits propriétaires.</p>';
+$g1Title    = $fields['g1_title'] ?? 'Rendements locatifs à Lannion et dans le Trégor';
+$g1Text     = $fields['g1_text']  ?? '<p><strong>Rentabilité brute à Lannion</strong> : entre 6 et 9 % selon le type de bien. Exemple concret : un T2 acheté 65 000 € et loué 450 €/mois génère un rendement brut de 8,3 %.<br><strong>Rentabilité nette</strong> : après charges, taxe foncière et fiscalité, comptez généralement 4 à 6 % net à Lannion — bien au-dessus de la moyenne nationale (3-4 %). Les prix contenus dans le Trégor (1 400 €/m² en médiane) sont le principal levier de ces rendements élevés.</p>';
 $g2Num      = $fields['g2_num']   ?? '02';
-$g2Title    = $fields['g2_title'] ?? 'Optimiser sa fiscalité : régime classique ou micro-foncier ?';
-$g2Text     = $fields['g2_text']  ?? '<p>Régime classique : déduction de toutes les charges (intérêts d\'emprunt, travaux, assurances). Meilleur pour les gros investisseurs.<br>Micro-foncier : abattement forfaitaire de 30%. Plus simple, idéal si peu de charges.</p>';
+$g2Title    = $fields['g2_title'] ?? 'Fiscalité : les dispositifs applicables dans le Trégor';
+$g2Text     = $fields['g2_text']  ?? '<p><strong>Denormandie dans l\'ancien</strong> : Lannion est éligible à ce dispositif de défiscalisation qui offre une réduction d\'impôt de 12 à 21 % du prix du bien (selon la durée de location : 6, 9 ou 12 ans) pour l\'achat d\'un logement ancien à rénover.<br><strong>LMNP (Loueur Meublé Non Professionnel)</strong> : amortissement du bien et des meubles, permettant de réduire voire annuler l\'imposition sur les loyers. Particulièrement adapté à la location étudiante à Lannion.<br><strong>Régime réel</strong> : déduction des charges réelles (intérêts d\'emprunt, travaux, assurance, frais de gestion). Recommandé si vos charges dépassent 30 % des loyers.<br><strong>Micro-foncier</strong> : abattement forfaitaire de 30 %, simple et adapté si peu de charges. Plafonné à 15 000 € de revenus fonciers annuels.<br><strong>Déficit foncier</strong> : les travaux de rénovation dans l\'ancien permettent de créer un déficit imputable sur le revenu global (jusqu\'à 10 700 €/an), idéal pour les biens à rénover dans le centre historique de Lannion ou de Tréguier.</p>';
 $g3Num      = $fields['g3_num']   ?? '03';
-$g3Title    = $fields['g3_title'] ?? 'Bien sélectionner votre bien : critères clés';
-$g3Text     = $fields['g3_text']  ?? '<p>Zone à forte demande locative, bonne accessibilité, état du bien, potentiel de plus-value. Éviter les zones de suroffre locative.</p>';
+$g3Title    = $fields['g3_title'] ?? 'Les meilleurs secteurs d\'investissement dans le Trégor';
+$g3Text     = $fields['g3_text']  ?? '<p><strong>Lannion centre-ville</strong> : forte demande locative (étudiants IUT et ENSSAT, salariés du pôle télécoms Nokia/Orange), rendements de 7 à 9 % sur les petites surfaces.<br><strong>Perros-Guirec / Trébeurden</strong> : potentiel en location saisonnière (côte de Granit Rose), rendements bruts de 5 à 7 % avec une forte valorisation patrimoniale.<br><strong>Tréguier / Paimpol</strong> : petits prix, biens de caractère à rénover (éligibles Denormandie), rendements bruts de 6 à 8 %.<br><strong>Critères clés</strong> : proximité des transports, état du bien et coût des travaux, tension locative du secteur, potentiel de plus-value à moyen terme.</p>';
 
-$ctaTitle     = $fields['cta_title']      ?? 'Prêt à lancer votre investissement ?';
-$ctaText      = $fields['cta_text']       ?? 'Je vous aide à définir votre stratégie et à identifier les meilleures opportunités.';
-$ctaBtnText   = $fields['cta_btn_text']   ?? 'Prendre rendez-vous';
+$ctaTitle     = $fields['cta_title']      ?? 'Prêt à investir dans le Trégor ?';
+$ctaText      = $fields['cta_text']       ?? 'Analyse de rentabilité gratuite, sélection de biens à potentiel, simulation fiscale personnalisée. Parlons de votre projet d\'investissement à Lannion et dans les Côtes-d\'Armor.';
+$ctaBtnText   = $fields['cta_btn_text']   ?? 'Étudier mon projet d\'investissement';
 $ctaBtnUrl    = $fields['cta_btn_url']    ?? _findMenuUrl($headerMenu['items'] ?? [], 'Contact', $siteUrl . '/contact');
 $ctaPhoneText = $fields['cta_phone_text'] ?? 'Ou appelez-moi directement';
 
