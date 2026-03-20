@@ -60,6 +60,7 @@ $moduleMap = [
     'media'    => __DIR__ . '/handlers/media.php',
     'settings' => __DIR__ . '/handlers/settings.php',
     'ai'       => __DIR__ . '/handlers/ai.php',
+    'annuaire' => __DIR__ . '/handlers/annuaire.php',
 ];
 
 if (empty($module) || !array_key_exists($module, $moduleMap)) {
@@ -137,6 +138,7 @@ $moduleMap = [
     'pages'     => $handlersDir . 'pages.php',
     'captures'  => $handlersDir . 'captures.php',
     'secteurs'  => $handlersDir . 'secteurs.php',
+    'annuaire'  => $handlersDir . 'annuaire.php',
 
     // ── IMMOBILIER ───────────────────────
     'biens'     => $handlersDir . 'biens.php',
@@ -156,6 +158,18 @@ $moduleMap = [
 
     // ── IA (dispatcher vers /core/ai/) ───
     'ai'        => $handlersDir . 'ai.php',
+
+    // ── MODULES COMPLÉMENTAIRES ─────────
+    'guides'      => $handlersDir . 'ressources.php',
+    'annuaire'    => $handlersDir . 'annuaire.php',
+    'estimation'  => $handlersDir . 'estimation.php',
+    'blog'        => $handlersDir . 'blog.php',
+    'scoring'     => $handlersDir . 'scoring.php',
+    'sequences'   => $handlersDir . 'sequences.php',
+    'rdv'         => $handlersDir . 'rdv.php',
+    'financement' => $handlersDir . 'financement.php',
+    'crm'         => $handlersDir . 'crm.php',
+    'journal'     => $handlersDir . 'journal.php',
 ];
 
 // ── VALIDATION ───────────────────────────────────────────────
