@@ -1,0 +1,23 @@
+# Bloquer l'execution de scripts dans le dossier uploads
+# Empeche l'execution de PHP, Python, Perl, CGI, etc.
+
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phps|phar|pl|py|cgi|asp|aspx|jsp|sh|bash)$">
+    Require all denied
+</FilesMatch>
+
+# Desactiver le moteur PHP si mod_php est charge
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+
+# Empecher le listing du repertoire
+Options -Indexes -ExecCGI
+
+# Forcer le type MIME pour eviter l'interpretation de fichiers
+AddType application/octet-stream .php .phtml .php3 .php4 .php5 .php7 .phps .phar

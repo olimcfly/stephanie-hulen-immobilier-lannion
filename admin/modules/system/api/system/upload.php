@@ -6,26 +6,24 @@
  */
 $pdo=$ctx['pdo']; $action=$ctx['action']; $method=$ctx['method']; $p=$ctx['params'];
 
+require_once __DIR__ . '/../../../../../includes/functions/security.php';
+
 $uploadsDir = realpath(__DIR__ . '/../../../uploads');
-$allowedImages = ['jpg','jpeg','png','gif','webp','svg'];
-$allowedDocs   = ['pdf','doc','docx','xls','xlsx','csv'];
-$maxSize = 10 * 1024 * 1024; // 10MB
 
 if (($action==='image' || $action==='document') && $method==='POST') {
     if (empty($ctx['files']['file'])) return ['success'=>false,'error'=>'Aucun fichier envoyé'];
     $file = $ctx['files']['file'];
-    if ($file['error'] !== UPLOAD_ERR_OK) return ['success'=>false,'error'=>'Erreur upload: '.$file['error']];
-    if ($file['size'] > $maxSize) return ['success'=>false,'error'=>'Fichier trop volumineux (max 10MB)'];
 
-    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    $allowed = $action === 'image' ? $allowedImages : $allowedDocs;
-    if (!in_array($ext, $allowed)) return ['success'=>false,'error'=>"Extension .{$ext} non autorisée"];
+    // Validation centralisée (MIME réel, taille, renommage sécurisé)
+    $category = $action === 'image' ? 'image' : 'document';
+    $validation = validateUpload($file, $category);
+    if (!$validation['valid']) return ['success'=>false,'error'=>$validation['error']];
 
     $subDir = $action === 'image' ? 'images' : 'documents';
     $destDir = $uploadsDir . '/' . $subDir . '/' . date('Y/m');
     if (!is_dir($destDir)) mkdir($destDir, 0755, true);
 
-    $filename = uniqid() . '_' . preg_replace('/[^a-z0-9._-]/i', '', $file['name']);
+    $filename = $validation['safe_name'];
     $destPath = $destDir . '/' . $filename;
     move_uploaded_file($file['tmp_name'], $destPath);
 
@@ -33,9 +31,9 @@ if (($action==='image' || $action==='document') && $method==='POST') {
 
     // Log in media table if exists
     try { $pdo->prepare("INSERT INTO media (filename,path,type,size,uploaded_by,created_at) VALUES (?,?,?,?,?,NOW())")
-        ->execute([$file['name'],$relPath,$file['type'],$file['size'],$ctx['admin_id']]); } catch(Exception $e) {}
+        ->execute([$file['name'],$relPath,$validation['mime'],$file['size'],$ctx['admin_id']]); } catch(Exception $e) {}
 
-    return ['success'=>true,'url'=>$relPath,'filename'=>$filename,'size'=>$file['size'],'type'=>$file['type']];
+    return ['success'=>true,'url'=>$relPath,'filename'=>$filename,'size'=>$file['size'],'type'=>$validation['mime']];
 }
 
 if ($action==='delete' && $method==='POST') {

@@ -6,6 +6,8 @@
  * Table: media (if exists)
  */
 
+require_once dirname(__DIR__, 2) . '/includes/functions/security.php';
+
 $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 $action = CURRENT_ACTION;
 
@@ -82,21 +84,16 @@ switch ($action) {
                 break;
             }
             $file = $_FILES['file'];
-            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'application/pdf', 'video/mp4', 'video/webm'];
-            if (!in_array($file['type'], $allowedTypes)) {
-                echo json_encode(['success' => false, 'message' => 'Type de fichier non autorise']);
-                break;
-            }
 
-            $maxSize = 10 * 1024 * 1024; // 10MB
-            if ($file['size'] > $maxSize) {
-                echo json_encode(['success' => false, 'message' => 'Fichier trop volumineux (max 10MB)']);
+            // Validation centralisée (MIME réel via finfo, taille, renommage par hash)
+            $validation = validateUpload($file, 'media');
+            if (!$validation['valid']) {
+                echo json_encode(['success' => false, 'message' => $validation['error']]);
                 break;
             }
 
             if (!is_dir($uploadsDir)) mkdir($uploadsDir, 0755, true);
-            $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $safeName = uniqid('media_') . '.' . $ext;
+            $safeName = $validation['safe_name'];
             $dest = $uploadsDir . $safeName;
 
             if (!move_uploaded_file($file['tmp_name'], $dest)) {
@@ -108,8 +105,8 @@ switch ($action) {
                 'filename' => $safeName,
                 'original_name' => $file['name'],
                 'path' => '/uploads/' . $safeName,
-                'type' => strpos($file['type'], 'image') !== false ? 'image' : (strpos($file['type'], 'video') !== false ? 'video' : 'document'),
-                'mime_type' => $file['type'],
+                'type' => strpos($validation['mime'], 'image') !== false ? 'image' : 'document',
+                'mime_type' => $validation['mime'],
                 'size' => $file['size'],
             ];
 

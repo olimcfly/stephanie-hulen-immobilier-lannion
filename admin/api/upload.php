@@ -7,6 +7,7 @@
 
 define('ADMIN_ROUTER', true);
 require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../includes/functions/security.php';
 
 header('Content-Type: application/json');
 
@@ -44,39 +45,16 @@ $file     = $_FILES['file'];
 $folder   = trim($_POST['folder'] ?? 'pages');
 $folder   = preg_replace('/[^a-z0-9\-_]/', '', strtolower($folder)) ?: 'pages';
 
-// Types autorisés
-$allowed  = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
-$finfo    = finfo_open(FILEINFO_MIME_TYPE);
-$mimeType = finfo_file($finfo, $file['tmp_name']);
-finfo_close($finfo);
-
-if (!in_array($mimeType, $allowed)) {
-    echo json_encode(['success' => false, 'error' => 'Type non autorisé : ' . $mimeType]);
+// Validation centralisée (MIME réel, taille, renommage sécurisé)
+$validation = validateUpload($file, 'image');
+if (!$validation['valid']) {
+    echo json_encode(['success' => false, 'error' => $validation['error']]);
     exit;
 }
 
-// Taille max 5 Mo
-if ($file['size'] > 5 * 1024 * 1024) {
-    echo json_encode(['success' => false, 'error' => 'Fichier trop lourd (max 5 Mo)']);
-    exit;
-}
-
-// Extensions
-$extMap = [
-    'image/jpeg'    => 'jpg',
-    'image/png'     => 'png',
-    'image/webp'    => 'webp',
-    'image/gif'     => 'gif',
-    'image/svg+xml' => 'svg',
-];
-$ext = $extMap[$mimeType];
-
-// Nom de fichier sécurisé
-$originalName = pathinfo($file['name'], PATHINFO_FILENAME);
-$originalName = preg_replace('/[^a-z0-9\-_]/i', '-', $originalName);
-$originalName = strtolower(trim($originalName, '-'));
-$originalName = substr($originalName, 0, 60) ?: 'image';
-$filename     = $originalName . '-' . uniqid() . '.' . $ext;
+$mimeType = $validation['mime'];
+$ext      = $validation['ext'];
+$filename = $validation['safe_name'];
 
 // Dossier cible
 $uploadRoot = $_SERVER['DOCUMENT_ROOT'] . '/uploads/' . $folder . '/';
