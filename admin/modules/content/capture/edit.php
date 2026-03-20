@@ -37,64 +37,15 @@ if (!$isNew && $captureId > 0) {
     } catch (Exception $e) { $saveError = 'Capture introuvable : ' . $e->getMessage(); }
 }
 
-// ── Traitement POST (sauvegarde) ──────────────────────────────
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === '1') {
-    $d = [
-        'titre'        => trim($_POST['titre']        ?? ''),
-        'slug'         => trim($_POST['slug']         ?? ''),
-        'type'         => $_POST['type']              ?? 'guide',
-        'template'     => $_POST['template']          ?? 'split',
-        'headline'     => trim($_POST['headline']     ?? ''),
-        'sous_titre'   => trim($_POST['sous_titre']   ?? ''),
-        'description'  => trim($_POST['description']  ?? ''),
-        'cta_text'     => trim($_POST['cta_text']     ?? ''),
-        'page_merci_url'=> trim($_POST['page_merci_url'] ?? '/merci'),
-        'status'       => ($_POST['status'] ?? 'inactive') === 'active' ? 'active' : 'inactive',
-        'active'       => ($_POST['status'] ?? 'inactive') === 'active' ? 1 : 0,
-        'actif'        => ($_POST['status'] ?? 'inactive') === 'active' ? 1 : 0,
-    ];
-
-    // Slug auto si vide
-    if (!$d['slug'] && $d['titre']) {
-        $d['slug'] = strtolower(trim(preg_replace('/[^a-z0-9]+/', '-', iconv('UTF-8','ASCII//TRANSLIT', $d['titre'])), '-'));
-    }
-    $d['slug'] = preg_replace('/[^a-z0-9-]/', '', strtolower($d['slug']));
-
-    if (!$d['titre'] || !$d['slug']) {
-        $saveError = 'Le titre et le slug sont obligatoires.';
-    } else {
-        try {
-            if ($isNew) {
-                $stmt = $pdo->prepare("INSERT INTO captures
-                    (titre, slug, type, template, headline, sous_titre, description, cta_text, page_merci_url, status, active, actif, vues, conversions, taux_conversion)
-                    VALUES
-                    (:titre,:slug,:type,:template,:headline,:sous_titre,:description,:cta_text,:page_merci_url,:status,:active,:actif,0,0,0.00)");
-                $stmt->execute($d);
-                $newId = (int)$pdo->lastInsertId();
-                header('Location: ?page=captures&action=edit&id=' . $newId . '&msg=created');
-                exit;
-            } else {
-                $stmt = $pdo->prepare("UPDATE captures SET
-                    titre=:titre, slug=:slug, type=:type, template=:template,
-                    headline=:headline, sous_titre=:sous_titre, description=:description,
-                    cta_text=:cta_text, page_merci_url=:page_merci_url,
-                    status=:status, active=:active, actif=:actif
-                    WHERE id=:id");
-                $d[':id'] = $captureId;
-                $stmt->execute(array_merge($d, ['id' => $captureId]));
-                // Recharger
-                $capture = $pdo->prepare("SELECT * FROM captures WHERE id = ?")->execute([$captureId])
-                    ? $pdo->prepare("SELECT * FROM captures WHERE id = ?")->execute([$captureId]) && false ?: null : null;
-                $stmt2 = $pdo->prepare("SELECT * FROM captures WHERE id = ?");
-                $stmt2->execute([$captureId]);
-                $capture = $stmt2->fetch(PDO::FETCH_ASSOC) ?: $d;
-                $saveOk = true;
-            }
-        } catch (Exception $e) {
-            $saveError = $e->getMessage();
-        }
-    }
+// ── CSRF Token ──────────────────────────────────────────────────
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
+$csrfToken = $_SESSION['csrf_token'];
+
+// ── Message flash (redirect après création) ─────────────────────
+$saveOkMsg = $_GET['msg'] ?? '';
+if ($saveOkMsg === 'created') $saveOk = true;
 
 // Valeurs courantes (fusion POST pour re-affichage en cas d'erreur)
 $v = [
@@ -258,8 +209,8 @@ $capUrl = '/capture/' . ($v['slug'] ?: 'draft');
     </div>
 </div>
 
-<form id="capeditForm" method="POST">
-<input type="hidden" name="_edit_submit" value="1">
+<form id="capeditForm">
+<input type="hidden" name="id" value="<?= $captureId ?>">
 
 <div class="capedit-grid">
 
@@ -527,5 +478,71 @@ function capeditToggleStatus(checkbox) {
 // ── Flash auto-disparition ──
 document.querySelectorAll('.capedit-flash').forEach(el => {
     setTimeout(() => { el.style.transition='opacity .4s'; el.style.opacity='0'; setTimeout(()=>el.remove(),400); }, 5000);
+});
+
+// ── Toast notification ──
+function capeditShowToast(msg, type) {
+    const existing = document.getElementById('capeditToast');
+    if (existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.id = 'capeditToast';
+    toast.className = 'capedit-flash ' + (type === 'err' ? 'err' : 'ok');
+    toast.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;min-width:300px;max-width:500px;box-shadow:0 4px 20px rgba(0,0,0,.15);';
+    toast.innerHTML = '<i class="fas ' + (type === 'err' ? 'fa-exclamation-circle' : 'fa-check-circle') + '"></i> ' + msg;
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.style.transition='opacity .4s'; toast.style.opacity='0'; setTimeout(()=>toast.remove(),400); }, 4000);
+}
+
+// ── AJAX form submit ──
+const CSRF = <?= json_encode($csrfToken) ?>;
+
+document.getElementById('capeditForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = this;
+    const fd = new FormData(form);
+    fd.append('action', 'save');
+
+    // Handle status checkbox → value
+    const statusCb = form.querySelector('[name="status"]');
+    if (statusCb && statusCb.type === 'checkbox') {
+        fd.set('status', statusCb.checked ? 'active' : 'inactive');
+    }
+
+    const saveBtn = form.querySelector('.capedit-btn-save') || document.querySelector('.capedit-btn-save');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enregistrement…';
+    }
+
+    fetch('/admin/modules/content/capture/api.php', {
+        method: 'POST',
+        headers: { 'X-CSRF-Token': CSRF },
+        body: fd
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.success) {
+            capeditShowToast(d.message || 'Sauvegardé !');
+            if (d.id && !fd.get('id').trim() || fd.get('id') === '0') {
+                // Redirect vers mode edit avec le nouvel id
+                window.location.href = '?page=captures&action=edit&id=' + d.id + '&msg=created';
+            }
+        } else {
+            let errMsg = d.message || d.error || 'Erreur inconnue';
+            if (d.errors) {
+                errMsg += ' — ' + Object.values(d.errors).join(', ');
+            }
+            capeditShowToast(errMsg, 'err');
+        }
+    })
+    .catch(err => {
+        capeditShowToast('Erreur de connexion au serveur.', 'err');
+    })
+    .finally(() => {
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fas fa-save"></i> Enregistrer';
+        }
+    });
 });
 </script>

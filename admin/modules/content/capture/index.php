@@ -756,7 +756,7 @@ if (!isset($_SESSION['csrf_token'])) {
 
 <script>
 const CAP = {
-    apiUrl: '/admin/modules/content/pages-capture/api.php',
+    apiUrl: '/admin/modules/content/capture/api.php',
     _modalCb: null,
 
     // ── filterBy (sub-filtres selects) ─────────────────────

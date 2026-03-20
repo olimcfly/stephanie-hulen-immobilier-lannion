@@ -260,7 +260,7 @@ document.getElementById('wizardForm').addEventListener('submit', async (e) => {
     btn.disabled = true;
     
     try {
-        const response = await fetch('/admin/api/content/pages.php', {
+        const response = await fetch('/admin/modules/content/pages/api.php', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(payload)

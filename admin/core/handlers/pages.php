@@ -4,6 +4,11 @@
  * Called via: /admin/api/router.php?module=pages&action=...
  * Table: pages
  *
+ * DÉLÉGATION : Ce handler délègue désormais vers le api.php local
+ * du module Pages (/admin/modules/content/pages/api.php) pour les
+ * actions communes. Les actions spécifiques au router global (create,
+ * update, bulk_visibility) restent ici pour rétrocompatibilité.
+ *
  * Supported actions:
  *   list           - Liste paginee + stats (GET)
  *   get            - Detail page par ID (GET)
@@ -21,6 +26,21 @@
  */
 
 $action = CURRENT_ACTION;
+
+// ─── Délégation vers api.php local pour les actions communes ───
+$localApi = dirname(__DIR__, 2) . '/modules/content/pages/api.php';
+$delegatedActions = [
+    'save', 'save_page', 'delete', 'get', 'list',
+    'toggle_status', 'duplicate', 'check_slug', 'ai_slug',
+    'ai_generate', 'create_with_ai', 'bulk_delete', 'reorder',
+    'autosave', 'bulk_status',
+];
+if (file_exists($localApi) && in_array($action, $delegatedActions)) {
+    // Passer l'action via $_GET pour que le api.php local la récupère
+    $_GET['action'] = $action;
+    require $localApi;
+    exit;
+}
 
 // Merge input sources: JSON body, $_POST, $_GET
 $input = $_POST;
