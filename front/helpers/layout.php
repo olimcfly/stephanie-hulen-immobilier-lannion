@@ -65,7 +65,7 @@ if (!function_exists('renderHeader')) {
         }
 
         // ── 2. Génération automatique ──
-        $name     = htmlspecialchars($h['company_name'] ?? $h['name'] ?? _ss('site_name', 'Eduardo De Sul'));
+        $name     = htmlspecialchars($h['company_name'] ?? $h['name'] ?? _ss('site_name', 'Stephanie Hulen'));
         $logo     = $h['logo_url'] ?? _ss('logo_url', '');
         $logoType = $h['logo_type'] ?? 'image';
         $logoText = $h['logo_text'] ?? $name;
@@ -161,10 +161,10 @@ if (!function_exists('renderFooter')) {
         }
 
         // ── 2. Génération automatique ──
-        $name          = htmlspecialchars($f['company_name'] ?? $f['name'] ?? _ss('site_name', 'Eduardo De Sul Immobilier'));
+        $name          = htmlspecialchars($f['company_name'] ?? $f['name'] ?? _ss('site_name', 'Stephanie Hulen Immobilier'));
         $phone         = htmlspecialchars($f['phone'] ?? $f['contact_phone'] ?? _ss('phone', ''));
         $email         = htmlspecialchars($f['email'] ?? $f['contact_email'] ?? _ss('email', ''));
-        $description   = htmlspecialchars($f['description'] ?? 'Votre conseiller immobilier à Bordeaux. Accompagnement personnalisé pour tous vos projets.');
+        $description   = htmlspecialchars($f['description'] ?? 'Votre conseillère immobilière à Lannion. Accompagnement personnalisé pour tous vos projets.');
         $bgColor       = $f['bg_color'] ?? '#0e3a5c';
         $copyright     = $f['copyright_text'] ?? '© ' . date('Y') . ' ' . strip_tags($name) . ' — Tous droits réservés';
         $paddingTop    = intval($f['padding_top']    ?? 60);
@@ -284,8 +284,8 @@ if (!function_exists('buildLayoutVars')) {
      */
     function buildLayoutVars(array $data): array {
         $vars = [
-            '{{site_name}}' => htmlspecialchars(_ss('site_name', defined('SITE_NAME') ? SITE_NAME : 'Eduardo De Sul Immobilier')),
-'{{site_url}}'  => htmlspecialchars(_ss('site_url',  defined('SITE_URL')  ? SITE_URL  : 'https://eduardo-desul-immobilier.fr')),
+            '{{site_name}}' => htmlspecialchars(_ss('site_name', defined('SITE_NAME') ? SITE_NAME : 'Stephanie Hulen Immobilier Lannion')),
+'{{site_url}}'  => htmlspecialchars(_ss('site_url',  defined('SITE_URL')  ? SITE_URL  : 'https://stephanie-hulen-immobilier-lannion.fr')),
 
             '{{logo}}'      => htmlspecialchars($data['logo_url'] ?? _ss('logo_url', '')),
             '{{logo_url}}'  => htmlspecialchars($data['logo_url'] ?? _ss('logo_url', '')),

@@ -63,7 +63,7 @@ if (!function_exists('siteUrl')) {
      * Retourne l'URL de base du site sans slash final
      */
     function siteUrl(): string {
-        return rtrim(_ss('site_url', 'https://eduardo-desul-immobilier.fr'), '/');
+        return rtrim(_ss('site_url', 'https://stephanie-hulen-immobilier-lannion.fr'), '/');
     }
 }
 
@@ -72,7 +72,7 @@ if (!function_exists('siteName')) {
      * Retourne le nom du site
      */
     function siteName(): string {
-        return _ss('site_name', 'Eduardo De Sul Immobilier');
+        return _ss('site_name', 'Stephanie Hulen Immobilier Lannion');
     }
 }
 
